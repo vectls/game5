@@ -5,41 +5,55 @@ import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
 
 export class Player extends GameObject {
-  private lastShotTime = 0;
-  private onShoot: (x: number, y: number) => void;
+    private lastShotTime = 0;
+    private onShoot: (x: number, y: number) => void;
 
-  constructor(texture: Texture, onShoot: (x: number, y: number) => void) {
-    super(texture);
-    this.onShoot = onShoot;
-    this.active = true;
-    this.sprite.visible = true;
-    
-    // 初期位置の設定
-    this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
-    this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
-  }
+    constructor(texture: Texture, onShoot: (x: number, y: number) => void) {
+        super(texture);
+        this.onShoot = onShoot;
+        this.active = true;
+        this.sprite.visible = true;
 
-  reset() {}
-
-  update(delta: number) {
-    // PlayerはhandleInputで操作
-  }
-
-  handleInput(input: InputManager, delta: number) {
-    // 移動
-    if (input.isDown("ArrowLeft") && this.sprite.x > 0) {
-      this.sprite.x -= CONFIG.PLAYER.SPEED * delta;
-    }
-    if (input.isDown("ArrowRight") && this.sprite.x < CONFIG.SCREEN.WIDTH) {
-      this.sprite.x += CONFIG.PLAYER.SPEED * delta;
+        // 初期位置の設定
+        this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
+        this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
 
-    // 発射
-    const now = performance.now();
-    if (input.isDown("Space") && now - this.lastShotTime > CONFIG.PLAYER.SHOT_INTERVAL_MS) {
-      // 発射位置オフセットを適用
-      this.onShoot(this.sprite.x, this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y);
-      this.lastShotTime = now;
+    reset() {}
+
+    update(delta: number) {
+        // PlayerはhandleInputで操作
     }
-  }
+
+    handleInput(input: InputManager, delta: number) {
+        const halfWidth = this.sprite.width / 2;
+
+        // 移動
+        if (input.isDown("ArrowLeft")) {
+            this.sprite.x -= CONFIG.PLAYER.SPEED * delta;
+        }
+        if (input.isDown("ArrowRight")) {
+            this.sprite.x += CONFIG.PLAYER.SPEED * delta;
+        }
+
+        // 画面境界でのクランプ（はみ出し防止）
+        this.sprite.x = Math.max(
+            halfWidth,
+            Math.min(CONFIG.SCREEN.WIDTH - halfWidth, this.sprite.x)
+        );
+
+        // 発射
+        const now = performance.now();
+        if (
+            input.isDown("Space") &&
+            now - this.lastShotTime > CONFIG.PLAYER.SHOT_INTERVAL_MS
+        ) {
+            // 発射位置オフセットを適用
+            this.onShoot(
+                this.sprite.x,
+                this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y
+            );
+            this.lastShotTime = now;
+        }
+    }
 }

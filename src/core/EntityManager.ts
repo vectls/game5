@@ -23,34 +23,47 @@ export class EntityManager {
     private activeBullets: Bullet[] = [];
     private activeEnemies: Enemy[] = [];
     private activeExplosions: Explosion[] = [];
-    
+
     private timeSinceLastSpawn = 0;
 
-    constructor(stage: Container, textures: Record<string, Texture>, onEnemyDestroyed: EnemyDestroyedCallback) {
+    constructor(
+        stage: Container,
+        textures: Record<string, Texture>,
+        onEnemyDestroyed: EnemyDestroyedCallback
+    ) {
         this.stage = stage;
         this.textures = textures;
         this.onEnemyDestroyed = onEnemyDestroyed;
 
         // 全てのプールを初期化
-        this.bulletPool = this.createPool(Bullet, CONFIG.ASSETS.TEXTURES.BULLET, CONFIG.BULLET.POOL_SIZE);
-        this.enemyPool = this.createPool(Enemy, CONFIG.ASSETS.TEXTURES.ENEMY, CONFIG.ENEMY.POOL_SIZE);
-        this.explosionPool = this.createPool(Explosion, CONFIG.ASSETS.TEXTURES.EXPLOSION, CONFIG.EXPLOSION.POOL_SIZE);
+        this.bulletPool = this.createPool(
+            Bullet,
+            CONFIG.ASSETS.TEXTURES.BULLET,
+            CONFIG.BULLET.POOL_SIZE
+        );
+        this.enemyPool = this.createPool(
+            Enemy,
+            CONFIG.ASSETS.TEXTURES.ENEMY,
+            CONFIG.ENEMY.POOL_SIZE
+        );
+        this.explosionPool = this.createPool(
+            Explosion,
+            CONFIG.ASSETS.TEXTURES.EXPLOSION,
+            CONFIG.EXPLOSION.POOL_SIZE
+        );
     }
-    
+
     // ジェネリックなプール生成ヘルパーメソッド
     private createPool<T extends GameObject>(
         Type: new (texture: Texture) => T,
-        textureKey: string, 
+        textureKey: string,
         size: number
     ): ObjectPool<T> {
-        return new ObjectPool<T>(
-            () => {
-                const obj = new Type(this.textures[textureKey]);
-                this.stage.addChild(obj.sprite);
-                return obj;
-            }, 
-            size
-        );
+        return new ObjectPool<T>(() => {
+            const obj = new Type(this.textures[textureKey]);
+            this.stage.addChild(obj.sprite);
+            return obj;
+        }, size);
     }
 
     // プレイヤーから弾生成の依頼を受ける
@@ -63,7 +76,7 @@ export class EntityManager {
         const enemy = this.enemyPool.get();
         this.activeEnemies.push(enemy);
     }
-    
+
     private spawnExplosion(x: number, y: number) {
         const explosion = this.explosionPool.get(x, y);
         this.activeExplosions.push(explosion);
@@ -81,14 +94,15 @@ export class EntityManager {
         }
 
         // オブジェクト更新
-        this.activeBullets.forEach(b => b.update(delta));
-        this.activeEnemies.forEach(e => e.update(delta));
-        this.activeExplosions.forEach(ex => ex.update(delta));
+        this.activeBullets.forEach((b) => b.update(delta));
+        this.activeEnemies.forEach((e) => e.update(delta));
+        this.activeExplosions.forEach((ex) => ex.update(delta));
 
         this.handleCollisions();
         this.cleanup();
     }
 
+    // src/core/EntityManager.ts の handleCollisions メソッド
     private handleCollisions() {
         for (const b of this.activeBullets) {
             if (!b.active) continue;
@@ -96,23 +110,21 @@ export class EntityManager {
             for (const e of this.activeEnemies) {
                 if (!e.active) continue;
 
-                // AABB衝突判定を直接実行
-                const bulletBounds = b.sprite.getBounds(); // 毎回呼び出すか、事前に必要なプロパティをGameObjectから取得
-                const enemyBounds = e.sprite.getBounds();
+                // 中心座標とヒットサイズを使用したAABB衝突判定
+                const dx = Math.abs(b.x - e.x);
+                const dy = Math.abs(b.y - e.y);
 
-                // 矩形衝突判定
-                const isCollision = (
-                    bulletBounds.x + bulletBounds.width > enemyBounds.x &&
-                    bulletBounds.x < enemyBounds.x + enemyBounds.width &&
-                    bulletBounds.y + bulletBounds.height > enemyBounds.y &&
-                    bulletBounds.y < enemyBounds.y + enemyBounds.height
-                );
+                const totalHalfWidth = b.hitWidth / 2 + e.hitWidth / 2;
+                const totalHalfHeight = b.hitHeight / 2 + e.hitHeight / 2;
+
+                const isCollision = dx < totalHalfWidth && dy < totalHalfHeight;
 
                 if (isCollision) {
                     b.active = false;
                     e.active = false;
-                    
-                    // ... (爆発とコールバックの処理)
+
+                    this.spawnExplosion(e.x, e.y); // 爆発生成
+                    this.onEnemyDestroyed(); // スコア処理をGameクラスへ通知
                 }
             }
         }
@@ -123,7 +135,7 @@ export class EntityManager {
         this.cleanupList(this.activeEnemies, this.enemyPool);
         this.cleanupList(this.activeExplosions, this.explosionPool);
     }
-    
+
     // リストのクリーンアップヘルパーメソッド
     private cleanupList<T extends GameObject>(list: T[], pool: ObjectPool<T>) {
         for (let i = list.length - 1; i >= 0; i--) {
