@@ -1,247 +1,187 @@
-import { Application, Sprite, Assets, Texture, Ticker } from "pixi.js";
+// src/main.ts
+import { Application, Assets, Texture, Ticker } from "pixi.js";
+import { CONFIG } from "./config";
+import { InputManager } from "./core/InputManager";
+import { ObjectPool } from "./core/ObjectPool";
+import { Player } from "./entities/Player";
+import { Bullet } from "./entities/Bullet";
+import { Enemy } from "./entities/Enemy";
+import { Explosion } from "./entities/Explosion";
+import { ScoreManager } from "./core/ScoreManager";
 
-// ==============================
-// 1. 設定・定数 (Config)
-// ==============================
-const CONFIG = {
-  SCREEN: { WIDTH: 800, HEIGHT: 600, BG_COLOR: 0x000000 },
-  ASSETS: {
-    SHEET: "sprites/sheet.json",
-    TEXTURES: {
-      PLAYER: "playerShip1_blue.png",
-      BULLET: "laserBlue07.png",
-      ENEMY: "enemyBlack5.png",
-    },
-  },
-  PLAYER: { SPEED: 300, SHOT_INTERVAL_MS: 150 },
-  BULLET: { SPEED: 600 },
-  ENEMY: { SPEED: 120, SPAWN_INTERVAL_MS: 2000 },
-} as const;
-
-// ==============================
-// 2. 入力管理 (Input System)
-// ==============================
-class InputManager {
-  private keys: Record<string, boolean> = {};
-
-  constructor() {
-    window.addEventListener("keydown", (e) => (this.keys[e.code] = true));
-    window.addEventListener("keyup", (e) => (this.keys[e.code] = false));
-  }
-
-  public isDown(code: string): boolean {
-    return !!this.keys[code];
-  }
-}
-
-// ==============================
-// 3. エンティティ (Entities)
-// ==============================
-
-// 共通の基底クラス（必要に応じて拡張可能）
-abstract class GameObject {
-  public sprite: Sprite;
-  public isDead: boolean = false;
-
-  constructor(texture: Texture) {
-    this.sprite = new Sprite(texture);
-    this.sprite.anchor.set(0.5);
-  }
-
-  abstract update(delta: number): void;
-
-  // 矩形衝突判定
-  public collidesWith(other: GameObject): boolean {
-    const a = this.sprite.getBounds();
-    const b = other.sprite.getBounds();
-    return (
-      a.x + a.width > b.x &&
-      a.x < b.x + b.width &&
-      a.y + a.height > b.y &&
-      a.y < b.y + b.height
-    );
-  }
-}
-
-class Bullet extends GameObject {
-  constructor(texture: Texture, x: number, y: number) {
-    super(texture);
-    this.sprite.x = x;
-    this.sprite.y = y;
-  }
-
-  update(delta: number): void {
-    this.sprite.y -= CONFIG.BULLET.SPEED * delta;
-    // 画面外に出たら死亡フラグ
-    if (this.sprite.y < -50) this.isDead = true;
-  }
-}
-
-class Enemy extends GameObject {
-  constructor(texture: Texture) {
-    super(texture);
-    this.sprite.x = Math.random() * CONFIG.SCREEN.WIDTH;
-    this.sprite.y = -50;
-  }
-
-  update(delta: number): void {
-    this.sprite.y += CONFIG.ENEMY.SPEED * delta;
-    // 画面外に出たら死亡フラグ
-    if (this.sprite.y > CONFIG.SCREEN.HEIGHT + 50) this.isDead = true;
-  }
-}
-
-class Player extends GameObject {
-  private lastShotTime = 0;
-  private textures: Record<string, Texture>;
-  private onShoot: (x: number, y: number) => void;
-
-  constructor(textures: Record<string, Texture>, onShoot: (x: number, y: number) => void) {
-    super(textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
-    this.textures = textures;
-    this.onShoot = onShoot;
-
-    this.sprite.x = CONFIG.SCREEN.WIDTH / 2;
-    this.sprite.y = 500;
-  }
-
-  update(delta: number): void {
-    // 継承元のupdateではなく、InputManagerを受け取る形に変更しても良いが
-    // ここでは簡易的にGameクラスから制御される想定
-  }
-
-  // 入力処理と移動ロジック
-  handleInput(input: InputManager, delta: number) {
-    // 移動
-    if (input.isDown("ArrowLeft") && this.sprite.x > 0) {
-      this.sprite.x -= CONFIG.PLAYER.SPEED * delta;
-    }
-    if (input.isDown("ArrowRight") && this.sprite.x < CONFIG.SCREEN.WIDTH) {
-      this.sprite.x += CONFIG.PLAYER.SPEED * delta;
-    }
-
-    // 発射
-    const now = performance.now();
-    if (input.isDown("Space") && now - this.lastShotTime > CONFIG.PLAYER.SHOT_INTERVAL_MS) {
-      this.onShoot(this.sprite.x, this.sprite.y - 20);
-      this.lastShotTime = now;
-    }
-  }
-}
-
-// ==============================
-// 4. ゲーム管理 (Game Manager)
-// ==============================
 class Game {
   private app: Application;
   private input: InputManager;
   private textures: Record<string, Texture> = {};
-  
+
   private player: Player | null = null;
-  private bullets: Bullet[] = [];
-  private enemies: Enemy[] = [];
   
+  private bulletPool: ObjectPool<Bullet> | null = null;
+  private enemyPool: ObjectPool<Enemy> | null = null;
+  private explosionPool: ObjectPool<Explosion> | null = null; // 🚀 Explosion Poolを追加
+
+  // 現在画面上に存在して更新が必要なリスト
+  private activeBullets: Bullet[] = [];
+  private activeEnemies: Enemy[] = [];
+  private activeExplosions: Explosion[] = [];
+
   private timeSinceLastSpawn = 0;
+
+  private scoreManager: ScoreManager; // 🚀 スコアマネージャーを追加
 
   constructor(app: Application) {
     this.app = app;
     this.input = new InputManager();
+    this.scoreManager = new ScoreManager();
   }
 
-  // 初期化とリソース読み込み
   async init() {
     const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
     this.textures = atlas.textures;
     this.createScene();
   }
 
-  // シーン構築
   private createScene() {
-    // プレイヤー生成
-    this.player = new Player(this.textures, (x, y) => this.spawnBullet(x, y));
+    // 1. プールの初期化
+    this.bulletPool = new ObjectPool<Bullet>(
+        () => {
+            const b = new Bullet(this.textures[CONFIG.ASSETS.TEXTURES.BULLET]);
+            this.app.stage.addChild(b.sprite);
+            return b;
+        }, 
+        CONFIG.BULLET.POOL_SIZE
+    );
+
+    this.enemyPool = new ObjectPool<Enemy>(
+        () => {
+            const e = new Enemy(this.textures[CONFIG.ASSETS.TEXTURES.ENEMY]);
+            this.app.stage.addChild(e.sprite);
+            return e;
+        }, 
+        CONFIG.ENEMY.POOL_SIZE
+    );
+
+    // 🚀 Explosion Poolの初期化
+    this.explosionPool = new ObjectPool<Explosion>(
+        () => {
+            const e = new Explosion(this.textures[CONFIG.ASSETS.TEXTURES.EXPLOSION]);
+            this.app.stage.addChild(e.sprite);
+            return e;
+        }, 
+        CONFIG.EXPLOSION.POOL_SIZE
+    );
+
+    // 2. プレイヤー生成
+    this.player = new Player(
+      this.textures[CONFIG.ASSETS.TEXTURES.PLAYER],
+      (x, y) => this.spawnBullet(x, y)
+    );
     this.app.stage.addChild(this.player.sprite);
 
-    // ゲームループ開始
+    // 3. ループ開始
     this.app.ticker.add((ticker) => this.update(ticker));
   }
 
-  // 弾の生成
   private spawnBullet(x: number, y: number) {
-    const bullet = new Bullet(this.textures[CONFIG.ASSETS.TEXTURES.BULLET], x, y);
-    this.bullets.push(bullet);
-    this.app.stage.addChild(bullet.sprite);
+    if (!this.bulletPool) return;
+    const bullet = this.bulletPool.get(x, y);
+    this.activeBullets.push(bullet);
   }
 
-  // 敵の生成
   private spawnEnemy() {
-    const enemy = new Enemy(this.textures[CONFIG.ASSETS.TEXTURES.ENEMY]);
-    this.enemies.push(enemy);
-    this.app.stage.addChild(enemy.sprite);
+    if (!this.enemyPool) return;
+    const enemy = this.enemyPool.get();
+    this.activeEnemies.push(enemy);
   }
 
-  // メインループ
+  private spawnExplosion(x: number, y: number) {
+    if (!this.explosionPool) return;
+    const explosion = this.explosionPool.get(x, y);
+    this.activeExplosions.push(explosion);
+  }
+
   private update(ticker: Ticker) {
     if (!this.player) return;
-
+    // deltaMSはPixiの仕様で、秒換算で利用するために1000で割る
     const delta = ticker.deltaMS / 1000;
 
-    // 1. プレイヤー制御
+    // 1. プレイヤー更新
     this.player.handleInput(this.input, delta);
 
-    // 2. 敵のスポーン管理
+    // 2. 敵スポーン
     this.timeSinceLastSpawn += ticker.elapsedMS;
     if (this.timeSinceLastSpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
       this.spawnEnemy();
       this.timeSinceLastSpawn = 0;
     }
 
-    // 3. オブジェクト更新（移動など）
-    this.bullets.forEach(b => b.update(delta));
-    this.enemies.forEach(e => e.update(delta));
+    // 3. オブジェクト更新
+    this.activeBullets.forEach(b => b.update(delta));
+    this.activeEnemies.forEach(e => e.update(delta));
+    this.activeExplosions.forEach(ex => ex.update(delta));
 
-    // 4. 当たり判定処理
+    // 4. 当たり判定
     this.handleCollisions();
 
-    // 5. 不要なオブジェクトの掃除
+    // 5. クリーンアップ
     this.cleanup();
   }
 
   private handleCollisions() {
-    for (const b of this.bullets) {
-      for (const e of this.enemies) {
-        if (!b.isDead && !e.isDead && b.collidesWith(e)) {
-          b.isDead = true;
-          e.isDead = true;
-          // ここで爆発エフェクトやスコア加算を追加可能
+    for (const b of this.activeBullets) {
+      if (!b.active) continue;
+
+      for (const e of this.activeEnemies) {
+        if (!e.active) continue;
+
+        if (b.collidesWith(e)) {
+          b.active = false;
+          e.active = false;
+
+          // 🚀 爆発を生成
+          this.spawnExplosion(e.sprite.x, e.sprite.y);
+
+          // 🚀 スコアを加算
+          this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
         }
       }
     }
   }
 
   private cleanup() {
-    // 弾の削除
-    this.bullets = this.bullets.filter(b => {
-      if (b.isDead) {
-        this.app.stage.removeChild(b.sprite);
-        return false;
-      }
-      return true;
-    });
+    if (this.bulletPool) {
+        for (let i = this.activeBullets.length - 1; i >= 0; i--) {
+            const b = this.activeBullets[i];
+            if (!b.active) {
+                this.bulletPool.release(b);
+                this.activeBullets.splice(i, 1);
+            }
+        }
+    }
 
-    // 敵の削除
-    this.enemies = this.enemies.filter(e => {
-      if (e.isDead) {
-        this.app.stage.removeChild(e.sprite);
-        return false;
-      }
-      return true;
-    });
+    if (this.enemyPool) {
+        for (let i = this.activeEnemies.length - 1; i >= 0; i--) {
+            const e = this.activeEnemies[i];
+            if (!e.active) {
+                this.enemyPool.release(e);
+                this.activeEnemies.splice(i, 1);
+            }
+        }
+    }
+
+    // 🚀 Explosion Poolのクリーンアップ
+    if (this.explosionPool) {
+        for (let i = this.activeExplosions.length - 1; i >= 0; i--) {
+            const ex = this.activeExplosions[i];
+            if (!ex.active) {
+                this.explosionPool.release(ex);
+                this.activeExplosions.splice(i, 1);
+            }
+        }
+    }
   }
 }
 
-// ==============================
-// 5. エントリーポイント
-// ==============================
 async function main() {
   const app = new Application();
   await app.init({
