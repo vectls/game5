@@ -6,6 +6,13 @@ export abstract class GameObject implements Poolable {
   public sprite: Sprite;
   public active: boolean = false;
 
+  // 衝突判定のために位置とサイズを公開
+  public get x() { return this.sprite.x; }
+  public get y() { return this.sprite.y; }
+  // 例: 衝突判定用の幅と高さ
+  public get hitWidth() { return this.sprite.width; }
+  public get hitHeight() { return this.sprite.height; }
+
   constructor(texture: Texture) {
     this.sprite = new Sprite(texture);
     this.sprite.anchor.set(0.5);
@@ -14,19 +21,4 @@ export abstract class GameObject implements Poolable {
 
   abstract update(delta: number): void;
   abstract reset(...args: any[]): void;
-
-  // 衝突判定
-  public collidesWith(other: GameObject): boolean {
-    if (!this.active || !other.active) return false;
-    
-    const a = this.sprite.getBounds();
-    const b = other.sprite.getBounds();
-    
-    return (
-      a.x + a.width > b.x &&
-      a.x < b.x + b.width &&
-      a.y + a.height > b.y &&
-      a.y < b.y + b.height
-    );
-  }
 }

@@ -1,18 +1,25 @@
 // src/core/ScoreManager.ts
-export class ScoreManager {
-  private score: number = 0;
 
-  public getScore(): number {
-    return this.score;
-  }
+// 💡 PixiJSのEventEmitterをインポートする
+import { EventEmitter } from "pixi.js";
 
-  public addScore(points: number): void {
-    this.score += points;
-    this.notifyScoreUpdate();
-  }
+export class ScoreManager extends EventEmitter{
+    private score: number = 0;
 
-  private notifyScoreUpdate() {
-    // TODO: ここにPixi.jsのTextオブジェクトを更新するロジックを追加
-    console.log(`Score: ${this.score}`); 
-  }
+    public static readonly SCORE_CHANGED_EVENT = "scoreChanged"; // イベント名
+
+    public getScore(): number {
+        return this.score;
+    }
+
+    public addScore(points: number): void {
+        this.score += points;
+        this.notifyScoreUpdate();
+    }
+
+    private notifyScoreUpdate() {
+        console.log(`Score: ${this.score}`);
+        // イベントを発火してリスナーに通知
+        this.emit(ScoreManager.SCORE_CHANGED_EVENT, this.score);
+    }
 }

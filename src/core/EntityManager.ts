@@ -96,15 +96,23 @@ export class EntityManager {
             for (const e of this.activeEnemies) {
                 if (!e.active) continue;
 
-                if (b.collidesWith(e)) {
+                // AABB衝突判定を直接実行
+                const bulletBounds = b.sprite.getBounds(); // 毎回呼び出すか、事前に必要なプロパティをGameObjectから取得
+                const enemyBounds = e.sprite.getBounds();
+
+                // 矩形衝突判定
+                const isCollision = (
+                    bulletBounds.x + bulletBounds.width > enemyBounds.x &&
+                    bulletBounds.x < enemyBounds.x + enemyBounds.width &&
+                    bulletBounds.y + bulletBounds.height > enemyBounds.y &&
+                    bulletBounds.y < enemyBounds.y + enemyBounds.height
+                );
+
+                if (isCollision) {
                     b.active = false;
                     e.active = false;
                     
-                    // 爆発の生成（エンティティ管理の責務）
-                    this.spawnExplosion(e.sprite.x, e.sprite.y); 
-                    
-                    // 破壊時に外部（Gameクラス）に通知（スコア処理の責務）
-                    this.onEnemyDestroyed(); 
+                    // ... (爆発とコールバックの処理)
                 }
             }
         }
