@@ -1,5 +1,5 @@
 // src/entities/GameObject.ts
-import { Sprite, Texture, Rectangle } from "pixi.js";
+import { Sprite, Texture } from "pixi.js";
 import type { Poolable } from "../core/ObjectPool";
 
 export abstract class GameObject implements Poolable {

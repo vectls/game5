@@ -1,5 +1,4 @@
 // src/core/ScoreManager.ts
-
 export class ScoreManager {
   private score: number = 0;
 
@@ -9,12 +8,11 @@ export class ScoreManager {
 
   public addScore(points: number): void {
     this.score += points;
-    this.notifyScoreUpdate(); // スコア表示の更新を通知する関数（後で実装）
+    this.notifyScoreUpdate();
   }
 
   private notifyScoreUpdate() {
-    // TODO: ここにPixi.jsのTextオブジェクトを更新するロジックや
-    // イベントを発火させるロジックを追加します。
+    // TODO: ここにPixi.jsのTextオブジェクトを更新するロジックを追加
     console.log(`Score: ${this.score}`); 
   }
 }
