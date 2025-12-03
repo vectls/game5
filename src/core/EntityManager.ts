@@ -8,13 +8,12 @@ import { Explosion } from "../entities/Explosion";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 
-// 敵破壊時にGameクラスへ通知するためのコールバック型
-type EnemyDestroyedCallback = () => void;
-
-export class EntityManager {
+export class EntityManager extends EventEmitter{
     private stage: Container;
     private textures: Record<string, Texture>;
-    private onEnemyDestroyed: EnemyDestroyedCallback;
+
+    // イベント名定数
+    public static readonly ENEMY_DESTROYED_EVENT = "enemyDestroyed";
 
     // プールとアクティブリストは内部で保持
     private bulletPool: ObjectPool<Bullet>;
@@ -29,12 +28,12 @@ export class EntityManager {
 
     constructor(
         stage: Container,
-        textures: Record<string, Texture>,
-        onEnemyDestroyed: EnemyDestroyedCallback
+        textures: Record<string, Texture>
     ) {
+        super();
+
         this.stage = stage;
         this.textures = textures;
-        this.onEnemyDestroyed = onEnemyDestroyed;
 
         // 全てのプールを初期化
         this.bulletPool = this.createPool(
@@ -116,7 +115,10 @@ export class EntityManager {
                     e.active = false;
 
                     this.spawnExplosion(e.x, e.y); // 爆発生成
-                    this.onEnemyDestroyed(); // スコア処理をGameクラスへ通知
+                    this.emit(
+                        EntityManager.ENEMY_DESTROYED_EVENT,
+                        CONFIG.ENEMY.SCORE_VALUE // スコア値をイベントのペイロードとして渡す
+                    );
                 }
             }
         }
