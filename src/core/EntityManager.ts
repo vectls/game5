@@ -83,11 +83,10 @@ export class EntityManager {
     }
 
     // 毎フレームの全エンティティ処理を一括で行う
-    public update(ticker: Ticker) {
-        const delta = ticker.deltaMS / 1000;
+    public update(delta: number, elapsedMS: number) {
 
         // 敵スポーンロジック
-        this.timeSinceLastSpawn += ticker.elapsedMS;
+        this.timeSinceLastSpawn += elapsedMS;
         if (this.timeSinceLastSpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
             this.spawnEnemy();
             this.timeSinceLastSpawn = 0;
