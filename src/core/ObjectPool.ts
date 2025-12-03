@@ -1,11 +1,16 @@
 // src/core/ObjectPool.ts
-import { Container } from "pixi.js";
+import { Container } from "pixi.js"; 
+
+// Tのresetメソッドの引数を抽出するためのヘルパー型
+// NOTE: `reset` の引数型を推論し、それをタプルとして返す
+type ResetArgs<T extends Poolable> = T extends { reset(...args: infer A): void } ? A : never;
 
 // プールで管理するオブジェクトが満たすべき条件
 export interface Poolable {
   active: boolean;
   sprite: Container;
-  reset(...args: any[]): void;
+  // resetメソッドは、具象クラスに応じて様々な引数を取れるように定義を保持
+  reset(...args: any[]): void; 
 }
 
 export class ObjectPool<T extends Poolable> {
@@ -28,7 +33,8 @@ export class ObjectPool<T extends Poolable> {
   }
 
   // プールからオブジェクトを取得（なければ生成）
-  public get(...args: any[]): T {
+  // ★ 変更点: getメソッドの引数を ResetArgs<T> で型安全にする
+  public get(...args: ResetArgs<T>): T {
     let obj = this.pool.find((p) => !p.active);
     if (!obj) {
       obj = this.createObject();
@@ -37,7 +43,9 @@ export class ObjectPool<T extends Poolable> {
     
     obj.active = true;
     obj.sprite.visible = true;
-    obj.reset(...args);
+    
+    // resetの呼び出しも型安全になる
+    (obj.reset as (...args: ResetArgs<T>) => void)(...args);
     return obj;
   }
 

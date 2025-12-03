@@ -1,11 +1,12 @@
 // src/core/EntityManager.ts
-import { Container, Texture, Ticker } from "pixi.js";
+import { Container, Texture, EventEmitter } from "pixi.js";
 import { CONFIG } from "../config";
 import { ObjectPool } from "./ObjectPool";
 import { Bullet } from "../entities/Bullet";
 import { Enemy } from "../entities/Enemy";
 import { Explosion } from "../entities/Explosion";
 import { GameObject } from "../entities/GameObject";
+import { checkAABBCollision } from "../utils/CollisionUtils";
 
 // 敵破壊時にGameクラスへ通知するためのコールバック型
 type EnemyDestroyedCallback = () => void;
@@ -109,16 +110,8 @@ export class EntityManager {
             for (const e of this.activeEnemies) {
                 if (!e.active) continue;
 
-                // 中心座標とヒットサイズを使用したAABB衝突判定
-                const dx = Math.abs(b.x - e.x);
-                const dy = Math.abs(b.y - e.y);
-
-                const totalHalfWidth = b.hitWidth / 2 + e.hitWidth / 2;
-                const totalHalfHeight = b.hitHeight / 2 + e.hitHeight / 2;
-
-                const isCollision = dx < totalHalfWidth && dy < totalHalfHeight;
-
-                if (isCollision) {
+                // 🚀 ユーティリティ関数を使用して衝突判定ロジックを外部化
+                if (checkAABBCollision(b, e)) {
                     b.active = false;
                     e.active = false;
 

@@ -29,10 +29,10 @@ export class Player extends GameObject {
         const halfWidth = this.sprite.width / 2;
 
         // 移動
-        if (input.isDown("ArrowLeft")) {
+        if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
             this.sprite.x -= CONFIG.PLAYER.SPEED * delta;
         }
-        if (input.isDown("ArrowRight")) {
+        if (input.isDown(CONFIG.INPUT.MOVE_RIGHT)) {
             this.sprite.x += CONFIG.PLAYER.SPEED * delta;
         }
 
@@ -45,7 +45,7 @@ export class Player extends GameObject {
         // 発射
         const now = performance.now();
         if (
-            input.isDown("Space") &&
+            input.isDown(CONFIG.INPUT.SHOOT) &&
             now - this.lastShotTime > CONFIG.PLAYER.SHOT_INTERVAL_MS
         ) {
             // 発射位置オフセットを適用

@@ -36,4 +36,9 @@ export const CONFIG = {
     LIFETIME_MS: 300, // 爆発の表示時間（ミリ秒）
     POOL_SIZE: 15,
   },
+  INPUT: {
+    MOVE_LEFT: "ArrowLeft",
+    MOVE_RIGHT: "ArrowRight",
+    SHOOT: "Space",
+  },
 } as const;
