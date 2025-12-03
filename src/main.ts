@@ -65,7 +65,7 @@ class Game {
         this.player.handleInput(this.input, delta);
 
         // 2. エンティティ全体の更新をEntityManagerに委譲 (deltaを渡す)
-        this.entityManager.update(delta, ticker.elapsedMS);
+        this.entityManager.update(delta);
     }
 }
 

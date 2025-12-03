@@ -2,11 +2,15 @@
 import { Container, Texture, EventEmitter } from "pixi.js";
 import { CONFIG } from "../config";
 import { ObjectPool } from "./ObjectPool";
+import type { Poolable } from "./ObjectPool";
 import { Bullet } from "../entities/Bullet";
 import { Enemy } from "../entities/Enemy";
 import { Explosion } from "../entities/Explosion";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
+
+// 管理対象オブジェクトの統一的な型を定義 (GameObjectかつPoolable)
+type ManagedObject = GameObject & Poolable;
 
 export class EntityManager extends EventEmitter{
     private stage: Container;
@@ -15,14 +19,9 @@ export class EntityManager extends EventEmitter{
     // イベント名定数
     public static readonly ENEMY_DESTROYED_EVENT = "enemyDestroyed";
 
-    // プールとアクティブリストは内部で保持
-    private bulletPool: ObjectPool<Bullet>;
-    private enemyPool: ObjectPool<Enemy>;
-    private explosionPool: ObjectPool<Explosion>;
-
-    private activeBullets: Bullet[] = [];
-    private activeEnemies: Enemy[] = [];
-    private activeExplosions: Explosion[] = [];
+    // 個別のプールとリストを廃止し、Mapに統合
+    private _pools = new Map<string, ObjectPool<any>>();
+    private _activeObjects = new Map<string, ManagedObject[]>();
 
     private timeSinceLastSpawn = 0;
 
@@ -35,89 +34,112 @@ export class EntityManager extends EventEmitter{
         this.stage = stage;
         this.textures = textures;
 
-        // 全てのプールを初期化
-        this.bulletPool = this.createPool(
+        // エンティティ初期化を統一されたメソッドで行う
+        this.initEntity(
+            "bullet", // キー
             Bullet,
             CONFIG.ASSETS.TEXTURES.BULLET,
             CONFIG.BULLET.POOL_SIZE
         );
-        this.enemyPool = this.createPool(
+        this.initEntity(
+            "enemy",
             Enemy,
             CONFIG.ASSETS.TEXTURES.ENEMY,
             CONFIG.ENEMY.POOL_SIZE
         );
-        this.explosionPool = this.createPool(
+        this.initEntity(
+            "explosion",
             Explosion,
             CONFIG.ASSETS.TEXTURES.EXPLOSION,
             CONFIG.EXPLOSION.POOL_SIZE
         );
     }
 
-    // ジェネリックなプール生成ヘルパーメソッド
-    private createPool<T extends GameObject>(
+   // 🚀 P4: ジェネリックなエンティティ初期化メソッド
+    private initEntity<T extends ManagedObject>(
+        key: string,
         Type: new (texture: Texture) => T,
         textureKey: string,
         size: number
-    ): ObjectPool<T> {
-        return new ObjectPool<T>(() => {
+    ) {
+        const pool = new ObjectPool<T>(() => {
             const obj = new Type(this.textures[textureKey]);
             this.stage.addChild(obj.sprite);
             return obj;
         }, size);
+
+        // 型安全を維持しつつMapに格納
+        this._pools.set(key, pool as ObjectPool<any>); 
+        this._activeObjects.set(key, []);
+    }
+    
+    // 🚀 P4: ジェネリックなエンティティ取得メソッド
+    private getEntity<T extends ManagedObject>(key: string, ...args: any[]): T {
+        const pool = this._pools.get(key) as ObjectPool<T> | undefined;
+        const list = this._activeObjects.get(key) as T[] | undefined;
+
+        if (!pool || !list) {
+            throw new Error(`Entity type ${key} not registered.`);
+        }
+
+        // ObjectPool.getはResetArgs<T>の型安全な引数を期待
+        const obj = pool.get(...args as any); 
+        list.push(obj);
+        return obj;
     }
 
     // プレイヤーから弾生成の依頼を受ける
     public spawnBullet(x: number, y: number) {
-        const bullet = this.bulletPool.get(x, y);
-        this.activeBullets.push(bullet);
+        this.getEntity<Bullet>("bullet", x, y);
     }
 
     private spawnEnemy() {
-        const enemy = this.enemyPool.get();
-        this.activeEnemies.push(enemy);
+        this.getEntity<Enemy>("enemy");
     }
 
     private spawnExplosion(x: number, y: number) {
-        const explosion = this.explosionPool.get(x, y);
-        this.activeExplosions.push(explosion);
+        this.getEntity<Explosion>("explosion", x, y);
     }
 
-    // 毎フレームの全エンティティ処理を一括で行う
-    public update(delta: number, elapsedMS: number) {
+    // updateの引数からelapsedMSを削除し、delta(秒)のみを使用
+    public update(delta: number) {
+        const deltaMS = delta * 1000;
 
         // 敵スポーンロジック
-        this.timeSinceLastSpawn += elapsedMS;
+        this.timeSinceLastSpawn += deltaMS;
         if (this.timeSinceLastSpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
             this.spawnEnemy();
             this.timeSinceLastSpawn = 0;
         }
 
-        // オブジェクト更新
-        this.activeBullets.forEach((b) => b.update(delta));
-        this.activeEnemies.forEach((e) => e.update(delta));
-        this.activeExplosions.forEach((ex) => ex.update(delta));
+        // オブジェクト更新をMapの値でループ
+        for (const list of this._activeObjects.values()) {
+            list.forEach((obj) => obj.update(delta));
+        }
 
         this.handleCollisions();
         this.cleanup();
     }
 
-    // src/core/EntityManager.ts の handleCollisions メソッド
     private handleCollisions() {
-        for (const b of this.activeBullets) {
+        // 🚀 P4: Mapからリストを取得
+        const activeBullets = this._activeObjects.get("bullet") as Bullet[];
+        const activeEnemies = this._activeObjects.get("enemy") as Enemy[];
+
+        for (const b of activeBullets) {
             if (!b.active) continue;
 
-            for (const e of this.activeEnemies) {
+            for (const e of activeEnemies) {
                 if (!e.active) continue;
 
-                // 🚀 ユーティリティ関数を使用して衝突判定ロジックを外部化
-                if (checkAABBCollision(b, e)) {
+                if (checkAABBCollision(b, e)) { //
                     b.active = false;
                     e.active = false;
 
                     this.spawnExplosion(e.x, e.y); // 爆発生成
                     this.emit(
-                        EntityManager.ENEMY_DESTROYED_EVENT,
-                        CONFIG.ENEMY.SCORE_VALUE // スコア値をイベントのペイロードとして渡す
+                        EntityManager.ENEMY_DESTROYED_EVENT, //
+                        CONFIG.ENEMY.SCORE_VALUE //
                     );
                 }
             }
@@ -125,13 +147,15 @@ export class EntityManager extends EventEmitter{
     }
 
     private cleanup() {
-        this.cleanupList(this.activeBullets, this.bulletPool);
-        this.cleanupList(this.activeEnemies, this.enemyPool);
-        this.cleanupList(this.activeExplosions, this.explosionPool);
+        // 🚀 P4: Mapのエントリをループして一括クリーンアップ
+        for (const [key, list] of this._activeObjects.entries()) {
+            const pool = this._pools.get(key) as ObjectPool<ManagedObject>;
+            this.cleanupList(list, pool);
+        }
     }
 
-    // リストのクリーンアップヘルパーメソッド
-    private cleanupList<T extends GameObject>(list: T[], pool: ObjectPool<T>) {
+// 🚀 P4: リストのクリーンアップヘルパーメソッドをManagedObjectで統一
+    private cleanupList(list: ManagedObject[], pool: ObjectPool<ManagedObject>) {
         for (let i = list.length - 1; i >= 0; i--) {
             const obj = list[i];
             if (!obj.active) {
