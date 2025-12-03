@@ -2,23 +2,69 @@
 import { Sprite, Texture } from "pixi.js";
 import type { Poolable } from "../core/ObjectPool";
 
-export abstract class GameObject implements Poolable {
-  public sprite: Sprite;
-  public active: boolean = false;
+// 衝突判定に必要なプロパティをインターフェースとして定義
+export interface Collider {
+    x: number;
+    y: number;
+    hitWidth: number;
+    hitHeight: number;
 
-  // 衝突判定のために位置とサイズを公開
-  public get x() { return this.sprite.x; }
-  public get y() { return this.sprite.y; }
-  // 例: 衝突判定用の幅と高さ
-  public get hitWidth() { return this.sprite.width; }
-  public get hitHeight() { return this.sprite.height; }
+    // 衝突判定に便利な境界線座標 (ゲッターとして実装)
+    get top(): number;
+    get bottom(): number;
+    get left(): number;
+    get right(): number;
+}
 
-  constructor(texture: Texture) {
-    this.sprite = new Sprite(texture);
-    this.sprite.anchor.set(0.5);
-    this.sprite.visible = false;
-  }
+export abstract class GameObject implements Poolable, Collider {
+    public sprite: Sprite;
+    public active: boolean = false;
 
-  abstract update(delta: number): void;
-  abstract reset(...args: any[]): void;
+    // 衝突判定用のプロパティをインスタンス変数として定義
+    protected _hitWidth: number;
+    protected _hitHeight: number;
+
+    // 衝突判定のために位置とサイズを公開
+    public get x() {
+        return this.sprite.x;
+    }
+    public get y() {
+        return this.sprite.y;
+    }
+
+    // 描画サイズ（sprite.width）ではなく、定義したヒットボックスサイズを返す
+    public get hitWidth() {
+        return this._hitWidth;
+    }
+    public get hitHeight() {
+        return this._hitHeight;
+    }
+
+    // 衝突判定に特化した境界線座標ゲッターを導入
+    public get top(): number {
+        return this.y - this.hitHeight / 2;
+    }
+    public get bottom(): number {
+        return this.y + this.hitHeight / 2;
+    }
+    public get left(): number {
+        return this.x - this.hitWidth / 2;
+    }
+    public get right(): number {
+        return this.x + this.hitWidth / 2;
+    }
+
+    constructor(texture: Texture) {
+        this.sprite = new Sprite(texture);
+        this.sprite.anchor.set(0.5);
+        this.sprite.visible = false;
+
+        // コンストラクタでヒットボックスの初期値を設定
+        // デフォルトはテクスチャサイズ（描画サイズから独立）とする
+        this._hitWidth = texture.width;
+        this._hitHeight = texture.height;
+    }
+
+    abstract update(delta: number): void;
+    abstract reset(...args: any[]): void;
 }

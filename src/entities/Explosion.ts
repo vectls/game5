@@ -9,6 +9,10 @@ export class Explosion extends GameObject {
   constructor(texture: Texture) {
     super(texture);
     this.sprite.scale.set(0.5); // 適切なサイズに調整
+
+    // Explosionのヒットボックスをスケールに合わせて調整
+    this._hitWidth = texture.width * 0.5;
+    this._hitHeight = texture.height * 0.5;
   }
 
   reset(x: number, y: number) {
