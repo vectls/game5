@@ -4,7 +4,7 @@ import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
 
 export class Explosion extends GameObject {
-  private lifeTime = 0; // 残り表示時間 (ms)
+  private _lifeTimeMs = 0; // 残り表示時間 (ms)
 
   constructor(texture: Texture) {
     super(texture);
@@ -18,7 +18,7 @@ export class Explosion extends GameObject {
   reset(x: number, y: number) {
     this.sprite.x = x;
     this.sprite.y = y;
-    this.lifeTime = CONFIG.EXPLOSION.LIFETIME_MS;
+    this._lifeTimeMs = CONFIG.EXPLOSION.LIFETIME_MS;
   }
 
   update(delta: number) {
@@ -26,10 +26,10 @@ export class Explosion extends GameObject {
     
     // deltaは秒なので、ミリ秒(ticker.deltaMS)で計算するために秒をミリ秒に戻す
     const deltaMS = delta * 1000;
-    this.lifeTime -= deltaMS;
+    this._lifeTimeMs -= deltaMS;
     
     // ライフタイムがゼロになったら非アクティブ化
-    if (this.lifeTime <= 0) {
+    if (this._lifeTimeMs <= 0) {
       this.active = false;
     }
   }

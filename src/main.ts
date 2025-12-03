@@ -45,6 +45,9 @@ class Game {
         );
         this.app.stage.addChild(this.player.sprite);
 
+        // Playerの初期設定を行うためにreset()を呼び出す
+        this.player.reset();
+
         // 3. ループ開始
         this.app.ticker.add((ticker) => this.update(ticker));
     }

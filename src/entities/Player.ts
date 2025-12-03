@@ -12,21 +12,24 @@ export class Player extends GameObject {
         super(texture);
         this.onShoot = onShoot;
         this.active = true;
-        this.sprite.visible = true;
+    }
 
+    public reset() {
+        this.active = true;
+        this.sprite.visible = true;
+        this.lastShotTime = 0;
+        
         // 初期位置の設定
         this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
         this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
-
-    reset() {}
 
     update(delta: number) {
         // PlayerはhandleInputで操作
     }
 
     handleInput(input: InputManager, delta: number) {
-        const halfWidth = this.sprite.width / 2;
+        const halfWidth = this.hitWidth / 2;
 
         // 移動
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
