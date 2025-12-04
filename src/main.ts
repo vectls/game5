@@ -31,11 +31,20 @@ class Game {
         // 1. EntityManagerの初期化
         this.entityManager = new EntityManager(this.app.stage, this.textures);
 
-        // イベントリスナーを登録
+        // EntityManagerのイベントリスナーを登録
         this.entityManager.on(
-            EntityManager.ENEMY_DESTROYED_EVENT, // イベント名を使用
-            this.handleEnemyDestroyed, // イベント発生時に呼び出すメソッド
-            this // thisをGameクラスにバインド
+            EntityManager.ENEMY_DESTROYED_EVENT,
+            this.handleEnemyDestroyed,
+            this
+        );
+        
+        // 🚀 【追加】ScoreManagerのイベントリスナーを登録 (ログ出力の責務を分離)
+        this.scoreManager.on(
+            ScoreManager.SCORE_CHANGED_EVENT,
+            (newScore: number) => { 
+                console.log(`Current Score: ${newScore}`); // ここでログ出力
+            },
+            this
         );
 
         // 2. プレイヤー生成
@@ -54,13 +63,10 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    // 🚀 【新規追加】Playerの"shoot"イベントを処理するハンドラ
     private handlePlayerShoot(x: number, y: number) {
-         // EntityManagerに弾生成を依頼する
          this.entityManager?.spawnBullet(x, y);
     }
 
-    // 🚀 敵破壊時の処理 (Gameクラスの責務: スコア/ライフ処理)
     private handleEnemyDestroyed() {
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
@@ -74,6 +80,12 @@ class Game {
 
         // 2. エンティティ全体の更新をEntityManagerに委譲 (deltaを渡す)
         this.entityManager.update(delta);
+    }
+    
+    // 🚀 【追加】リソースクリーンアップメソッド
+    public destroy() {
+        this.input.destroy(); 
+        // 他のマネージャやPIXIリソースのクリーンアップを追加できます
     }
 }
 
