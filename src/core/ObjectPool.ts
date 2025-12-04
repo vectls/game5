@@ -14,37 +14,39 @@ export interface Poolable {
 }
 
 export class ObjectPool<T extends Poolable> {
-  private pool: T[] = [];
+  // 利用可能なオブジェクトのスタック（高速化のため）
+  private freeObjects: T[] = [];
+  // 全オブジェクトの参照（クリーンアップや破棄用）
+  private allObjects: T[] = [];
   private factory: () => T;
 
   constructor(factory: () => T, initialSize: number = 10) {
     this.factory = factory;
-    for (let i = 0; i < initialSize; i++) {
-      const obj = this.createObject();
-      this.pool.push(obj);
+    this.expand(initialSize);
+  }
+
+  private expand(count: number) {
+    for (let i = 0; i < count; i++) {
+      const obj = this.factory();
+      obj.active = false;
+      obj.sprite.visible = false;
+      this.freeObjects.push(obj);
+      this.allObjects.push(obj);
     }
   }
 
-  private createObject(): T {
-    const obj = this.factory();
-    obj.active = false;
-    obj.sprite.visible = false;
-    return obj;
-  }
-
   // プールからオブジェクトを取得（なければ生成）
-  // ★ 変更点: getメソッドの引数を ResetArgs<T> で型安全にする
   public get(...args: ResetArgs<T>): T {
-    let obj = this.pool.find((p) => !p.active);
+    let obj = this.freeObjects.pop();
+
     if (!obj) {
-      obj = this.createObject();
-      this.pool.push(obj);
+      this.expand(5); // 足りなければ5個ずつ拡張
+      obj = this.freeObjects.pop()!;
     }
     
     obj.active = true;
     obj.sprite.visible = true;
     
-    // resetの呼び出しも型安全になる
     (obj.reset as (...args: ResetArgs<T>) => void)(...args);
     return obj;
   }
@@ -53,5 +55,6 @@ export class ObjectPool<T extends Poolable> {
   public release(obj: T) {
     obj.active = false;
     obj.sprite.visible = false;
+    this.freeObjects.push(obj);
   }
 }
