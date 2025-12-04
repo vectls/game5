@@ -41,15 +41,23 @@ class Game {
         // 2. プレイヤー生成
         this.player = new Player(
             this.textures[CONFIG.ASSETS.TEXTURES.PLAYER],
-            (x, y) => this.entityManager?.spawnBullet(x, y) // 🚀 EntityManagerを経由して弾を生成
         );
         this.app.stage.addChild(this.player.sprite);
+
+        // Playerの発射イベントを購読する
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this);
 
         // Playerの初期設定を行うためにreset()を呼び出す
         this.player.reset();
 
         // 3. ループ開始
         this.app.ticker.add((ticker) => this.update(ticker));
+    }
+
+    // 🚀 【新規追加】Playerの"shoot"イベントを処理するハンドラ
+    private handlePlayerShoot(x: number, y: number) {
+         // EntityManagerに弾生成を依頼する
+         this.entityManager?.spawnBullet(x, y);
     }
 
     // 🚀 敵破壊時の処理 (Gameクラスの責務: スコア/ライフ処理)
