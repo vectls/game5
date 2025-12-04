@@ -31,6 +31,7 @@ export const CONFIG = {
     SPAWN_INTERVAL_MS: 2000,
     POOL_SIZE: 10, // 同時に出せる敵の上限数
     SCORE_VALUE: 100,
+    INITIAL_Y: 50,
   },
   EXPLOSION: { // 🚀 新規追加
     LIFETIME_MS: 300, // 爆発の表示時間（ミリ秒）

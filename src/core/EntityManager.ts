@@ -12,18 +12,22 @@ import { checkAABBCollision } from "../utils/CollisionUtils";
 // 管理対象オブジェクトの統一的な型を定義 (GameObjectかつPoolable)
 type ManagedObject = GameObject & Poolable;
 
-// 🚀 【新規追加】定数としてエンティティキーを一元管理 (as constが重要)
+// 🚀 【変更なし】定数としてエンティティキーを一元管理 (as constが重要)
 export const ENTITY_KEYS = {
     BULLET: "bullet",
     ENEMY: "enemy",
     EXPLOSION: "explosion",
-} as const; // これにより、値が文字列リテラル型として固定される
+} as const; 
 
-// 🚀 【変更点】EntityTypeを定数オブジェクトから導出
-// typeof ENTITY_KEYS: オブジェクトの型 { BULLET: "bullet", ENEMY: "enemy", ... }
-// [keyof typeof ENTITY_KEYS]: オブジェクトのキー("BULLET" | "ENEMY" | ...)
-// の値を取り出すため、型は "bullet" | "enemy" | "explosion" のユニオン型になる
+// 🚀 【変更なし】EntityTypeを定数オブジェクトから導出
 export type EntityType = typeof ENTITY_KEYS[keyof typeof ENTITY_KEYS];
+
+// 🚀 【重要: 追加済み】EntityMapの定義: Record型と連携し、型安全性を高める
+interface EntityMap {
+    [ENTITY_KEYS.BULLET]: Bullet;
+    [ENTITY_KEYS.ENEMY]: Enemy;
+    [ENTITY_KEYS.EXPLOSION]: Explosion;
+}
 
 type EntityConstructor<T extends ManagedObject> = new (texture: Texture) => T;
 export class EntityManager extends EventEmitter {
@@ -33,9 +37,9 @@ export class EntityManager extends EventEmitter {
     // イベント名定数
     public static readonly ENEMY_DESTROYED_EVENT = "enemyDestroyed";
 
-    // 個別のプールとリストを廃止し、Mapに統合
-    private _pools = new Map<EntityType, ObjectPool<any>>();
-    private _activeObjects = new Map<EntityType, ManagedObject[]>();
+    // 🚀 【ts(2564)エラー解消】Record型で定義し、初期化子 = {} を設定
+    private _pools: Record<EntityType, ObjectPool<any>> = {} as Record<EntityType, ObjectPool<any>>;
+    private _activeObjects: Record<EntityType, ManagedObject[]> = {} as Record<EntityType, ManagedObject[]>;
 
     private timeSinceLastSpawn = 0;
 
@@ -44,8 +48,6 @@ export class EntityManager extends EventEmitter {
 
         this.stage = stage;
         this.textures = textures;
-
-        // 🚀 初期化処理は一箇所に集中させ、統一的なメソッドで処理します
         this.initializePools();
     }
 
@@ -53,7 +55,7 @@ export class EntityManager extends EventEmitter {
         // 新しいエンティティを追加する場合、ここに追加するだけでOKです
         this.initEntity(
             ENTITY_KEYS.BULLET,
-            Bullet as EntityConstructor<Bullet>, // 型キャストでコンストラクタの型を明確にする
+            Bullet as EntityConstructor<Bullet>, 
             CONFIG.ASSETS.TEXTURES.BULLET,
             CONFIG.BULLET.POOL_SIZE
         );
@@ -73,7 +75,7 @@ export class EntityManager extends EventEmitter {
 
     // 🚀 ジェネリックなエンティティ初期化メソッド
     private initEntity<T extends ManagedObject>(
-        key: EntityType, // 厳密な EntityType をキーとして使用
+        key: EntityType,
         Type: EntityConstructor<T>,
         textureKey: string,
         size: number
@@ -84,26 +86,20 @@ export class EntityManager extends EventEmitter {
             return obj;
         }, size);
 
-        // Mapに格納 (キーはEntityType、値はObjectPool<T>だが、Mapの定義に合わせてanyを許容)
-        this._pools.set(key, pool as ObjectPool<any>);
-        this._activeObjects.set(key, []);
+        // 🚀 【修正1】Mapの.set()をRecordのプロパティ代入に変更
+        this._pools[key] = pool as ObjectPool<any>; 
+        this._activeObjects[key] = []; 
     }
 
-    // 🚀 ジェネリックなエンティティ取得メソッド (内部処理を統一)
-    private getEntity<T extends ManagedObject>(
-        key: EntityType,
+    // 🚀 ジェネリックなエンティティ取得メソッド (型安全性の向上)
+    private getEntity<K extends EntityType>(
+        key: K,
         ...args: any[]
-    ): T {
-        // ObjectPool<T> の型安全な取得のためにキャスト
-        const pool = this._pools.get(key) as ObjectPool<T> | undefined;
-        const list = this._activeObjects.get(key) as T[] | undefined;
+    ): EntityMap[K] {
+        // 🚀 【修正2】Mapの.get()をRecordのプロパティアクセスに変更
+        const pool = this._pools[key] as ObjectPool<EntityMap[K]>;
+        const list = this._activeObjects[key] as EntityMap[K][];
 
-        if (!pool || !list) {
-            // ここに到達した場合、initializePools()での定義漏れを意味します
-            throw new Error(`Entity type ${key} not registered.`);
-        }
-
-        // ObjectPool.getはResetArgs<T>の型安全な引数を期待
         const obj = pool.get(...(args as any));
         list.push(obj);
         return obj;
@@ -111,17 +107,18 @@ export class EntityManager extends EventEmitter {
 
     // プレイヤーから弾生成の依頼を受ける (外部公開API)
     public spawnBullet(x: number, y: number) {
-        this.getEntity<Bullet>(ENTITY_KEYS.BULLET, x, y);
+        // EntityMapのおかげで、戻り値がBullet型に安全に確定する
+        this.getEntity(ENTITY_KEYS.BULLET, x, y);
     }
 
     // 敵生成 (内部ロジック)
     private spawnEnemy() {
-        this.getEntity<Enemy>(ENTITY_KEYS.ENEMY);
+        this.getEntity(ENTITY_KEYS.ENEMY);
     }
 
     // 爆発生成 (内部ロジック)
     private spawnExplosion(x: number, y: number) {
-        this.getEntity<Explosion>(ENTITY_KEYS.EXPLOSION, x, y);
+        this.getEntity(ENTITY_KEYS.EXPLOSION, x, y);
     }
 
     // updateの引数からelapsedMSを削除し、delta(秒)のみを使用
@@ -135,8 +132,8 @@ export class EntityManager extends EventEmitter {
             this.timeSinceLastSpawn = 0;
         }
 
-        // 🚀 全オブジェクト更新 (新しいエンティティが増えてもこのループは変更不要)
-        for (const list of this._activeObjects.values()) {
+        // 🚀 【修正3】Mapの.values()をObject.values()に変更
+        for (const list of Object.values(this._activeObjects)) {
             list.forEach((obj) => obj.update(delta));
         }
 
@@ -146,9 +143,9 @@ export class EntityManager extends EventEmitter {
 
     // 🚀 衝突判定の分離 (可読性向上)
     private handleCollisions() {
-        // 衝突判定を行うエンティティのリストをMapから取得
-        const activeBullets = this._activeObjects.get(ENTITY_KEYS.BULLET) as Bullet[];
-        const activeEnemies = this._activeObjects.get(ENTITY_KEYS.ENEMY) as Enemy[];
+        // 🚀 【修正4】Mapの.get()をRecordのプロパティアクセスに変更
+        const activeBullets = this._activeObjects[ENTITY_KEYS.BULLET] as Bullet[];
+        const activeEnemies = this._activeObjects[ENTITY_KEYS.ENEMY] as Enemy[];
 
         // ヌルチェックは必要に応じて追加できますが、ここでは初期化済みと仮定します
         if (!activeBullets || !activeEnemies) return;
@@ -174,9 +171,11 @@ export class EntityManager extends EventEmitter {
     }
 
     private cleanup() {
-        // 🚀 全オブジェクトのクリーンアップ (新しいエンティティが増えてもこのループは変更不要)
-        for (const [key, list] of this._activeObjects.entries()) {
-            const pool = this._pools.get(key) as ObjectPool<ManagedObject>;
+        // 🚀 【修正5】Mapの.entries()をObject.entries()に変更
+        // Object.entries()でキーと値のペアをループ。型アサーションで型を保証
+        for (const [key, list] of Object.entries(this._activeObjects) as [EntityType, ManagedObject[]][]) {
+            // 🚀 【修正6】Mapの.get()をRecordのプロパティアクセスに変更
+            const pool = this._pools[key] as ObjectPool<ManagedObject>;
             this.cleanupList(list, pool);
         }
     }

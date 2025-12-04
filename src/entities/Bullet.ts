@@ -5,7 +5,7 @@ import { CONFIG } from "../config";
 
 export class Bullet extends GameObject {
   constructor(texture: Texture) {
-    super(texture);
+    super(texture, texture.width * 0.5, texture.height * 0.5);
   }
 
   reset(x: number, y: number) {

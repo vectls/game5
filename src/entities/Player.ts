@@ -12,7 +12,7 @@ export class Player extends GameObject {
     private emitter: EventEmitter = new EventEmitter();
 
     constructor(texture: Texture) { 
-        super(texture);
+        super(texture, texture.width, texture.height);
         this.active = true;
     }
 

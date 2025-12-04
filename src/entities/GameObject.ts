@@ -54,15 +54,14 @@ export abstract class GameObject implements Poolable, Collider {
         return this.x + this.hitWidth / 2;
     }
 
-    constructor(texture: Texture) {
+    constructor(texture: Texture, hitWidth: number, hitHeight: number) {
         this.sprite = new Sprite(texture);
         this.sprite.anchor.set(0.5);
         this.sprite.visible = false;
 
-        // コンストラクタでヒットボックスの初期値を設定
-        // デフォルトはテクスチャサイズ（描画サイズから独立）とする
-        this._hitWidth = texture.width;
-        this._hitHeight = texture.height;
+        // コンストラクタで引数からヒットボックスの初期値を設定
+        this._hitWidth = hitWidth;
+        this._hitHeight = hitHeight;
     }
 
     abstract update(delta: number): void;

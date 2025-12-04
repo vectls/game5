@@ -7,7 +7,7 @@ export class Explosion extends GameObject {
   private _lifeTimeMs = 0; // 残り表示時間 (ms)
 
   constructor(texture: Texture) {
-    super(texture);
+    super(texture,0,0);
     this.sprite.scale.set(0.5); // 適切なサイズに調整
 
     // Explosionのヒットボックスをスケールに合わせて調整
