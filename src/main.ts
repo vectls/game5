@@ -28,26 +28,7 @@ class Game {
     }
 
     private createScene() {
-        // 1. EntityManagerの初期化
-        this.entityManager = new EntityManager(this.app.stage, this.textures);
-
-        // EntityManagerのイベントリスナーを登録
-        this.entityManager.on(
-            EntityManager.ENEMY_DESTROYED_EVENT,
-            this.handleEnemyDestroyed,
-            this
-        );
-        
-        // 🚀 【追加】ScoreManagerのイベントリスナーを登録 (ログ出力の責務を分離)
-        this.scoreManager.on(
-            ScoreManager.SCORE_CHANGED_EVENT,
-            (newScore: number) => { 
-                console.log(`Current Score: ${newScore}`); // ここでログ出力
-            },
-            this
-        );
-
-        // 2. プレイヤー生成
+        // 1. プレイヤー生成（EntityManagerの初期化前に必要）
         this.player = new Player(
             this.textures[CONFIG.ASSETS.TEXTURES.PLAYER],
         );
@@ -58,6 +39,27 @@ class Game {
 
         // Playerの初期設定を行うためにreset()を呼び出す
         this.player.reset();
+        
+        // 2. EntityManagerの初期化
+        // 🚀 【重要修正】Playerインスタンス(this.player)を第3引数として渡す
+        // これで「3個の引数が必要ですが、2個指定されました」のエラーが解消します。
+        this.entityManager = new EntityManager(this.app.stage, this.textures, this.player);
+
+        // EntityManagerのイベントリスナーを登録
+        this.entityManager.on(
+            EntityManager.ENEMY_DESTROYED_EVENT,
+            this.handleEnemyDestroyed,
+            this // this.player ではなく this (Gameクラス) をリスナーのコンテキストとして使用
+        );
+        
+        // ScoreManagerのイベントリスナーを登録 (ログ出力の責務を分離)
+        this.scoreManager.on(
+            ScoreManager.SCORE_CHANGED_EVENT,
+            (newScore: number) => { 
+                console.log(`Current Score: ${newScore}`); // ここでログ出力
+            },
+            this
+        );
 
         // 3. ループ開始
         this.app.ticker.add((ticker) => this.update(ticker));
@@ -68,6 +70,7 @@ class Game {
     }
 
     private handleEnemyDestroyed() {
+        // スコア加算
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
 
@@ -78,11 +81,11 @@ class Game {
         // 1. プレイヤー更新
         this.player.handleInput(this.input, delta);
 
-        // 2. エンティティ全体の更新をEntityManagerに委譲 (deltaを渡す)
+        // 2. エンティティ全体の更新をEntityManagerに委譲
         this.entityManager.update(delta);
     }
     
-    // 🚀 【追加】リソースクリーンアップメソッド
+    // リソースクリーンアップメソッド
     public destroy() {
         this.input.destroy(); 
         // 他のマネージャやPIXIリソースのクリーンアップを追加できます

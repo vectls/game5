@@ -9,6 +9,7 @@ export class Player extends GameObject {
     public static readonly SHOOT_EVENT = "shoot";
 
     private lastShotTime = 0;
+    public active: boolean = true;
     private emitter: EventEmitter = new EventEmitter();
 
     constructor(texture: Texture) { 
@@ -38,6 +39,16 @@ export class Player extends GameObject {
 
     update(delta: number) {
         // PlayerはhandleInputで操作
+    }
+
+    // 🚀 【追加】ダメージを受けるメソッド
+    public takeHit() {
+        if (!this.active) return;
+
+        // ここにHP減少や無敵時間、ゲームオーバー判定のロジックを実装します
+        console.log("Player hit!");
+        // 例: this.hp -= 1;
+        // if (this.hp <= 0) this.die();
     }
 
     handleInput(input: InputManager, delta: number) {
