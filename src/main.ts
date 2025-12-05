@@ -3,7 +3,7 @@ import { Application, Assets, Texture, Ticker } from "pixi.js";
 import { CONFIG } from "./config";
 import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
-import { EntityManager } from "./core/EntityManager"; 
+import { EntityManager, ENTITY_KEYS } from "./core/EntityManager"; 
 import { Player } from "./entities/Player";
 
 class Game {
@@ -66,7 +66,8 @@ class Game {
     }
 
     private handlePlayerShoot(x: number, y: number) {
-         this.entityManager?.spawnBullet(x, y);
+         // 🚀 【修正】 spawnBullet を汎用 spawn に変更
+         this.entityManager?.spawn(ENTITY_KEYS.BULLET, x, y);
     }
 
     private handleEnemyDestroyed() {

@@ -140,6 +140,19 @@ export class EntityManager extends EventEmitter {
         this.getEntity(ENTITY_KEYS.EXPLOSION, x, y);
     }
 
+    /**
+     * 🚀 【修正: 汎用スポーン】
+     * 汎用的なエンティティスポーンメソッド
+     * @param key スポーンするエンティティの種類 (ENTITY_KEYS)
+     * @param args エンティティの reset メソッドに渡す引数
+     */
+    public spawn<K extends EntityType>(
+        key: K,
+        ...args: any[]
+    ): EntityMap[K] {
+        return this.getEntity(key, ...args);
+    }
+
     public update(delta: number) {
         const deltaMS = delta * 1000;
 

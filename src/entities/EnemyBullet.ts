@@ -20,8 +20,7 @@ export class EnemyBullet extends GameObject implements Poolable, Collider {
     }
 
     public reset(x: number, y: number): void {
-        // sprite.x/y に代入
-        this.sprite.x = x - this.width / 2; 
+        this.sprite.x = x; 
         this.sprite.y = y;
         this.active = true;
         this.sprite.visible = true;
@@ -38,12 +37,4 @@ export class EnemyBullet extends GameObject implements Poolable, Collider {
             this.active = false;
         }
     }
-    
-    // Colliderのゲッター
-    public get x() { return this.sprite.x; }
-    public get y() { return this.sprite.y; }
-    public get left() { return this.x; }
-    public get right() { return this.x + this.width; }
-    public get top() { return this.y; }
-    public get bottom() { return this.y + this.height; }
 }

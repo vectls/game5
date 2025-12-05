@@ -5,8 +5,7 @@ import { GameObject } from "./GameObject";
 import type { Collider } from "./GameObject"; 
 import type { Poolable } from "../core/ObjectPool"; 
 import { CONFIG } from "../config";
-import { EntityManager } from "../core/EntityManager"; 
-
+import { EntityManager, ENTITY_KEYS } from "../core/EntityManager"; 
 /**
  * 敵機を表すクラス。
  * ColliderとPoolableインターフェースを実装。
@@ -23,8 +22,8 @@ export class Enemy extends GameObject implements Poolable, Collider {
 
     constructor(texture: Texture, entityManager: EntityManager) {
         // 敵機のサイズを少し小さく設定
-        const w = texture.width * 0.8;
-        const h = texture.height * 0.8;
+        const w = texture.width * 0.9;
+        const h = texture.height * 0.9;
         super(texture, w, h); 
         
         this.width = w; 
@@ -70,25 +69,15 @@ export class Enemy extends GameObject implements Poolable, Collider {
         }
     }
     
-    /**
-     * 敵の弾を発射する
-     */
     private fireBullet() {
-        // 敵機の底部中央から弾を発射
-        const bulletX = this.sprite.x + this.width / 2;
-        const bulletY = this.sprite.y + this.height; 
-        this.entityManager.spawnEnemyBullet(bulletX, bulletY);
+ // 🚀 【修正】敵機Spriteの底部中央から弾を発射する
+        // this.sprite.x は Spriteの中心X座標
+        const bulletX = this.sprite.x; 
+        
+        // this.sprite.y (Spriteの中心Y) + Spriteの描画サイズの半分 (ヒットボックスの高さではなく)
+        const bulletY = this.sprite.y + this.sprite.height / 2; 
+        
+        // 🚀 【修正】汎用 spawn メソッドを使用
+        this.entityManager.spawn(ENTITY_KEYS.ENEMY_BULLET, bulletX, bulletY);
     }
-
-    // ------------------------------------
-    // Colliderインターフェースの実装
-    // ------------------------------------
-    // x, yプロパティはGameObjectのsprite.x/yを参照します。
-    public get x() { return this.sprite.x; }
-    public get y() { return this.sprite.y; }
-
-    public get left() { return this.x; }
-    public get right() { return this.x + this.width; }
-    public get top() { return this.y; }
-    public get bottom() { return this.y + this.height; }
 }
