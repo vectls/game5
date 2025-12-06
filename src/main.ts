@@ -65,9 +65,9 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    private handlePlayerShoot(x: number, y: number) {
-         // 🚀 【修正】 spawnBullet を汎用 spawn に変更
-         this.entityManager?.spawn(ENTITY_KEYS.BULLET, x, y);
+    private handlePlayerShoot(x: number, y: number, velX: number, velY: number) {
+         // 🚀 修正: spawn に速度引数を渡す
+         this.entityManager?.spawn(ENTITY_KEYS.BULLET, x, y, velX, velY); 
     }
 
     private handleEnemyDestroyed() {
@@ -81,6 +81,8 @@ class Game {
 
         // 1. プレイヤー更新
         this.player.handleInput(this.input, delta);
+        // 🚀 【重要修正】Playerのupdateメソッドを呼び出す
+        this.player.update(delta); 
 
         // 2. エンティティ全体の更新をEntityManagerに委譲
         this.entityManager.update(delta);

@@ -12,6 +12,9 @@ export class Player extends GameObject {
     public active: boolean = true;
     private emitter: EventEmitter = new EventEmitter();
 
+    // 🚀 新規追加: ロータリーショットの現在の回転角度 (度)
+    private _rotaryShotAngle: number = 0;
+
     constructor(texture: Texture) { 
         super(texture, texture.width, texture.height);
         this.active = true;
@@ -37,8 +40,11 @@ export class Player extends GameObject {
         this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
 
+    // 🚀 【重要】update メソッドで角度を回転させ続ける
     update(delta: number) {
-        // PlayerはhandleInputで操作
+        // 角度の継続的な回転を毎フレーム実行 (KeyXが押されていなくても回転し続ける)
+        const rotationSpeed = CONFIG.PLAYER.ROTARY_SHOT.ROTATION_SPEED;
+        this._rotaryShotAngle = (this._rotaryShotAngle + rotationSpeed * delta) % 360;
     }
 
     // 🚀 【追加】ダメージを受けるメソッド
@@ -68,19 +74,111 @@ export class Player extends GameObject {
             Math.min(CONFIG.SCREEN.WIDTH - halfWidth, this.sprite.x)
         );
 
-        // 発射
         const now = performance.now();
-        if (
-            input.isDown(CONFIG.INPUT.SHOOT) &&
-            now - this.lastShotTime > CONFIG.PLAYER.SHOT_INTERVAL_MS
-        ) {
-            // 🚀 修正: コールバック呼び出しをイベント発火に置き換える
+        const interval = CONFIG.PLAYER.SHOT_INTERVAL_MS;
+
+        // 1. 単発ショット (CONFIG.INPUT.SHOOT)
+        if (input.isDown(CONFIG.INPUT.SHOOT)) {
+            if (now - this.lastShotTime > interval) {
+                this.fireSingleShot(); // 単発ショットを実行
+                this.lastShotTime = now;
+            }
+        }
+        
+        // 2. 扇形ショット (仮のキー 'KeyZ' を使用)
+        if (input.isDown('KeyZ')) { 
+            // 扇形ショットは少し発射間隔を長く設定
+            if (now - this.lastShotTime > interval * 1.5) { 
+                this.fireFanShot(); // 🚀 扇形ショットを実行
+                this.lastShotTime = now;
+            }
+        }
+
+        // 🚀 3. ロータリーショット ('KeyX')：カウントを使用したバースト発射
+        else if (input.isDown('KeyX')) { 
+            const rotaryInterval = CONFIG.PLAYER.ROTARY_SHOT.SHOT_INTERVAL_MS;
+            if (now - this.lastShotTime > rotaryInterval) { 
+                this.fireRotaryShot(); // 🚀 COUNTを使用するメソッドを呼び出す
+                this.lastShotTime = now;
+            }
+        }
+    }
+
+    // 単発ショットのロジック (前回追加)
+    private fireSingleShot() {
+        const speed = CONFIG.BULLET.SPEED;
+        const velX = 0;
+        const velY = -speed; // y軸は下向きが正なので、上向きは負
+
+        this.emit(
+            Player.SHOOT_EVENT, 
+            this.sprite.x,
+            this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y,
+            velX,
+            velY
+        );
+    }
+
+    // 🚀 新規/修正メソッド: 扇形に弾丸を発射するロジック
+    private fireFanShot() {
+        // 設定値の取得
+        const numBullets = CONFIG.PLAYER.FAN_SHOT.COUNT;
+        const arc = CONFIG.PLAYER.FAN_SHOT.ARC_DEGREES;
+        const speed = CONFIG.BULLET.SPEED;
+        
+        // 角度の計算 (プレイヤーは上向き=90度を基準とする)
+        const startAngleRad = (90 - arc / 2) * (Math.PI / 180);
+        const angleStepRad = (arc / (numBullets - 1)) * (Math.PI / 180);
+
+        for (let i = 0; i < numBullets; i++) {
+            let angleRad = startAngleRad;
+            if (numBullets > 1) {
+                angleRad += i * angleStepRad;
+            }
+
+            // 速度ベクトルの計算
+            const velX = speed * Math.cos(angleRad);
+            const velY = -speed * Math.sin(angleRad); // y軸は下向きが正
+
             this.emit(
                 Player.SHOOT_EVENT, // イベント名
                 this.sprite.x,
-                this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y
+                this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y,
+                velX,
+                velY
             );
-            this.lastShotTime = now;
+        }
+    }
+
+    // 🚀 【再実装】 COUNT を使用した円形同時発射ロジック
+    private fireRotaryShot() {
+        const numBullets = CONFIG.PLAYER.ROTARY_SHOT.COUNT;
+        const speed = CONFIG.BULLET.SPEED;
+        
+        // 弾丸間の角度差 (360度 / 弾数)
+        const angleStepDeg = 360 / numBullets;
+        
+        // 🚀 基準角度として、updateで更新された滑らかな角度を使用
+        const baseAngleDeg = this._rotaryShotAngle;
+
+        for (let i = 0; i < numBullets; i++) {
+            // 現在の円形配置における角度 = 基準角度 + 均等分割された角度
+            const currentAngleDeg = (baseAngleDeg + i * angleStepDeg) % 360;
+            
+            // ラジアンに変換
+            const angleRad = currentAngleDeg * (Math.PI / 180);
+            
+            // 速度ベクトルの計算
+            const velX = speed * Math.cos(angleRad);
+            const velY = speed * Math.sin(angleRad); 
+
+            this.emit(
+                Player.SHOOT_EVENT, 
+                this.sprite.x,
+                this.sprite.y, 
+                velX, 
+                velY  
+            );
         }
     }
 }

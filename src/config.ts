@@ -22,6 +22,23 @@ export const CONFIG = {
         INITIAL_X_RATIO: 0.5, // 画面幅に対する比率 (0.5 = 中央)
         INITIAL_Y: 500, // 初期Y座標
         BULLET_OFFSET_Y: 20, // 機体から弾が出る位置のオフセット
+        // 🚀 新規追加: 扇形ショットの設定
+        FAN_SHOT: {
+            COUNT: 5,        // 弾丸の数
+            ARC_DEGREES: 60, // 扇形の角度 (60度)
+        },
+        // 🚀 修正: ロータリーショットの設定
+        ROTARY_SHOT: {
+            COUNT: 2,              // 🚀 復活: 1度に発射する弾丸の数 (8発)
+            ROTATION_SPEED: 720,   // 🚀 調整: 回転速度 (180度/秒)
+            SHOT_INTERVAL_MS: 15, // 🚀 調整: バースト発射に適した間隔 (100ms)
+        },
+        // 🚀 新規追加: ウェーブショットの設定
+        WAVE_SHOT: {
+            AMPLITUDE: 80, // 振幅 (波の横の広がり)
+            FREQUENCY: 6,  // 周波数 (波のうねりの速さ)
+            SHOT_INTERVAL_MS: 150, // 発射間隔
+        }
     },
     BULLET: {
         SPEED: 600,

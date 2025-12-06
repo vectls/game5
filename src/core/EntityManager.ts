@@ -122,10 +122,12 @@ export class EntityManager extends EventEmitter {
         return obj;
     }
 
-    public spawnBullet(x: number, y: number) {
-        this.getEntity(ENTITY_KEYS.BULLET, x, y);
+    // 🚀 修正: 速度(X, Y)を受け取るように変更
+    public spawnBullet(x: number, y: number, velX: number, velY: number) {
+        // 修正: 速度引数をgetEntity経由でBulletのresetに渡す
+        this.getEntity(ENTITY_KEYS.BULLET, x, y, velX, velY); 
     }
-
+    
     public spawnEnemyBullet(x: number, y: number) {
         this.getEntity(ENTITY_KEYS.ENEMY_BULLET, x, y);
     }
