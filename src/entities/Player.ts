@@ -15,6 +15,12 @@ export class Player extends GameObject {
     // 🚀 新規追加: ロータリーショットの現在の回転角度 (度)
     private _rotaryShotAngle: number = 0;
 
+    // 🚀 波状回転用の角度 (KeyCで使用)
+    private _wavyRotaryShotAngle: number = 0;
+    // 🚀 波状回転の位相タイマー
+    private _wavyRotationTimer: number = 0;   
+    private lastWavyShotTime = 0; // KeyC用の発射タイマー
+
     constructor(texture: Texture) { 
         super(texture, texture.width, texture.height);
         this.active = true;
@@ -40,11 +46,32 @@ export class Player extends GameObject {
         this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
 
-    // 🚀 【重要】update メソッドで角度を回転させ続ける
+    // 🚀 修正: update メソッドで2種類の角度を独立して更新
     update(delta: number) {
-        // 角度の継続的な回転を毎フレーム実行 (KeyXが押されていなくても回転し続ける)
-        const rotationSpeed = CONFIG.PLAYER.ROTARY_SHOT.ROTATION_SPEED;
-        this._rotaryShotAngle = (this._rotaryShotAngle + rotationSpeed * delta) % 360;
+        
+        // 1. STANDARD ROTARY SHOT ROTATION (一定回転)
+        const standardRotationSpeed = CONFIG.PLAYER.ROTARY_SHOT.ROTATION_SPEED;
+        // 常に一定速度で回転します
+        this._rotaryShotAngle = (this._rotaryShotAngle + standardRotationSpeed * delta) % 360;
+
+        // 2. WAVY ROTARY SHOT ROTATION (滑らかな波状回転)
+        const wavySpeed = CONFIG.PLAYER.WAVY_ROTARY_SHOT.ROTATION_SPEED;
+        const halfPeriodMs = CONFIG.PLAYER.WAVY_ROTARY_SHOT.ROTATION_CHANGE_INTERVAL_MS;
+        const fullPeriodMs = halfPeriodMs * 2;
+        
+        // 位相タイマーを更新
+        this._wavyRotationTimer += delta * 1000;
+        if (this._wavyRotationTimer >= fullPeriodMs) {
+            this._wavyRotationTimer -= fullPeriodMs;
+        }
+
+        // サインカーブで滑らかな回転速度を計算 (-最大速度から+最大速度まで変動)
+        const phase = (this._wavyRotationTimer / fullPeriodMs) * 2 * Math.PI;
+        const modulationFactor = Math.sin(phase);
+        const currentWavyRotationSpeed = wavySpeed * modulationFactor;
+
+        // 波状回転用の角度を更新
+        this._wavyRotaryShotAngle = (this._wavyRotaryShotAngle + currentWavyRotationSpeed * delta) % 360;
     }
 
     // 🚀 【追加】ダメージを受けるメソッド
@@ -94,12 +121,23 @@ export class Player extends GameObject {
             }
         }
 
-        // 🚀 3. ロータリーショット ('KeyX')：カウントを使用したバースト発射
+        // 2. 🚀 標準ロータリーショット ('KeyX')：一定回転
         else if (input.isDown('KeyX')) { 
             const rotaryInterval = CONFIG.PLAYER.ROTARY_SHOT.SHOT_INTERVAL_MS;
             if (now - this.lastShotTime > rotaryInterval) { 
-                this.fireRotaryShot(); // 🚀 COUNTを使用するメソッドを呼び出す
+                // fireRotaryShot()を汎用化し、標準角度と弾数を渡す
+                this.fireRotaryShot(this._rotaryShotAngle, CONFIG.PLAYER.ROTARY_SHOT.COUNT); 
                 this.lastShotTime = now;
+            }
+        }
+
+        // 3. 🚀 波状ロータリーショット ('KeyC')：波状回転
+        else if (input.isDown('KeyC')) { 
+            const wavyInterval = CONFIG.PLAYER.WAVY_ROTARY_SHOT.SHOT_INTERVAL_MS;
+            if (now - this.lastWavyShotTime > wavyInterval) { 
+                // fireRotaryShot()を汎用化し、波状角度と弾数を渡す
+                this.fireRotaryShot(this._wavyRotaryShotAngle, CONFIG.PLAYER.WAVY_ROTARY_SHOT.COUNT);
+                this.lastWavyShotTime = now;
             }
         }
     }
@@ -150,25 +188,18 @@ export class Player extends GameObject {
         }
     }
 
-    // 🚀 【再実装】 COUNT を使用した円形同時発射ロジック
-    private fireRotaryShot() {
-        const numBullets = CONFIG.PLAYER.ROTARY_SHOT.COUNT;
+    // 🚀 修正: fireRotaryShot を汎用化し、基準角度と弾数を引数で受け取る
+    private fireRotaryShot(baseAngleDeg: number, numBullets: number) {
         const speed = CONFIG.BULLET.SPEED;
         
-        // 弾丸間の角度差 (360度 / 弾数)
         const angleStepDeg = 360 / numBullets;
         
-        // 🚀 基準角度として、updateで更新された滑らかな角度を使用
-        const baseAngleDeg = this._rotaryShotAngle;
-
         for (let i = 0; i < numBullets; i++) {
-            // 現在の円形配置における角度 = 基準角度 + 均等分割された角度
+            // 基準角度 (標準 or 波状) を使って弾丸の角度を計算
             const currentAngleDeg = (baseAngleDeg + i * angleStepDeg) % 360;
             
-            // ラジアンに変換
             const angleRad = currentAngleDeg * (Math.PI / 180);
             
-            // 速度ベクトルの計算
             const velX = speed * Math.cos(angleRad);
             const velY = speed * Math.sin(angleRad); 
 
@@ -181,4 +212,36 @@ export class Player extends GameObject {
             );
         }
     }
+
+    // // 🚀 【再実装】 COUNT を使用した円形同時発射ロジック
+    // private fireRotaryShot() {
+    //     const numBullets = CONFIG.PLAYER.ROTARY_SHOT.COUNT;
+    //     const speed = CONFIG.BULLET.SPEED;
+        
+    //     // 弾丸間の角度差 (360度 / 弾数)
+    //     const angleStepDeg = 360 / numBullets;
+        
+    //     // 🚀 基準角度として、updateで更新された滑らかな角度を使用
+    //     const baseAngleDeg = this._rotaryShotAngle;
+
+    //     for (let i = 0; i < numBullets; i++) {
+    //         // 現在の円形配置における角度 = 基準角度 + 均等分割された角度
+    //         const currentAngleDeg = (baseAngleDeg + i * angleStepDeg) % 360;
+            
+    //         // ラジアンに変換
+    //         const angleRad = currentAngleDeg * (Math.PI / 180);
+            
+    //         // 速度ベクトルの計算
+    //         const velX = speed * Math.cos(angleRad);
+    //         const velY = speed * Math.sin(angleRad); 
+
+    //         this.emit(
+    //             Player.SHOOT_EVENT, 
+    //             this.sprite.x,
+    //             this.sprite.y, 
+    //             velX, 
+    //             velY  
+    //         );
+    //     }
+    // }
 }
