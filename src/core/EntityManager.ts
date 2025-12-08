@@ -123,15 +123,18 @@ export class EntityManager extends EventEmitter {
     }
 
     // 🚀 修正: 速度(X, Y)を受け取るように変更
-    public spawnBullet(x: number, y: number, velX: number, velY: number) {
-        // 修正: 速度引数をgetEntity経由でBulletのresetに渡す
-        this.getEntity(ENTITY_KEYS.BULLET, x, y, velX, velY); 
+    // 🚀 【修正】成長パラメータ (growthRate, maxScale) を追加
+    public spawnBullet(x: number, y: number, velX: number, velY: number, growthRate: number = 0, maxScale: number = 1.0) {
+        // 修正: 速度引数に加えて、成長引数もgetEntity経由でBulletのresetに渡す
+        this.getEntity(ENTITY_KEYS.BULLET, x, y, velX, velY, growthRate, maxScale); 
     }
-    
+
     public spawnEnemyBullet(x: number, y: number) {
         this.getEntity(ENTITY_KEYS.ENEMY_BULLET, x, y);
     }
 
+
+    
     private spawnEnemy() {
         const x = Math.random() * CONFIG.SCREEN.WIDTH;
         const y = -CONFIG.SCREEN.MARGIN;

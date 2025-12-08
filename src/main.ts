@@ -29,9 +29,7 @@ class Game {
 
     private createScene() {
         // 1. プレイヤー生成（EntityManagerの初期化前に必要）
-        this.player = new Player(
-            this.textures[CONFIG.ASSETS.TEXTURES.PLAYER],
-        );
+        this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
 
         // Playerの発射イベントを購読する
@@ -39,11 +37,15 @@ class Game {
 
         // Playerの初期設定を行うためにreset()を呼び出す
         this.player.reset();
-        
+
         // 2. EntityManagerの初期化
         // 🚀 【重要修正】Playerインスタンス(this.player)を第3引数として渡す
         // これで「3個の引数が必要ですが、2個指定されました」のエラーが解消します。
-        this.entityManager = new EntityManager(this.app.stage, this.textures, this.player);
+        this.entityManager = new EntityManager(
+            this.app.stage,
+            this.textures,
+            this.player
+        );
 
         // EntityManagerのイベントリスナーを登録
         this.entityManager.on(
@@ -51,11 +53,11 @@ class Game {
             this.handleEnemyDestroyed,
             this // this.player ではなく this (Gameクラス) をリスナーのコンテキストとして使用
         );
-        
+
         // ScoreManagerのイベントリスナーを登録 (ログ出力の責務を分離)
         this.scoreManager.on(
             ScoreManager.SCORE_CHANGED_EVENT,
-            (newScore: number) => { 
+            (newScore: number) => {
                 console.log(`Current Score: ${newScore}`); // ここでログ出力
             },
             this
@@ -65,9 +67,25 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    private handlePlayerShoot(x: number, y: number, velX: number, velY: number) {
-         // 🚀 修正: spawn に速度引数を渡す
-         this.entityManager?.spawn(ENTITY_KEYS.BULLET, x, y, velX, velY); 
+    private handlePlayerShoot(
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        // 💡 【修正】オプション引数を追加
+        growthRate: number = 0,
+        maxScale: number = 1.0
+    ) {
+        // 🚀 修正: spawn に成長引数を渡す
+        this.entityManager?.spawn(
+            ENTITY_KEYS.BULLET,
+            x,
+            y,
+            velX,
+            velY,
+            growthRate,
+            maxScale
+        );
     }
 
     private handleEnemyDestroyed() {
@@ -82,15 +100,15 @@ class Game {
         // 1. プレイヤー更新
         this.player.handleInput(this.input, delta);
         // 🚀 【重要修正】Playerのupdateメソッドを呼び出す
-        this.player.update(delta); 
+        this.player.update(delta);
 
         // 2. エンティティ全体の更新をEntityManagerに委譲
         this.entityManager.update(delta);
     }
-    
+
     // リソースクリーンアップメソッド
     public destroy() {
-        this.input.destroy(); 
+        this.input.destroy();
         // 他のマネージャやPIXIリソースのクリーンアップを追加できます
     }
 }

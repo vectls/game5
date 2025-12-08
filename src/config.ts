@@ -24,8 +24,14 @@ export const CONFIG = {
         BULLET_OFFSET_Y: 20, // 機体から弾が出る位置のオフセット
         // 🚀 新規追加: 扇形ショットの設定
         FAN_SHOT: {
-            COUNT: 5,        // 弾丸の数
+            COUNT: 10,        // 弾丸の数
             ARC_DEGREES: 60, // 扇形の角度 (60度)
+            // 🚀 【新規追加】扇形ショットの角度を波状に変化させる設定
+            WAVY_ARC: {
+                BASE_ARC: 30,  // 角度変動の基点となる最小角度
+                AMPLITUDE: 45, // 角度変動の振幅 (最大角度は BASE_ARC + AMPLITUDE)
+                PERIOD_MS: 1200, // 角度が最小から最大、最小に戻るまでの時間 (ミリ秒)
+            }
         },
         // 🚀 修正: ロータリーショットの設定
         ROTARY_SHOT: {
@@ -40,6 +46,13 @@ export const CONFIG = {
             SHOT_INTERVAL_MS: 33,      // 🚀 調整: 発射間隔を短くする (50 -> 33)
             ROTATION_CHANGE_INTERVAL_MS: 1000, // 🚀 調整: 波の半周期を長くする (750 -> 1000)
         },
+        // 💡 成長ショットの設定
+        GROWING_SHOT: {
+            INITIAL_SCALE: 0.5, // 変更なし
+            MAX_SCALE: 15.0,     // 🚀 調整: 最大サイズを大きくする (例: 2.0 -> 3.0)
+            GROWTH_RATE: 3.6,   // 🚀 調整: 成長率を上げる (例: 0.5 -> 1.5)
+            SHOT_INTERVAL_MS: 300, // 変更なし
+        }
     },
     BULLET: {
         SPEED: 600,

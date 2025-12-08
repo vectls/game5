@@ -4,43 +4,74 @@ import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
 
 export class Bullet extends GameObject {
-  private velX: number = 0; // 🚀 追加：X方向の速度
-  private velY: number = 0; // 🚀 追加：Y方向の速度
+  private velX: number = 0; 
+  private velY: number = 0; 
+
+  // 💡 【プロパティ】成長ショット用のプロパティを保持
+  private growthRate: number = 0;   
+  private maxScale: number = 1.0;   
 
   constructor(texture: Texture) {
-    super(texture, texture.width * 0.5, texture.height * 0.5);
+    // 💡 【コンストラクタ】初期スケールを適用
+    const initialScale = CONFIG.PLAYER.GROWING_SHOT?.INITIAL_SCALE || 0.5; 
+    super(texture, texture.width * initialScale * 0.5, texture.height * initialScale * 0.5);
+    this.sprite.scale.set(initialScale); 
   }
 
-  // 🚀 修正: 速度(X, Y)を受け取るようにresetメソッドを拡張
-  reset(x: number, y: number, velX: number, velY: number) {
+  // 🚀 【reset】成長用の引数 (growthRate, maxScale) を追加
+  reset(x: number, y: number, velX: number, velY: number, growthRate: number = 0, maxScale: number = 1.0) {
     this.sprite.x = x;
     this.sprite.y = y;
     this.velX = velX;
     this.velY = velY;
-    this.active = true; // resetされたらアクティブにする
-    this.sprite.visible = true; // resetされたら可視化する
+    this.active = true; 
+    this.sprite.visible = true; 
+
+    // 💡 成長パラメータを保存
+    this.growthRate = growthRate;
+    this.maxScale = maxScale;
+
+    // 💡 成長ショットの場合、初期スケールに戻す
+    const scale = this.growthRate > 0 ? CONFIG.PLAYER.GROWING_SHOT.INITIAL_SCALE || 0.5 : 1.0;
+    this.sprite.scale.set(scale);
     
-    // 弾丸の向きを速度ベクトルに合わせて設定
-    // Math.atan2(y, x) はラジアンを返す
-    // Math.PI / 2 (90度)を足すのは、通常Spriteが上向きに描画されていることを想定
+    // ヒットボックスをスケールに合わせて更新
+    this._hitWidth = this.sprite.texture.width * scale * 0.5;
+    this._hitHeight = this.sprite.texture.height * scale * 0.5;
+    
     this.sprite.rotation = Math.atan2(velY, velX) + Math.PI / 2;
   }
 
   update(delta: number) {
     if (!this.active) return;
-    
-    // 🚀 修正: 速度ベクトルに基づいて移動する
+
+    // 💡 【update】サイズ成長ロジック (deltaを使用)
+    if (this.growthRate > 0) {
+        let currentScale = this.sprite.scale.x;
+        // 1秒あたり growthRate の割合でスケール増加
+        const newScale = Math.min(this.maxScale, currentScale + this.growthRate * delta);
+
+        if (newScale !== currentScale) {
+            this.sprite.scale.set(newScale);
+            // ヒットボックスのサイズも更新
+            this._hitWidth = this.sprite.texture.width * newScale * 0.5;
+            this._hitHeight = this.sprite.texture.height * newScale * 0.5;
+        }
+    }
+
+    // 移動処理
     this.sprite.x += this.velX * delta;
     this.sprite.y += this.velY * delta;
-    
-    // 画面外チェック (上下左右)
+
+    // 画面外チェック (既存)
     if (
-        this.sprite.y < -CONFIG.SCREEN.MARGIN || 
-        this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN ||
-        this.sprite.x < -CONFIG.SCREEN.MARGIN ||
-        this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN
+      this.sprite.x < -CONFIG.SCREEN.MARGIN ||
+      this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN ||
+      this.sprite.y < -CONFIG.SCREEN.MARGIN ||
+      this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN
     ) {
       this.active = false;
+      this.sprite.visible = false;
     }
   }
 }
