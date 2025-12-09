@@ -3,8 +3,9 @@ import { Application, Assets, Texture, Ticker } from "pixi.js";
 import { CONFIG } from "./config";
 import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
-import { EntityManager, ENTITY_KEYS } from "./core/EntityManager"; 
+import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
 import { Player } from "./entities/Player";
+import type { ScaleOption, SpeedOption } from "./types/ShotTypes";
 
 class Game {
     private app: Application;
@@ -22,25 +23,24 @@ class Game {
     }
 
     async init() {
+        // アセットのロード
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
         this.textures = atlas.textures;
         this.createScene();
     }
 
     private createScene() {
-        // 1. プレイヤー生成（EntityManagerの初期化前に必要）
+        // 1. プレイヤー生成
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
 
         // Playerの発射イベントを購読する
         this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this);
 
-        // Playerの初期設定を行うためにreset()を呼び出す
         this.player.reset();
 
         // 2. EntityManagerの初期化
-        // 🚀 【重要修正】Playerインスタンス(this.player)を第3引数として渡す
-        // これで「3個の引数が必要ですが、2個指定されました」のエラーが解消します。
+        // Playerインスタンスを渡す
         this.entityManager = new EntityManager(
             this.app.stage,
             this.textures,
@@ -51,10 +51,10 @@ class Game {
         this.entityManager.on(
             EntityManager.ENEMY_DESTROYED_EVENT,
             this.handleEnemyDestroyed,
-            this // this.player ではなく this (Gameクラス) をリスナーのコンテキストとして使用
+            this
         );
 
-        // ScoreManagerのイベントリスナーを登録 (ログ出力の責務を分離)
+        // ScoreManagerのイベントリスナーを登録
         this.scoreManager.on(
             ScoreManager.SCORE_CHANGED_EVENT,
             (newScore: number) => {
@@ -67,27 +67,37 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
+    /**
+     * PlayerのSHOOT_EVENTハンドラ
+     * Bulletの初期速度、サイズ変化オプション、速度変化オプションを受け取り、EntityManagerに弾丸の生成を依頼する
+     */
+    // src/main.ts の handlePlayerShoot メソッド
+
     private handlePlayerShoot(
         x: number,
         y: number,
         velX: number,
         velY: number,
-        // 💡 【修正】オプション引数を追加
-        growthRate: number = 0,
-        maxScale: number = 1.0
+        scaleOpt: ScaleOption | null,
+        speedOpt: SpeedOption | null // 🚀 速度変化オプション
     ) {
-        // 🚀 修正: spawn に成長引数を渡す
-        this.entityManager?.spawn(
+        // 💡 【修正点】this.entityManagerがnullでないことを保証し、型をEntityManagerに絞り込む
+        const entityManager = this.entityManager;
+        if (!entityManager) return; // nullチェック
+
+        // 型が絞り込まれた entityManager を使用するため、オプショナルチェイニングは不要
+        // これにより、コンパイラは ENTITY_KEYS.BULLET (リテラル型 'bullet') に一致する
+        // 7引数のオーバーロードを正しく選択できます。
+        entityManager.spawn(
             ENTITY_KEYS.BULLET,
             x,
             y,
             velX,
             velY,
-            growthRate,
-            maxScale
+            scaleOpt,
+            speedOpt
         );
     }
-
     private handleEnemyDestroyed() {
         // スコア加算
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
@@ -95,21 +105,19 @@ class Game {
 
     private update(ticker: Ticker) {
         if (!this.player || !this.entityManager) return;
-        const delta = ticker.deltaMS / 1000;
+        const delta = ticker.deltaMS / 1000; // 秒に変換
 
-        // 1. プレイヤー更新
+        // 1. プレイヤー更新（入力処理と内部タイマーの更新）
         this.player.handleInput(this.input, delta);
-        // 🚀 【重要修正】Playerのupdateメソッドを呼び出す
-        this.player.update(delta);
+        this.player.update(delta); // 波状ショット等のタイマーを更新
 
-        // 2. エンティティ全体の更新をEntityManagerに委譲
+        // 2. エンティティ全体の更新
         this.entityManager.update(delta);
     }
 
     // リソースクリーンアップメソッド
     public destroy() {
         this.input.destroy();
-        // 他のマネージャやPIXIリソースのクリーンアップを追加できます
     }
 }
 

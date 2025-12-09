@@ -1,10 +1,14 @@
 // src/entities/Player.ts
+
 import { Texture, EventEmitter } from "pixi.js";
 import { GameObject } from "./GameObject";
+import type { Collider } from "./GameObject"; // Colliderインターフェースをインポート
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
+import type { ShotSpec, ScaleOption, SpeedOption } from "../types/ShotTypes"; 
+import { ShotPatterns, ScaleModes } from "../types/ShotTypes"; // 💡 定数をインポート
 
-export class Player extends GameObject {
+export class Player extends GameObject implements Collider {
 
     public static readonly SHOOT_EVENT = "shoot";
 
@@ -12,25 +16,22 @@ export class Player extends GameObject {
     public active: boolean = true;
     private emitter: EventEmitter = new EventEmitter();
 
-    // 🚀 新規追加: ロータリーショットの現在の回転角度 (度)
-    private _rotaryShotAngle: number = 0;
-
-    // 🚀 波状回転用の角度 (KeyCで使用)
-    private _wavyRotaryShotAngle: number = 0;
-    // 🚀 波状回転の位相タイマー
-    private _wavyRotationTimer: number = 0;   
-    private lastWavyShotTime = 0; // KeyC用の発射タイマー
-    // 💡 【新規追加】扇形ショットの波状タイマー (KeyBで使用)
-    private _fanShotWavyTimer: number = 0;
-    // 💡 【新規追加】成長ショットの発射タイマー (KeyZで使用)
-    private lastGrowingShotTime = 0;
+    private _shotWavyTimer: number = 0; 
+    private _rotaryShotAngle: number = 0; 
+    
+    // ⚠️ 修正: hitWidth, hitHeightのプロパティ宣言を削除 (GameObjectのゲッターを使用)
 
     constructor(texture: Texture) { 
-        super(texture, texture.width, texture.height);
+        const w = texture.width;
+        const h = texture.height;
+        // GameObjectのコンストラクタで _hitWidth, _hitHeightを設定する
+        super(texture, w, h); 
+        
+        // ⚠️ 修正: プロパティへの代入を削除
+        
         this.active = true;
     }
-
-    // 💡 EventEmitterの機能を外部に公開するためのメソッド（main.tsがこれを使って購読します）
+    
     public on(event: string | symbol, fn: (...args: any[]) => void, context?: any): this {
         this.emitter.on(event, fn, context);
         return this;
@@ -44,224 +45,216 @@ export class Player extends GameObject {
         this.active = true;
         this.sprite.visible = true;
         this.lastShotTime = 0;
-        
-        // 初期位置の設定
+        this._shotWavyTimer = 0;
+        this._rotaryShotAngle = 0;
         this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
         this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
 
-    // 🚀 修正: update メソッドで2種類の角度を独立して更新
-    update(delta: number) {
-        
-        // 1. STANDARD ROTARY SHOT ROTATION (一定回転)
-        const standardRotationSpeed = CONFIG.PLAYER.ROTARY_SHOT.ROTATION_SPEED;
-        // 常に一定速度で回転します
-        this._rotaryShotAngle = (this._rotaryShotAngle + standardRotationSpeed * delta) % 360;
-
-        // 2. WAVY ROTARY SHOT ROTATION (滑らかな波状回転)
-        const wavySpeed = CONFIG.PLAYER.WAVY_ROTARY_SHOT.ROTATION_SPEED;
-        const halfPeriodMs = CONFIG.PLAYER.WAVY_ROTARY_SHOT.ROTATION_CHANGE_INTERVAL_MS;
-        const fullPeriodMs = halfPeriodMs * 2;
-        
-        // 位相タイマーを更新
-        this._wavyRotationTimer += delta * 1000;
-        if (this._wavyRotationTimer >= fullPeriodMs) {
-            this._wavyRotationTimer -= fullPeriodMs;
-        }
-
-        // サインカーブで滑らかな回転速度を計算 (-最大速度から+最大速度まで変動)
-        const phase = (this._wavyRotationTimer / fullPeriodMs) * 2 * Math.PI;
-        const modulationFactor = Math.sin(phase);
-        const currentWavyRotationSpeed = wavySpeed * modulationFactor;
-
-        // 波状回転用の角度を更新
-        this._wavyRotaryShotAngle = (this._wavyRotaryShotAngle + currentWavyRotationSpeed * delta) % 360;
-
-        // 💡 【新規追加】扇形ショットの波状タイマーを更新
-        this._fanShotWavyTimer = (this._fanShotWavyTimer + delta * 1000) % CONFIG.PLAYER.FAN_SHOT.WAVY_ARC.PERIOD_MS;
+    public update(delta: number) {
+        this._shotWavyTimer += delta; 
     }
 
-    // 🚀 【追加】ダメージを受けるメソッド
     public takeHit() {
         if (!this.active) return;
-
-        // ここにHP減少や無敵時間、ゲームオーバー判定のロジックを実装します
         console.log("Player hit!");
-        // 例: this.hp -= 1;
-        // if (this.hp <= 0) this.die();
+        // TODO: ここにHP減少や無敵時間、ゲームオーバー判定のロジックを実装します
+    }
+    
+    /**
+     * 💎 汎用ショット発射メソッド
+     */
+    public fire(spec: ShotSpec) {
+        const { pattern, count, speed, scale, wave, speedMod } = spec; 
+        
+        const scaleOpt = scale ?? null;
+        const speedOpt = speedMod ?? null; 
+        const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
+
+        let baseAngle = 270; 
+        let angleStep = 0;
+        let startAngle = 270; 
+
+        if (pattern === ShotPatterns.SPIRAL) { // 💡 定数化
+            startAngle = this._rotaryShotAngle; 
+        }
+        
+        // 1. パターンごとの基本角度群を決定
+        switch (pattern) {
+            case ShotPatterns.FAN: // 💡 定数化
+            case ShotPatterns.RANDOM: // 💡 定数化
+                const arc = spec.angle || 60;
+                startAngle = baseAngle - (arc / 2);
+                angleStep = count > 1 ? arc / (count - 1) : 0;
+                break;
+            case ShotPatterns.RING: // 💡 定数化
+                angleStep = 360 / count;
+                startAngle = baseAngle;
+                break;
+            case ShotPatterns.STRAIGHT: // 💡 定数化
+            default:
+                angleStep = 0;
+                break;
+        }
+
+        // 2. 発射時の角度揺らぎオフセットを一意に決定
+        let wavyOffset = 0;
+        if (wave) {
+            const { speed: wavySpeed, range: wavyRange } = wave;
+            const sineValue = Math.sin(this._shotWavyTimer * wavySpeed); 
+            wavyOffset = sineValue * wavyRange; 
+        }
+
+        // 3. 弾の生成ループ
+        for (let i = 0; i < count; i++) {
+            let currentAngleDeg = startAngle + (i * angleStep);
+            
+            // RANDOM の場合、角度をランダムにずらす
+            if (pattern === ShotPatterns.RANDOM && spec.angle) { // 💡 定数化
+                const maxAngle = spec.angle / 2;
+                const randomOffset = (Math.random() - 0.5) * maxAngle; 
+                currentAngleDeg = baseAngle + randomOffset;
+            }
+            
+            // 発射角度に揺らぎオフセットを適用
+            currentAngleDeg += wavyOffset;
+
+            const angleRad = currentAngleDeg * (Math.PI / 180);
+
+            const velX = speed * Math.cos(angleRad);
+            const velY = speed * Math.sin(angleRad);
+            
+            const finalX = spec.spacing ? this.sprite.x + (i - (count - 1) / 2) * spec.spacing : this.sprite.x;
+
+            // 発射イベント (speedOpt を渡す)
+            this.emit(
+                Player.SHOOT_EVENT,
+                finalX,
+                this.sprite.y - offsetY,
+                velX,
+                velY,
+                scaleOpt,
+                speedOpt 
+            );
+        }
+        
+        // 4. SPIRAL の場合、次の発射のために角度を更新
+        if (pattern === ShotPatterns.SPIRAL && spec.angle) { // 💡 定数化
+            this._rotaryShotAngle = (this._rotaryShotAngle + spec.angle) % 360;
+        }
     }
 
-    handleInput(input: InputManager, delta: number) {
-        const halfWidth = this.hitWidth / 2;
 
-        // 移動
+    public handleInput(input: InputManager, delta: number): void {
+        const moveSpeed = CONFIG.PLAYER.SPEED * delta;
+        
+        // 1. 移動処理 (省略)
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
-            this.sprite.x -= CONFIG.PLAYER.SPEED * delta;
+            this.sprite.x = Math.max(this.sprite.x - moveSpeed, this.hitWidth / 2);
         }
         if (input.isDown(CONFIG.INPUT.MOVE_RIGHT)) {
-            this.sprite.x += CONFIG.PLAYER.SPEED * delta;
+            this.sprite.x = Math.min(this.sprite.x + moveSpeed, CONFIG.SCREEN.WIDTH - this.hitWidth / 2);
         }
-
-        // 画面境界でのクランプ（はみ出し防止）
-        this.sprite.x = Math.max(
-            halfWidth,
-            Math.min(CONFIG.SCREEN.WIDTH - halfWidth, this.sprite.x)
-        );
-
+        
         const now = performance.now();
-        const interval = CONFIG.PLAYER.SHOT_INTERVAL_MS;
-
-        // 1. 単発ショット (CONFIG.INPUT.SHOOT)
-        if (input.isDown(CONFIG.INPUT.SHOOT)) {
-            if (now - this.lastShotTime > interval) {
-                this.fireSingleShot(); // 単発ショットを実行
-                this.lastShotTime = now;
-            }
-        }
         
-        // 2. 扇形ショット (仮のキー 'KeyZ' を使用)
-        if (input.isDown('KeyZ')) { 
-            // 扇形ショットは少し発射間隔を長く設定
-            if (now - this.lastShotTime > interval * 1.5) { 
-                this.fireFanShot(CONFIG.BULLET.SPEED);
+        // --- ショット定義 ---
+
+        // KeyA: 基本ショット (STRAIGHT)
+        if (input.isDown('KeyA')) {
+            if (now - this.lastShotTime > 150) { 
+                this.fire({ pattern: ShotPatterns.STRAIGHT, count: 1, speed: 600 }); // 💡 定数化
                 this.lastShotTime = now;
             }
         }
 
-        // 2. 🚀 標準ロータリーショット ('KeyX')：一定回転
-        else if (input.isDown('KeyX')) { 
-            const rotaryInterval = CONFIG.PLAYER.ROTARY_SHOT.SHOT_INTERVAL_MS;
-            if (now - this.lastShotTime > rotaryInterval) { 
-                // fireRotaryShot()を汎用化し、標準角度と弾数を渡す
-                this.fireRotaryShot(this._rotaryShotAngle, CONFIG.PLAYER.ROTARY_SHOT.COUNT); 
+        // KeyS: 扇形ショット (FAN)
+        if (input.isDown('KeyS')) {
+            if (now - this.lastShotTime > 250) { 
+                this.fire({ pattern: ShotPatterns.FAN, count: 7, speed: 550, angle: 90 }); // 💡 定数化
+                this.lastShotTime = now;
+            }
+        }
+        
+        // KeyD: ロータリーショット (SPIRAL)
+        if (input.isDown('KeyD')) {
+            if (now - this.lastShotTime > 20) { 
+                this.fire({ pattern: ShotPatterns.SPIRAL, count: 1, speed: 400, angle: 15 }); // 💡 定数化
                 this.lastShotTime = now;
             }
         }
 
-        // 3. 🚀 波状ロータリーショット ('KeyC')：波状回転
-        else if (input.isDown('KeyC')) { 
-            const wavyInterval = CONFIG.PLAYER.WAVY_ROTARY_SHOT.SHOT_INTERVAL_MS;
-            if (now - this.lastWavyShotTime > wavyInterval) { 
-                // fireRotaryShot()を汎用化し、波状角度と弾数を渡す
-                this.fireRotaryShot(this._wavyRotaryShotAngle, CONFIG.PLAYER.WAVY_ROTARY_SHOT.COUNT);
-                this.lastWavyShotTime = now;
+        // KeyF: 行ったり来たりする直線弾 (Wavy Straight Shot)
+        if (input.isDown('KeyF')) {
+            if (now - this.lastShotTime > 100) { 
+                this.fire({
+                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
+                    count: 1,
+                    speed: 600,
+                    wave: { speed: 5, range: 30 },
+                    scale: { rate: -0.5, initial: 1.2 }
+                });
+                this.lastShotTime = now;
             }
         }
-
-        // 💡 【追記】成長ショット ('KeyQ')
-        if (input.isDown('KeyQ')) { 
-            const growingInterval = CONFIG.PLAYER.GROWING_SHOT.SHOT_INTERVAL_MS;
-            if (now - this.lastGrowingShotTime > growingInterval) { 
-                this.fireGrowingShot();
-                this.lastGrowingShotTime = now;
+        
+        // KeyG: 🚀 【新規デモ】加速しながら縮小するショット
+        if (input.isDown('KeyG')) {
+            if (now - this.lastShotTime > 150) { 
+                this.fire({
+                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
+                    count: 1,
+                    speed: 150, // 初期速度は遅め
+                    speedMod: {
+                        rate: 400, // 1秒あたり 400px/s で加速
+                    },
+                    scale: {
+                        rate: -0.8, // 1秒あたり 0.8 縮小
+                        initial: 2.0, // 初期サイズは大きめ
+                        minScale: 0.1
+                    }
+                });
+                this.lastShotTime = now;
             }
         }
-    }
-
-    // 単発ショットのロジック (前回追加)
-    private fireSingleShot() {
-        const speed = CONFIG.BULLET.SPEED;
-        const velX = 0;
-        const velY = -speed; // y軸は下向きが正なので、上向きは負
-
-        this.emit(
-            Player.SHOOT_EVENT, 
-            this.sprite.x,
-            this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y,
-            velX,
-            velY
-        );
-    }
-
-    // 🚀 新規/修正メソッド: 扇形に弾丸を発射するロジック
- /**
-     * キーBで発動する扇形ショット
-     * @param speed 弾速
-     */
-    private fireFanShot(speed: number) {
-        const { COUNT, WAVY_ARC } = CONFIG.PLAYER.FAN_SHOT;
-
-        // 💡 【修正】波状変動する扇形角度 (Arc) を計算
-        // サイン波を使用して、0 から 1 の範囲で変動する値 (0.0 〜 1.0)
-        const timeRatio = this._fanShotWavyTimer / WAVY_ARC.PERIOD_MS;
-        const sinValue = (Math.sin(timeRatio * 2 * Math.PI) + 1) / 2; // -1 to 1 を 0 to 1 に変換
-
-        // 最終的な扇形角度を計算
-        const arcDegrees = WAVY_ARC.BASE_ARC + WAVY_ARC.AMPLITUDE * sinValue;
-
-        // 弾丸間の角度差 (扇形の角度 / (弾数 - 1))
-        const angleStepDeg = COUNT > 1 ? arcDegrees / (COUNT - 1) : 0;
         
-        // 扇形の中心からのオフセット角度
-        const offsetDeg = arcDegrees / 2;
-
-        // 垂直上向きを基準 (270度) とし、そこから左右に角度を振る
-        const baseAngle = 270;
-
-        for (let i = 0; i < COUNT; i++) {
-            // 270度から左右に COUNT-1 のステップで分散させる
-            const currentAngleDeg = baseAngle + (i * angleStepDeg) - offsetDeg; 
-            
-            // ラジアンに変換
-            const angleRad = currentAngleDeg * (Math.PI / 180);
-            
-            const velX = speed * Math.cos(angleRad);
-            const velY = speed * Math.sin(angleRad); 
-
-            this.emit(
-                Player.SHOOT_EVENT, 
-                this.sprite.x,
-                this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y, // 弾発射位置を調整
-                velX, 
-                velY  
-            );
+        // KeyW: 鼓動する全方位ショット (Pulsing Ring)
+        if (input.isDown('KeyW')) {
+            if (now - this.lastShotTime > 1000) { 
+                this.fire({
+                    pattern: ShotPatterns.RING, // 💡 定数化
+                    count: 16,
+                    speed: 150,
+                    scale: { mode: ScaleModes.SINE, rate: 4.0, minScale: 0.8, maxScale: 1.8 } // 💡 定数化
+                });
+                this.lastShotTime = now;
+            }
         }
-    }
-
-    // 🚀 修正: fireRotaryShot を汎用化し、基準角度と弾数を引数で受け取る
-    private fireRotaryShot(baseAngleDeg: number, numBullets: number) {
-        const speed = CONFIG.BULLET.SPEED;
         
-        const angleStepDeg = 360 / numBullets;
-        
-        for (let i = 0; i < numBullets; i++) {
-            // 基準角度 (標準 or 波状) を使って弾丸の角度を計算
-            const currentAngleDeg = (baseAngleDeg + i * angleStepDeg) % 360;
-            
-            const angleRad = currentAngleDeg * (Math.PI / 180);
-            
-            const velX = speed * Math.cos(angleRad);
-            const velY = speed * Math.sin(angleRad); 
+        // KeyQ: 複合ショット (Wavy Fan + Growing Straight)
+        if (input.isDown('KeyQ')) {
+            if (now - this.lastShotTime > 500) { 
+                
+                // 1/2: 角度が揺らぐ扇形 
+                this.fire({
+                    pattern: ShotPatterns.FAN, // 💡 定数化
+                    count: 5,
+                    speed: 400,
+                    angle: 45,
+                    wave: { speed: 3, range: 15 } 
+                });
 
-            this.emit(
-                Player.SHOOT_EVENT, 
-                this.sprite.x,
-                this.sprite.y, 
-                velX, 
-                velY  
-            );
+                // 2/2: 巨大化する並行ショット
+                this.fire({
+                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
+                    count: 2,
+                    speed: 300,
+                    spacing: 30,
+                    scale: { mode: ScaleModes.LINEAR, rate: 1.0, maxScale: 3.0 } // 💡 定数化
+                });
+                
+                this.lastShotTime = now;
+            }
         }
-    }
-
-    /**
-     * キーQで発動する成長ショット
-     */
-    private fireGrowingShot() {
-        const speed = CONFIG.BULLET.SPEED;
-        
-        // 真上 (角度 270度 または -90度)
-        const velX = 0; 
-        const velY = -speed; // Y軸は下が正なので、上向きは負
-
-        this.emit(
-            Player.SHOOT_EVENT, 
-            this.sprite.x,
-            this.sprite.y - CONFIG.PLAYER.BULLET_OFFSET_Y, // 弾発射位置を調整
-            velX, 
-            velY,
-            // 💡 【重要】成長ショットのパラメータを渡す (Bullet.tsで受け取る)
-            CONFIG.PLAYER.GROWING_SHOT.GROWTH_RATE,
-            CONFIG.PLAYER.GROWING_SHOT.MAX_SCALE
-        );
     }
 }

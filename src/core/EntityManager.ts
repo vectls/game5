@@ -11,6 +11,7 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player"; 
+import type { ScaleOption, SpeedOption } from "../types/ShotTypes"; // 🚀 【修正】SpeedOptionを追加
 
 // 🚀 【import type に修正】型エイリアス
 type ManagedObject = GameObject & Poolable;
@@ -145,17 +146,64 @@ export class EntityManager extends EventEmitter {
         this.getEntity(ENTITY_KEYS.EXPLOSION, x, y);
     }
 
-    /**
-     * 🚀 【修正: 汎用スポーン】
-     * 汎用的なエンティティスポーンメソッド
-     * @param key スポーンするエンティティの種類 (ENTITY_KEYS)
-     * @param args エンティティの reset メソッドに渡す引数
-     */
-    public spawn<K extends EntityType>(
-        key: K,
-        ...args: any[]
-    ): EntityMap[K] {
-        return this.getEntity(key, ...args);
+    // Enemy / Explosion (座標のみを受け取る)
+    public spawn(
+        type: typeof ENTITY_KEYS.ENEMY | typeof ENTITY_KEYS.EXPLOSION, 
+        x: number, 
+        y: number
+    ): Enemy | Explosion | undefined;
+
+    // 🚀 実装シグネチャ (全ての引数を網羅し、デフォルト値はここで設定)
+    public spawn(
+        type: EntityType, 
+        x: number, 
+        y: number, 
+        velX?: number, 
+        velY?: number,
+        scaleOpt: ScaleOption | null = null, 
+        speedOpt: SpeedOption | null = null // デフォルト値は実装でのみ使用
+    ): ManagedObject | undefined {
+        const pool = this._pools[type] as ObjectPool<ManagedObject>;
+        if (!pool) return undefined;
+
+        const activeList = this._activeObjects[type] as ManagedObject[];
+        
+        switch (type) {
+            case ENTITY_KEYS.BULLET:
+                const bullet = pool.get() as Bullet;
+                if (velX !== undefined && velY !== undefined) {
+                    bullet.reset(x, y, velX, velY, scaleOpt, speedOpt); 
+                } else {
+                    console.error("Bullet spawn called without velocity.");
+                    return undefined;
+                }
+                activeList.push(bullet);
+                return bullet;
+
+            case ENTITY_KEYS.ENEMY:
+                const enemy = pool.get() as Enemy;
+                enemy.reset(x, y); 
+                activeList.push(enemy);
+                return enemy;
+            
+            case ENTITY_KEYS.EXPLOSION:
+                const explosion = pool.get() as Explosion;
+                explosion.reset(x, y); 
+                activeList.push(explosion);
+                return explosion;
+
+            case ENTITY_KEYS.ENEMY_BULLET:
+                const enemyBullet = pool.get() as EnemyBullet;
+                if (velX !== undefined && velY !== undefined) {
+                    // EnemyBulletはreset(x, y)のみを受け取る想定
+                    enemyBullet.reset(x, y); 
+                } else {
+                    enemyBullet.reset(x, y); 
+                }
+                activeList.push(enemyBullet);
+                return enemyBullet;
+        }
+        return undefined; 
     }
 
     public update(delta: number) {
