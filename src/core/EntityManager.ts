@@ -1,4 +1,5 @@
 // src/core/EntityManager.ts
+
 import { Container, Texture, EventEmitter } from "pixi.js";
 import { CONFIG } from "../config";
 import { ObjectPool } from "./ObjectPool";
@@ -10,7 +11,8 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player"; 
-import type { ScaleOption, SpeedOption } from "../types/ShotTypes";
+// 💡 修正: ShotSpec, ShotPatterns のみをインポート（TrajectoryModesはfireDeathShot内で不要のため削除）
+import { type ScaleOption, type SpeedOption, type ShotSpec, ShotPatterns } from "../types/ShotTypes"; 
 
 type ManagedObject = GameObject & Poolable;
 
@@ -53,10 +55,11 @@ export class EntityManager extends EventEmitter {
     }
     
     private initializePools() {
-        // Player Bullet
+        // Player Bullet (EntityManagerの参照を渡す)
         this.initEntity(
             ENTITY_KEYS.BULLET,
-            (texture) => new Bullet(texture), 
+            // 💡 変更: Bulletのファクトリ関数にthis (EntityManager) を渡す
+            (texture, manager) => new Bullet(texture, manager as EntityManager), 
             CONFIG.ASSETS.TEXTURES.BULLET,
             CONFIG.BULLET.POOL_SIZE
         );
@@ -88,13 +91,12 @@ export class EntityManager extends EventEmitter {
 
     private initEntity<T extends EntityType>(
         key: T,
-        factory: (texture: Texture, manager?: EntityManager) => EntityMap[T], 
+        factory: (texture: Texture, manager: EntityManager) => EntityMap[T], 
         textureKey: string,
         size: number
     ) {
         const poolFactory = () => {
-            const managerArg = key === ENTITY_KEYS.ENEMY ? this : undefined;
-            const obj = factory(this.textures[textureKey], managerArg as EntityManager);
+            const obj = factory(this.textures[textureKey], this);
             this.stage.addChild(obj.sprite);
             return obj;
         };
@@ -104,8 +106,6 @@ export class EntityManager extends EventEmitter {
         this._pools[key] = pool as ObjectPool<any>; 
         this._activeObjects[key] = []; 
     }
-
-    // 💡 削除: private getEntity は未使用のため削除
 
     private spawnEnemy() {
         const x = Math.random() * CONFIG.SCREEN.WIDTH;
@@ -125,8 +125,6 @@ export class EntityManager extends EventEmitter {
         type: typeof ENTITY_KEYS.ENEMY_BULLET, 
         x: number, 
         y: number,
-        velX: number,
-        velY: number,
     ): EnemyBullet | undefined;
 
     public spawn(
@@ -137,7 +135,8 @@ export class EntityManager extends EventEmitter {
         velY: number,
         textureKey: string, 
         scaleOpt?: ScaleOption | null,
-        speedOpt?: SpeedOption | null
+        speedOpt?: SpeedOption | null,
+        onDeathShotSpec?: ShotSpec | null
     ): Bullet | undefined;
 
     // 実装シグネチャ
@@ -149,7 +148,8 @@ export class EntityManager extends EventEmitter {
         velY?: number,
         textureKey?: string, 
         scaleOpt: ScaleOption | null = null, 
-        speedOpt: SpeedOption | null = null 
+        speedOpt: SpeedOption | null = null,
+        onDeathShotSpec: ShotSpec | null = null
     ): ManagedObject | undefined {
         const pool = this._pools[type] as ObjectPool<ManagedObject>;
         if (!pool) return undefined;
@@ -162,13 +162,11 @@ export class EntityManager extends EventEmitter {
                     return undefined;
                 }
                 
-                const bullet = pool.get(x, y, velX, velY, scaleOpt, speedOpt) as Bullet;
+                const bullet = pool.get(x, y, velX, velY, scaleOpt, speedOpt, onDeathShotSpec) as Bullet;
                 
                 const texture = this.textures[textureKey];
                 if (texture) {
                     bullet.setTexture(texture); 
-                } else {
-                     // 💡 削除: 警告ログを削除
                 }
                 
                 activeList.push(bullet);
@@ -185,14 +183,79 @@ export class EntityManager extends EventEmitter {
                 return explosion;
 
             case ENTITY_KEYS.ENEMY_BULLET:
-                if (velX === undefined || velY === undefined) {
-                    return undefined;
-                }
-                const enemyBullet = pool.get(x, y, velX, velY) as EnemyBullet;
+                const enemyBullet = pool.get(x, y) as EnemyBullet;
                 activeList.push(enemyBullet);
                 return enemyBullet;
         }
         return undefined; 
+    }
+    
+    // 💡 新規: 弾の死亡時イベントから子弾を発射するためのロジック (Player.fireの簡略版)
+    public fireDeathShot(
+        x: number,
+        y: number,
+        spec: ShotSpec
+    ) {
+        const { pattern, count, speed, angle, spacing, speedMod, scale, textureKey: specTextureKey } = spec; 
+        
+        // 💡 修正: ShotSpecからonDeathShotを取得
+        const deathShotSpec = spec.onDeathShot ?? null; 
+        
+        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
+        const scaleOpt = scale ?? null;
+        const speedOpt = speedMod ?? null; 
+        
+
+        let baseAngle = 270; // 死亡時の発射はデフォルト上向き
+        let angleStep = 0;
+        let startAngle = baseAngle;
+        
+        // 死亡時のショットはTrajectory（連続的な回転や揺らぎ）は無視する
+        
+        switch (pattern) {
+            case ShotPatterns.FAN:
+                const arc = angle || 60; 
+                startAngle -= (arc / 2); 
+                angleStep = count > 1 ? arc / (count - 1) : 0;
+                break;
+                
+            case ShotPatterns.RING:
+                baseAngle = Math.random() * 360; 
+                angleStep = 360 / count;
+                startAngle = baseAngle;
+                break;
+                
+            case ShotPatterns.LINE:
+            default:
+                angleStep = 0;
+                break;
+        }
+        
+        // --- 弾丸生成ループ ---
+        for (let i = 0; i < count; i++) {
+            const currentAngleDeg = startAngle + (i * angleStep);
+            
+            const angleRad = currentAngleDeg * (Math.PI / 180);
+
+            const velX = speed * Math.cos(angleRad);
+            const velY = speed * Math.sin(angleRad);
+            
+            const finalX = (pattern === ShotPatterns.LINE && spacing)
+                ? x + (i - (count - 1) / 2) * spacing
+                : x;
+
+            this.spawn(
+                ENTITY_KEYS.BULLET,
+                finalX,
+                y,
+                velX,
+                velY,
+                textureKey,
+                scaleOpt,
+                speedOpt,
+                deathShotSpec // 子弾の子弾仕様
+            );
+        }
     }
 
     public update(delta: number) {
@@ -228,7 +291,7 @@ export class EntityManager extends EventEmitter {
                     if (!e.active) continue;
 
                     if (checkAABBCollision(b, e)) {
-                        b.active = false;
+                        b.deactivateAndFireDeathShot(); // 💡 変更: 死亡時子弾をチェック
                         e.active = false;
 
                         this.spawn(ENTITY_KEYS.EXPLOSION, e.x, e.y);

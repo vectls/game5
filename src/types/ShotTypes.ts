@@ -1,25 +1,35 @@
 // src/types/ShotTypes.ts
 
-/** 弾丸の発射パターンを定義する定数オブジェクト */
+// --- 1. 発射時の配置 (Pattern) ---
+/** 弾丸の発射パターンを定義する定数オブジェクト (発射時の配置) */
 export const ShotPatterns = {
-    STRAIGHT: 'STRAIGHT',
-    FAN: 'FAN',
-    RING: 'RING',
-    SPIRAL: 'SPIRAL',
-    RANDOM: 'RANDOM',
+    LINE: 'LINE',   // 機体前方などに並列に配置
+    FAN: 'FAN',     // 扇形に広がる
+    RING: 'RING',   // 360度均等に広がる
 } as const;
-
-/** ショットの基本パターン (ShotPatternsの値から型を抽出) */
 export type ShotPattern = typeof ShotPatterns[keyof typeof ShotPatterns];
 
-// --- サイズ変化オプション ---
-/** サイズ変化モードを定義する定数オブジェクト */
-export const ScaleModes = {
-    LINEAR: 'LINEAR', // 一直線に変化
-    SINE: 'SINE',     // 波状に揺らぐ
+// --- 2. 方向の動かし方 (Trajectory) ---
+export const TrajectoryModes = {
+    FIXED: 'FIXED',   // 角度固定 (デフォルト)
+    ROTARY: 'ROTARY', // 発射するたびに角度が回転
+    WAVE: 'WAVE',     // 角度がサイン波のように揺れる
 } as const;
+export type TrajectoryMode = typeof TrajectoryModes[keyof typeof TrajectoryModes];
 
-/** サイズ変化のモード */
+/** ショットの軌道変化オプション */
+export interface TrajectoryOption {
+    mode: TrajectoryMode;
+    rate: number;   // ROTARY: 1発あたりの回転角度 (度) / WAVE: 揺れる速さ (周波数)
+    range?: number; // WAVE: 揺れる幅 (角度・度数)
+}
+
+// --- 3. 弾丸自体の変化 (Bullet Effects) ---
+// サイズ変化モード
+export const ScaleModes = {
+    LINEAR: 'LINEAR',
+    SINE: 'SINE',
+} as const;
 export type ScaleMode = typeof ScaleModes[keyof typeof ScaleModes];
 
 /** 弾丸のサイズ変化オプション */
@@ -31,36 +41,32 @@ export interface ScaleOption {
     initial?: number;
 }
 
-// --- 角度揺らぎオプション ---
-/** 弾丸の発射時の角度揺らぎオプション（Wavy Angle） */
-export interface WavyAngleOption {
-    speed: number;    // 揺れる速さ (周波数)
-    range: number;    // 揺れる幅 (角度・度数)
-}
-
-// --- 速度変化オプション ---
 /** 弾丸の速度変化オプション (Acceleration/Deceleration) */
 export interface SpeedOption {
-    rate: number; // 1秒あたりの速度変化量 (ピクセル/秒^2)。+で加速、-で減速。
+    rate: number; // 1秒あたりの速度変化量 (ピクセル/秒^2)
 }
 
 // --- 最終仕様書 ---
 /** Playerのfireメソッドに渡すショットの仕様書 */
 export interface ShotSpec {
+    // 1. 発射時の配置 (Pattern)
     pattern: ShotPattern;
     count: number;
     speed: number; // 発射速度 (ピクセル/秒)
     
-    // FAN, RANDOM, SPIRALで使用
-    angle?: number; // FAN/RANDOMの場合は扇形の角度(度数)。SPIRALの場合は回転ステップの角度。
+    // Patternごとの設定
+    angle?: number; // FAN: 扇形の角度 (度数)
+    spacing?: number; // LINE: X軸方向の間隔
 
-    // STRAIGHTで使用
-    spacing?: number; // 複数弾発射時のX軸方向の間隔
+    // 2. 方向の動かし方 (Trajectory)
+    trajectory?: TrajectoryOption;
 
-    // オプション
-    scale?: ScaleOption; // サイズ変化
-    wave?: WavyAngleOption; // 発射角度の揺らぎ
-    speedMod?: SpeedOption; // 速度変化（加速/減速）
-    textureKey?: string; // 使用するテクスチャのキー
-    offsetY?: number; // プレイヤーからのY軸オフセット
+    // 3. 弾丸自体の変化 (Bullet Effects)
+    scale?: ScaleOption;
+    speedMod?: SpeedOption;
+    textureKey?: string; 
+    offsetY?: number; 
+    
+    // 💡 修正: 弾が消える際に発射する子弾の仕様 (再帰的にShotSpecを保持)
+    onDeathShot?: ShotSpec;
 }

@@ -1,20 +1,22 @@
 // src/main.ts
+
 import { Application, Assets, Texture, Ticker } from "pixi.js";
 import { CONFIG } from "./config";
 import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
 import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
 import { Player } from "./entities/Player";
-import type { ScaleOption, SpeedOption } from "./types/ShotTypes";
+// 💡 修正: ShotSpecをインポート
+import type { ScaleOption, SpeedOption, ShotSpec } from "./types/ShotTypes";
 
 class Game {
-    private app: Application;
-    private input: InputManager;
-    private textures: Record<string, Texture> = {};
+    private app: Application; // 💡 修正: プロパティ宣言を追加
+    private input: InputManager; // 💡 修正: プロパティ宣言を追加
+    private textures: Record<string, Texture> = {}; // 💡 修正: プロパティ宣言を追加
 
-    private player: Player | null = null;
-    private scoreManager: ScoreManager;
-    private entityManager: EntityManager | null = null;
+    private player: Player | null = null; // 💡 修正: プロパティ宣言を追加
+    private scoreManager: ScoreManager; // 💡 修正: プロパティ宣言を追加
+    private entityManager: EntityManager | null = null; // 💡 修正: プロパティ宣言を追加
 
     constructor(app: Application) {
         this.app = app;
@@ -23,41 +25,41 @@ class Game {
     }
 
     async init() {
+        // 💡 修正: asyncを付加
+        // アセットのロード
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
-        this.textures = atlas.textures;
+        this.textures = atlas.textures as Record<string, Texture>;
         this.createScene();
     }
 
     private createScene() {
+        // 1. プレイヤー生成
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
 
-        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this);
-
+        // 💡 修正: プレイヤーの初期位置と可視性を設定するために reset() を呼び出す
         this.player.reset();
 
+        // 2. スコアマネージャー、エンティティマネージャーの生成
         this.entityManager = new EntityManager(
             this.app.stage,
             this.textures,
             this.player
         );
 
+        // Playerの発射イベントを購読する
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
+        // スコア更新イベントを購読する
         this.entityManager.on(
             EntityManager.ENEMY_DESTROYED_EVENT,
-            this.handleEnemyDestroyed,
-            this
+            this.handleEnemyDestroyed.bind(this)
         );
 
-        this.scoreManager.on(
-            ScoreManager.SCORE_CHANGED_EVENT,
-            // 💡 削除: スコア変更時のログ出力を削除
-            () => {},
-            this
-        );
-
+        // 3. メインループの開始
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
+    // 💡 修正: onDeathShotSpecを引数に追加
     private handlePlayerShoot(
         x: number,
         y: number,
@@ -65,37 +67,48 @@ class Game {
         velY: number,
         textureKey: string,
         scaleOpt: ScaleOption | null,
-        speedOpt: SpeedOption | null
+        speedOpt: SpeedOption | null,
+        onDeathShotSpec: ShotSpec | null
     ) {
         const entityManager = this.entityManager;
         if (!entityManager) return;
 
         entityManager.spawn(
-            ENTITY_KEYS.BULLET, 
-            x, y, 
-            velX, velY, 
-            textureKey, 
-            scaleOpt,   
-            speedOpt
+            ENTITY_KEYS.BULLET,
+            x,
+            y,
+            velX,
+            velY,
+            textureKey,
+            scaleOpt,
+            speedOpt,
+            onDeathShotSpec
         );
     }
-    
+
     private handleEnemyDestroyed() {
+        // スコア加算
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
 
+    // 💡 修正: updateメソッドとTicker型を定義
     private update(ticker: Ticker) {
         if (!this.player || !this.entityManager) return;
+        // deltaは秒に変換
         const delta = ticker.deltaMS / 1000;
 
+        // 1. プレイヤー更新（入力処理と内部タイマーの更新）
         this.player.handleInput(this.input, delta);
         this.player.update(delta);
 
+        // 2. エンティティ全体の更新
         this.entityManager.update(delta);
     }
 
+    // リソースクリーンアップメソッド
     public destroy() {
         this.input.destroy();
+        this.app.destroy();
     }
 }
 
@@ -109,7 +122,7 @@ async function main() {
     document.body.appendChild(app.canvas);
 
     const game = new Game(app);
-    await game.init();
+    await game.init(); // 💡 修正: initを呼び出し
 }
 
 main();

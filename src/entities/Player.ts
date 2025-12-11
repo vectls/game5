@@ -5,7 +5,9 @@ import { GameObject } from "./GameObject";
 import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
-import type { ShotSpec, ScaleOption, SpeedOption } from "../types/ShotTypes"; 
+// 💡 修正: 使用されていない型は 'import type' に変更し、未使用警告を解消
+import type { ShotSpec } from "../types/ShotTypes"; 
+import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
 
 export class Player extends GameObject implements Collider {
 
@@ -51,67 +53,88 @@ export class Player extends GameObject implements Collider {
 
     public takeHit() {
         if (!this.active) return;
-        console.log("Player hit!");
-        // TODO: ここにHP減少や無敵時間、ゲームオーバー判定のロジックを実装します
     }
     
     public fire(spec: ShotSpec) {
-        const { pattern, count, speed, scale, wave, speedMod, textureKey: specTextureKey } = spec; 
+        const { 
+            pattern, 
+            count, 
+            speed, 
+            trajectory, 
+            angle, 
+            spacing, 
+            speedMod, 
+            scale, 
+            textureKey: specTextureKey,
+            onDeathShot, // 💡 修正: onDeathShotを取得
+        } = spec; 
         
         const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
         const scaleOpt = scale ?? null;
         const speedOpt = speedMod ?? null; 
         const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
 
-        let baseAngle = 270; 
-        let angleStep = 0;
-        let startAngle = 270; 
+        let baseAngle = 270; // 真上 (度数)
 
-        if (pattern === 'SPIRAL') {
-            startAngle = this._rotaryShotAngle; 
+        // --- 2. 方向の動かし方 (Trajectory) の計算 ---
+        let trajectoryOffsetDeg = 0;
+        
+        if (trajectory) {
+            switch (trajectory.mode) {
+                case TrajectoryModes.ROTARY:
+                    // 発射角度を更新し、今回の発射角度として使用
+                    this._rotaryShotAngle = (this._rotaryShotAngle + trajectory.rate) % 360;
+                    baseAngle = this._rotaryShotAngle;
+                    break;
+                    
+                case TrajectoryModes.WAVE:
+                    // サイン波で角度を揺らす
+                    const range = trajectory.range ?? 30; 
+                    const rate = trajectory.rate; 
+                    trajectoryOffsetDeg = Math.sin(this._shotWavyTimer * rate) * range;
+                    break;
+                
+                case TrajectoryModes.FIXED:
+                default:
+                    break;
+            }
         }
+
+
+        // --- 1. 発射時の配置 (Pattern) の計算 ---
+        let startAngle = baseAngle + trajectoryOffsetDeg;
+        let angleStep = 0;
         
         switch (pattern) {
-            case 'FAN':
-            case 'RANDOM':
-                const arc = spec.angle || 60;
-                startAngle = baseAngle - (arc / 2);
+            case ShotPatterns.FAN:
+                const arc = angle || 60;
+                startAngle -= (arc / 2); 
                 angleStep = count > 1 ? arc / (count - 1) : 0;
                 break;
-            case 'RING':
+                
+            case ShotPatterns.RING:
                 angleStep = 360 / count;
-                startAngle = baseAngle;
                 break;
-            case 'STRAIGHT':
+                
+            case ShotPatterns.LINE:
             default:
                 angleStep = 0;
                 break;
         }
 
-        let wavyOffset = 0;
-        if (wave) {
-            const { speed: wavySpeed, range: wavyRange } = wave;
-            const sineValue = Math.sin(this._shotWavyTimer * wavySpeed); 
-            wavyOffset = sineValue * wavyRange; 
-        }
 
+        // --- 弾丸生成ループ ---
         for (let i = 0; i < count; i++) {
             let currentAngleDeg = startAngle + (i * angleStep);
             
-            if (pattern === 'RANDOM' && spec.angle) {
-                const maxAngle = spec.angle / 2;
-                const randomOffset = (Math.random() - 0.5) * maxAngle; 
-                currentAngleDeg = baseAngle + randomOffset;
-            }
-            
-            currentAngleDeg += wavyOffset;
-
             const angleRad = currentAngleDeg * (Math.PI / 180);
 
             const velX = speed * Math.cos(angleRad);
             const velY = speed * Math.sin(angleRad);
             
-            const finalX = spec.spacing ? this.sprite.x + (i - (count - 1) / 2) * spec.spacing : this.sprite.x;
+            const finalX = (pattern === ShotPatterns.LINE && spacing)
+                ? this.sprite.x + (i - (count - 1) / 2) * spacing
+                : this.sprite.x;
 
             this.emit(
                 Player.SHOOT_EVENT,
@@ -121,18 +144,16 @@ export class Player extends GameObject implements Collider {
                 velY,
                 textureKey, 
                 scaleOpt,   
-                speedOpt    
+                speedOpt,
+                onDeathShot ?? null // 💡 修正: onDeathShotを渡す
             );
-        }
-        
-        if (pattern === 'SPIRAL' && spec.angle) {
-            this._rotaryShotAngle = (this._rotaryShotAngle + spec.angle) % 360;
         }
     }
 
     public handleInput(input: InputManager, delta: number): void {
         const moveSpeed = CONFIG.PLAYER.SPEED * delta;
 
+        // --- 移動ロジック ---
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
             this.sprite.x = Math.max(
                 this.sprite.x - moveSpeed,
@@ -148,17 +169,17 @@ export class Player extends GameObject implements Collider {
 
         const now = performance.now();
 
-        // --- ショット定義 ---
+        // --- 新しいショット定義 ---
 
-        // KeyA: 基本ショット (STRAIGHT)
+        // KeyA: 基本の直線ショット (LINE + FIXED)
         if (input.isDown("KeyA")) {
             if (now - this.lastShotTime > 150) {
-                this.fire({ pattern: "STRAIGHT", count: 1, speed: 600 });
+                this.fire({ pattern: "LINE", count: 1, speed: 600 });
                 this.lastShotTime = now;
             }
         }
 
-        // KeyS: 扇形ショット (FAN)
+        // KeyS: 扇形ショット (FAN + FIXED)
         if (input.isDown("KeyS")) {
             if (now - this.lastShotTime > 250) {
                 this.fire({ pattern: "FAN", count: 7, speed: 550, angle: 90 });
@@ -166,39 +187,39 @@ export class Player extends GameObject implements Collider {
             }
         }
 
-        // KeyD: ロータリーショット (SPIRAL)
+        // KeyD: ロータリーショット (LINE + ROTARY)
         if (input.isDown("KeyD")) {
             if (now - this.lastShotTime > 20) {
                 this.fire({
-                    pattern: "SPIRAL",
+                    pattern: "LINE",
                     count: 1,
                     speed: 400,
-                    angle: 15,
+                    trajectory: { mode: TrajectoryModes.ROTARY, rate: 15 }
                 });
                 this.lastShotTime = now;
             }
         }
 
-        // KeyF: 行ったり来たりする直線弾 (Wavy Straight Shot)
+        // KeyF: 角度が左右に揺れる直線ショット (LINE + WAVE)
         if (input.isDown("KeyF")) {
             if (now - this.lastShotTime > 100) {
                 this.fire({
-                    pattern: "STRAIGHT",
+                    pattern: "LINE",
                     count: 4,
                     spacing: 30,
                     speed: 600,
-                    wave: { speed: 5, range: 30 },
+                    trajectory: { mode: TrajectoryModes.WAVE, rate: 5, range: 30 },
                     scale: { rate: -0.5, initial: 1.2 },
                 });
                 this.lastShotTime = now;
             }
         }
 
-        // KeyG: 加速しながら縮小するショット
+        // KeyG: 加速・縮小するショット
         if (input.isDown("KeyG")) {
             if (now - this.lastShotTime > 150) {
                 this.fire({
-                    pattern: "STRAIGHT",
+                    pattern: "LINE",
                     count: 1,
                     speed: 150, 
                     textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, 
@@ -215,44 +236,42 @@ export class Player extends GameObject implements Collider {
             }
         }
 
-        // KeyW: 鼓動する全方位ショット (Pulsing Ring)
+        // KeyW: 鼓動する全方位ショット (RING + WAVE + SINE Scale)
         if (input.isDown("KeyW")) {
             if (now - this.lastShotTime > 1000) {
                 this.fire({
                     pattern: "RING",
                     count: 16,
                     speed: 150,
+                    trajectory: { mode: TrajectoryModes.WAVE, rate: 3, range: 10 },
                     scale: {
                         mode: "SINE",
                         rate: 4.0,
                         minScale: 0.8,
                         maxScale: 1.8,
                     },
-                    wave: { speed: 3, range: 15 },
                 });
                 this.lastShotTime = now;
             }
         }
-
-        // KeyQ: 複合ショット (Wavy Fan + Growing Straight)
+        
+        // KeyQ: 複合ショット & 死亡時子弾のテスト (LINE + ON DEATH)
         if (input.isDown("KeyQ")) {
             if (now - this.lastShotTime > 500) {
                 this.fire({
-                    pattern: "FAN",
-                    count: 5,
+                    pattern: "LINE",
+                    count: 1,
                     speed: 400,
-                    angle: 45,
-                    wave: { speed: 3, range: 15 },
+                    scale: { rate: 0.5, initial: 1.0, maxScale: 3.0 },
+                    // 💡 新規: 弾が消えるときに全方位に子弾を8発発射
+                    onDeathShot: {
+                        pattern: "RING",
+                        count: 8,
+                        speed: 200,
+                        textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
+                        scale: { rate: -1.0, initial: 1.0 },
+                    }
                 });
-
-                this.fire({
-                    pattern: "STRAIGHT",
-                    count: 2,
-                    speed: 300,
-                    spacing: 30,
-                    scale: { mode: "LINEAR", rate: 1.0, maxScale: 3.0 },
-                });
-
                 this.lastShotTime = now;
             }
         }

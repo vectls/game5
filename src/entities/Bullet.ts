@@ -3,7 +3,9 @@
 import { Texture } from "pixi.js";
 import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
-import { ScaleModes, type ScaleOption, type SpeedOption } from "../types/ShotTypes"; 
+// 💡 修正: ShotSpecもインポート
+import { ScaleModes, type ScaleOption, type SpeedOption, type ShotSpec } from "../types/ShotTypes"; 
+import type { EntityManager } from "../core/EntityManager"; 
 
 export class Bullet extends GameObject {
   private velX: number = 0; 
@@ -14,11 +16,17 @@ export class Bullet extends GameObject {
   private currentMinScale: number = 0.1; 
 
   private speedOpt: SpeedOption | null = null; 
+  
+  // 💡 新規: 子弾生成のためにEntityManagerへの参照を保持
+  private entityManager: EntityManager | null = null;
+  private onDeathShotSpec: ShotSpec | null = null; 
 
-  constructor(texture: Texture) {
+  // 💡 変更: コンストラクタでEntityManagerを受け取るようにする
+  constructor(texture: Texture, entityManager: EntityManager) {
     const initialScale = 1.0; 
     super(texture, texture.width * initialScale * 0.5, texture.height * initialScale * 0.5);
     this.sprite.scale.set(initialScale); 
+    this.entityManager = entityManager;
   }
 
   public setTexture(texture: Texture): void {
@@ -26,6 +34,7 @@ export class Bullet extends GameObject {
       this.updateHitbox(this.sprite.scale.x); 
   }
   
+  // 💡 変更: resetの引数にonDeathShotSpecを追加
   reset(
     x: number, 
     y: number, 
@@ -33,6 +42,7 @@ export class Bullet extends GameObject {
     velY: number, 
     scaleOpt: ScaleOption | null = null, 
     speedOpt: SpeedOption | null = null, 
+    onDeathShotSpec: ShotSpec | null = null,
   ) {
     this.sprite.x = x;
     this.sprite.y = y;
@@ -42,6 +52,8 @@ export class Bullet extends GameObject {
 
     this.scaleOpt = scaleOpt;
     this.speedOpt = speedOpt; 
+    this.onDeathShotSpec = onDeathShotSpec; // 子弾仕様を保持
+
     const initialScale = scaleOpt?.initial ?? 1.0;
     this.currentMinScale = scaleOpt?.minScale ?? 0.1; 
     this.sprite.scale.set(initialScale);
@@ -69,8 +81,7 @@ export class Bullet extends GameObject {
       let newSpeed = currentSpeed + this.speedOpt.rate * delta;
       
       if (newSpeed <= 0) {
-          this.active = false; 
-          this.sprite.visible = false;
+          this.deactivateAndFireDeathShot(); 
           return;
       }
       
@@ -107,9 +118,25 @@ export class Bullet extends GameObject {
       }
       
       if (newScale <= this.currentMinScale * 0.2) { 
-          this.active = false;
-          this.sprite.visible = false;
+          this.deactivateAndFireDeathShot(); 
       }
+  }
+
+  // 💡 新規: 非アクティブ化と子弾発射を処理するヘルパー
+  public deactivateAndFireDeathShot() {
+    if (!this.active) return; // 二重発射防止
+
+    this.active = false;
+    this.sprite.visible = false;
+    
+    if (this.onDeathShotSpec && this.entityManager) {
+        // Playerのfireロジックを再利用して子弾を発射
+        this.entityManager.fireDeathShot(
+            this.x,
+            this.y,
+            this.onDeathShotSpec
+        );
+    }
   }
 
   update(delta: number) {
@@ -128,8 +155,7 @@ export class Bullet extends GameObject {
       this.sprite.y < -CONFIG.SCREEN.MARGIN ||
       this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN
     ) {
-      this.active = false;
-      this.sprite.visible = false;
+      this.deactivateAndFireDeathShot(); // 画面外に出た場合もヘルパーを使用
     }
   }
 }
