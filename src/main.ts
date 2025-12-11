@@ -6,17 +6,16 @@ import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
 import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
 import { Player } from "./entities/Player";
-// 💡 修正: ShotSpecをインポート
 import type { ScaleOption, SpeedOption, ShotSpec } from "./types/ShotTypes";
 
 class Game {
-    private app: Application; // 💡 修正: プロパティ宣言を追加
-    private input: InputManager; // 💡 修正: プロパティ宣言を追加
-    private textures: Record<string, Texture> = {}; // 💡 修正: プロパティ宣言を追加
+    private app: Application;
+    private input: InputManager;
+    private textures: Record<string, Texture> = {};
 
-    private player: Player | null = null; // 💡 修正: プロパティ宣言を追加
-    private scoreManager: ScoreManager; // 💡 修正: プロパティ宣言を追加
-    private entityManager: EntityManager | null = null; // 💡 修正: プロパティ宣言を追加
+    private player: Player | null = null;
+    private scoreManager: ScoreManager;
+    private entityManager: EntityManager | null = null;
 
     constructor(app: Application) {
         this.app = app;
@@ -25,7 +24,6 @@ class Game {
     }
 
     async init() {
-        // 💡 修正: asyncを付加
         // アセットのロード
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
         this.textures = atlas.textures as Record<string, Texture>;
@@ -37,7 +35,7 @@ class Game {
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
 
-        // 💡 修正: プレイヤーの初期位置と可視性を設定するために reset() を呼び出す
+        // プレイヤーの初期位置と可視性を設定するために reset() を呼び出す
         this.player.reset();
 
         // 2. スコアマネージャー、エンティティマネージャーの生成
@@ -46,6 +44,9 @@ class Game {
             this.textures,
             this.player
         );
+        
+        // EntityManagerのオブジェクトプールを初期化
+        this.entityManager.setup(this.textures); 
 
         // Playerの発射イベントを購読する
         this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
@@ -59,7 +60,7 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    // 💡 修正: onDeathShotSpecを引数に追加
+    // onDeathShotSpecを引数に追加
     private handlePlayerShoot(
         x: number,
         y: number,
@@ -91,14 +92,14 @@ class Game {
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
 
-    // 💡 修正: updateメソッドとTicker型を定義
     private update(ticker: Ticker) {
         if (!this.player || !this.entityManager) return;
         // deltaは秒に変換
         const delta = ticker.deltaMS / 1000;
 
         // 1. プレイヤー更新（入力処理と内部タイマーの更新）
-        this.player.handleInput(this.input, delta);
+        // 🚀 修正: Playerの入力処理をメインループで明示的に呼び出し、弾が発射されない問題を解消
+        this.player.handleInput(this.input, delta); 
         this.player.update(delta);
 
         // 2. エンティティ全体の更新
@@ -122,7 +123,7 @@ async function main() {
     document.body.appendChild(app.canvas);
 
     const game = new Game(app);
-    await game.init(); // 💡 修正: initを呼び出し
+    await game.init(); // initを呼び出し
 }
 
 main();

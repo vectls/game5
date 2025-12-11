@@ -3,7 +3,6 @@
 import { Texture } from "pixi.js";
 import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
-// 💡 修正: ShotSpecもインポート
 import { ScaleModes, type ScaleOption, type SpeedOption, type ShotSpec } from "../types/ShotTypes"; 
 import type { EntityManager } from "../core/EntityManager"; 
 
@@ -17,11 +16,9 @@ export class Bullet extends GameObject {
 
   private speedOpt: SpeedOption | null = null; 
   
-  // 💡 新規: 子弾生成のためにEntityManagerへの参照を保持
   private entityManager: EntityManager | null = null;
   private onDeathShotSpec: ShotSpec | null = null; 
 
-  // 💡 変更: コンストラクタでEntityManagerを受け取るようにする
   constructor(texture: Texture, entityManager: EntityManager) {
     const initialScale = 1.0; 
     super(texture, texture.width * initialScale * 0.5, texture.height * initialScale * 0.5);
@@ -31,80 +28,73 @@ export class Bullet extends GameObject {
 
   public setTexture(texture: Texture): void {
       this.sprite.texture = texture;
-      this.updateHitbox(this.sprite.scale.x); 
+      this.updateHitbox(this.sprite.scale.x);
   }
-  
-  // 💡 変更: resetの引数にonDeathShotSpecを追加
-  reset(
+
+// resetメソッドのみ修正します
+  public reset(
     x: number, 
     y: number, 
     velX: number, 
     velY: number, 
+    textureKey: string, 
     scaleOpt: ScaleOption | null = null, 
-    speedOpt: SpeedOption | null = null, 
-    onDeathShotSpec: ShotSpec | null = null,
-  ) {
-    this.sprite.x = x;
-    this.sprite.y = y;
-    this.active = true; 
-    this.sprite.visible = true; 
-    this.lifeTime = 0; 
+    speedOpt: SpeedOption | null = null,
+    onDeathShotSpec: ShotSpec | null = null
+  ): void {
+      this.sprite.x = x;
+      this.sprite.y = y;
+      this.active = true;
+      this.sprite.visible = true;
+      this.lifeTime = 0;
 
-    this.scaleOpt = scaleOpt;
-    this.speedOpt = speedOpt; 
-    this.onDeathShotSpec = onDeathShotSpec; // 子弾仕様を保持
-
-    const initialScale = scaleOpt?.initial ?? 1.0;
-    this.currentMinScale = scaleOpt?.minScale ?? 0.1; 
-    this.sprite.scale.set(initialScale);
-    
-    this.velX = velX;
-    this.velY = velY;
-
-    this.updateHitbox(initialScale);
-    this.sprite.rotation = Math.atan2(velY, velX) + Math.PI / 2;
-  }
-
-  private updateHitbox(newScale: number) {
-    this._hitWidth = this.sprite.texture.width * newScale * 0.5;
-    this._hitHeight = this.sprite.texture.height * newScale * 0.5;
-  }
-
-  private handleSpeed(delta: number) {
-      if (!this.speedOpt) return;
-
-      const currentSpeedSq = this.velX * this.velX + this.velY * this.velY;
-      if (currentSpeedSq === 0) return; 
-
-      const currentSpeed = Math.sqrt(currentSpeedSq);
+      // 速度の初期化
+      this.velX = velX;
+      this.velY = velY;
       
-      let newSpeed = currentSpeed + this.speedOpt.rate * delta;
-      
-      if (newSpeed <= 0) {
-          this.deactivateAndFireDeathShot(); 
-          return;
+      // 🚀 修正: 進行方向（速度ベクトル）に合わせて画像を回転させる
+      // Math.atan2(y, x) でラジアン角を取得し、画像が上向き( -90度 )の素材である場合の補正 (+90度 = +PI/2) を加える
+      // ※ 素材の向きによって + Math.PI / 2 の有無や値を調整してください
+      this.sprite.rotation = Math.atan2(velY, velX) + Math.PI / 2;
+
+      // オプションの初期化
+      this.scaleOpt = scaleOpt;
+      this.speedOpt = speedOpt;
+      this.onDeathShotSpec = onDeathShotSpec;
+
+      // テクスチャの更新
+      if (this.entityManager && typeof (this.entityManager as any).getTexture === 'function') {
+           const newTexture = (this.entityManager as any).getTexture(textureKey);
+           if (newTexture) this.setTexture(newTexture);
       }
-      
-      const ratio = newSpeed / currentSpeed; 
-      
-      this.velX *= ratio; 
-      this.velY *= ratio; 
+
+      // スケールの初期化
+      const initialScale = scaleOpt?.initial ?? 1.0;
+      this.sprite.scale.set(initialScale);
+      this.updateHitbox(initialScale);
+      this.currentMinScale = scaleOpt?.minScale ?? 0.1; 
   }
 
-  private handleScale(delta: number) {
+  private updateHitbox(scale: number): void {
+      this._hitWidth = this.sprite.texture.width * scale * 0.5;
+      this._hitHeight = this.sprite.texture.height * scale * 0.5;
+  }
+
+  private handleScale(delta: number) { 
       if (!this.scaleOpt) return;
-      let newScale = this.sprite.scale.x;
+      
       const opt = this.scaleOpt;
-      const maxScale = opt.maxScale ?? 1.0;
+      let newScale = this.sprite.scale.x;
+      const maxScale = opt.maxScale ?? Infinity;
 
       if (opt.mode === ScaleModes.SINE) {
-          const minScale = opt.minScale ?? 0.1;
-          const range = maxScale - minScale;
-          const base = minScale + range / 2;
-          newScale = base + (range / 2) * Math.sin(this.lifeTime * opt.rate);
-      } else { 
+          const t = this.lifeTime * (opt.rate ?? 1); 
+          const sineValue = (1 + Math.sin(t)) / 2;
+          const range = (opt.maxScale ?? 1.5) - (opt.minScale ?? 0.5);
+          newScale = (opt.minScale ?? 0.5) + sineValue * range;
+      } 
+      else if (opt.rate !== 0) { 
           newScale = this.sprite.scale.x + opt.rate * delta;
-          
           if (opt.rate > 0) { 
               newScale = Math.min(maxScale, newScale);
           } else { 
@@ -122,15 +112,13 @@ export class Bullet extends GameObject {
       }
   }
 
-  // 💡 新規: 非アクティブ化と子弾発射を処理するヘルパー
   public deactivateAndFireDeathShot() {
-    if (!this.active) return; // 二重発射防止
+    if (!this.active) return; 
 
     this.active = false;
     this.sprite.visible = false;
     
     if (this.onDeathShotSpec && this.entityManager) {
-        // Playerのfireロジックを再利用して子弾を発射
         this.entityManager.fireDeathShot(
             this.x,
             this.y,
@@ -139,23 +127,38 @@ export class Bullet extends GameObject {
     }
   }
 
-  update(delta: number) {
+  public update(delta: number) {
     if (!this.active) return;
     this.lifeTime += delta; 
 
     this.handleScale(delta); 
-    this.handleSpeed(delta); 
+
+    if (this.speedOpt) {
+        const currentSpeed = Math.sqrt(this.velX * this.velX + this.velY * this.velY);
+        const newSpeed = currentSpeed + this.speedOpt.rate * delta;
+        const finalSpeed = Math.max(0, newSpeed);
+
+        if (currentSpeed > 0) {
+            const ratio = finalSpeed / currentSpeed;
+            this.velX *= ratio;
+            this.velY *= ratio;
+        }
+    }
 
     this.sprite.x += this.velX * delta;
     this.sprite.y += this.velY * delta;
 
+    if (this.lifeTime * 1000 > CONFIG.BULLET.LIFE_TIME_MS) {
+        this.deactivateAndFireDeathShot();
+    }
+    
     if (
-      this.sprite.x < -CONFIG.SCREEN.MARGIN ||
-      this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN ||
-      this.sprite.y < -CONFIG.SCREEN.MARGIN ||
-      this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN
+        this.sprite.x < -CONFIG.SCREEN.MARGIN ||
+        this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN ||
+        this.sprite.y < -CONFIG.SCREEN.MARGIN ||
+        this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN
     ) {
-      this.deactivateAndFireDeathShot(); // 画面外に出た場合もヘルパーを使用
+        this.deactivateAndFireDeathShot();
     }
   }
 }

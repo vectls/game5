@@ -2,8 +2,7 @@
 
 import { Container, Texture, EventEmitter } from "pixi.js";
 import { CONFIG } from "../config";
-import { ObjectPool } from "./ObjectPool";
-import type { Poolable } from "./ObjectPool";
+import { ObjectPool, type Poolable, type ResetArgs } from "./ObjectPool";
 import { Bullet } from "../entities/Bullet";
 import { Enemy } from "../entities/Enemy";
 import { Explosion } from "../entities/Explosion";
@@ -11,8 +10,7 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player"; 
-// 💡 修正: ShotSpec, ShotPatterns のみをインポート（TrajectoryModesはfireDeathShot内で不要のため削除）
-import { type ScaleOption, type SpeedOption, type ShotSpec, ShotPatterns } from "../types/ShotTypes"; 
+import { type ScaleOption, type SpeedOption, type ShotSpec } from "../types/ShotTypes"; 
 
 type ManagedObject = GameObject & Poolable;
 
@@ -33,267 +31,141 @@ interface EntityMap {
 }
 
 export class EntityManager extends EventEmitter {
-    private stage: Container;
-    private textures: Record<string, Texture>;
-    private player: Player; 
+    private _pools: { [key in EntityType]: ObjectPool<EntityMap[key]> };
+    private _activeObjects: { [key in EntityType]: ManagedObject[] } = {
+        [ENTITY_KEYS.BULLET]: [],
+        [ENTITY_KEYS.ENEMY]: [],
+        [ENTITY_KEYS.EXPLOSION]: [],
+        [ENTITY_KEYS.ENEMY_BULLET]: [],
+    };
+    private _container: Container;
+    private _textures: Record<string, Texture>; // テクスチャ参照を保持
+    private player: Player;
+    
+    private timeSinceLastEnemySpawn: number = 0;
 
     public static readonly ENEMY_DESTROYED_EVENT = "enemyDestroyed";
-
-    private _pools: Record<EntityType, ObjectPool<any>> = {} as Record<EntityType, ObjectPool<any>>;
-    private _activeObjects: Record<EntityType, ManagedObject[]> = {} as Record<EntityType, ManagedObject[]>;
-
-    private timeSinceLastSpawn = 0;
-
-    constructor(stage: Container, textures: Record<string, Texture>, player: Player) {
+    
+    // コンストラクタで textures を受け取ったらプロパティに保存するように変更
+    constructor(container: Container, textures: Record<string, Texture>, player: Player) {
         super();
+        this._container = container;
+        this._textures = textures; // 保持する
+        this.player = player;
 
-        this.stage = stage;
-        this.textures = textures;
-        this.player = player; 
-        this.initializePools();
-        this.timeSinceLastSpawn = CONFIG.ENEMY.SPAWN_INTERVAL_MS;
+        this._pools = {} as { [key in EntityType]: ObjectPool<EntityMap[key]> };
     }
-    
-    private initializePools() {
-        // Player Bullet (EntityManagerの参照を渡す)
-        this.initEntity(
-            ENTITY_KEYS.BULLET,
-            // 💡 変更: Bulletのファクトリ関数にthis (EntityManager) を渡す
-            (texture, manager) => new Bullet(texture, manager as EntityManager), 
-            CONFIG.ASSETS.TEXTURES.BULLET,
-            CONFIG.BULLET.POOL_SIZE
-        );
+
+    public setup(textures: Record<string, Texture>): void {
+        this._textures = textures; // 再度設定（念のため）
         
-        // Enemy
-        this.initEntity(
-            ENTITY_KEYS.ENEMY,
-            (texture, manager) => new Enemy(texture, manager), 
-            CONFIG.ASSETS.TEXTURES.ENEMY,
-            CONFIG.ENEMY.POOL_SIZE
-        );
+        const bulletFactory = () => new Bullet(textures[CONFIG.ASSETS.TEXTURES.BULLET], this);
+        const enemyFactory = () => new Enemy(textures[CONFIG.ASSETS.TEXTURES.ENEMY], this);
+        const explosionFactory = () => new Explosion(textures[CONFIG.ASSETS.TEXTURES.EXPLOSION]);
+        const enemyBulletFactory = () => new EnemyBullet(textures[CONFIG.ASSETS.TEXTURES.ENEMY_BULLET]);
 
-        // Enemy Bullet
-        this.initEntity(
-            ENTITY_KEYS.ENEMY_BULLET,
-            (texture) => new EnemyBullet(texture), 
-            CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
-            CONFIG.ENEMY_BULLET.POOL_SIZE
-        );
-        
-        // Explosion
-        this.initEntity(
-            ENTITY_KEYS.EXPLOSION,
-            (texture) => new Explosion(texture), 
-            CONFIG.ASSETS.TEXTURES.EXPLOSION,
-            CONFIG.EXPLOSION.POOL_SIZE
-        );
+        this._pools[ENTITY_KEYS.BULLET] = new ObjectPool(bulletFactory, CONFIG.BULLET.POOL_SIZE);
+        this._pools[ENTITY_KEYS.ENEMY] = new ObjectPool(enemyFactory, CONFIG.ENEMY.POOL_SIZE);
+        this._pools[ENTITY_KEYS.EXPLOSION] = new ObjectPool(explosionFactory, CONFIG.EXPLOSION.POOL_SIZE);
+        this._pools[ENTITY_KEYS.ENEMY_BULLET] = new ObjectPool(enemyBulletFactory, CONFIG.ENEMY_BULLET.POOL_SIZE);
+
+        for (const poolKey of Object.keys(this._pools) as EntityType[]) {
+            const pool = this._pools[poolKey];
+            pool.getAllObjects().forEach((obj: ManagedObject) => {
+                this._container.addChild(obj.sprite);
+            });
+        }
+
+        const enemyPool = this._pools[ENTITY_KEYS.ENEMY] as ObjectPool<Enemy>;
+        enemyPool.getAllObjects().forEach((enemy: Enemy) => {
+            // Enemyにon/emitが実装されている前提
+            if (typeof enemy.on === 'function') {
+                enemy.on(Enemy.FIRE_EVENT, this.spawnEnemyBullet, this);
+            }
+        });
     }
 
-    private initEntity<T extends EntityType>(
-        key: T,
-        factory: (texture: Texture, manager: EntityManager) => EntityMap[T], 
-        textureKey: string,
-        size: number
-    ) {
-        const poolFactory = () => {
-            const obj = factory(this.textures[textureKey], this);
-            this.stage.addChild(obj.sprite);
-            return obj;
-        };
-
-        const pool = new ObjectPool<EntityMap[T]>(poolFactory, size);
-
-        this._pools[key] = pool as ObjectPool<any>; 
-        this._activeObjects[key] = []; 
+    // 🚀 新規: Bulletがテクスチャを変更できるようにする
+    public getTexture(key: string): Texture | undefined {
+        return this._textures[key];
     }
 
-    private spawnEnemy() {
-        const x = Math.random() * CONFIG.SCREEN.WIDTH;
-        const y = -CONFIG.SCREEN.MARGIN;
-        this.spawn(ENTITY_KEYS.ENEMY, x, y);
+    // main.ts から呼ばれる汎用スポーンメソッド
+    public spawn<K extends EntityType>(key: K, ...args: ResetArgs<EntityMap[K]>): EntityMap[K] {
+        const pool = this._pools[key] as ObjectPool<EntityMap[K]>;
+        const obj = pool.get(...args);
+        this._activeObjects[key].push(obj as ManagedObject);
+        return obj;
     }
 
-    // --- spawnメソッドのオーバーロード ---
+    public spawnEnemyBullet(x: number, y: number): EnemyBullet {
+        const enemyBullet = this.spawn(ENTITY_KEYS.ENEMY_BULLET, x, y);
+        return enemyBullet;
+    }
 
-    public spawn(
-        type: typeof ENTITY_KEYS.ENEMY | typeof ENTITY_KEYS.EXPLOSION, 
-        x: number, 
-        y: number
-    ): Enemy | Explosion | undefined;
-
-    public spawn(
-        type: typeof ENTITY_KEYS.ENEMY_BULLET, 
+    // 古いメソッド（念のため残すが、main.tsはspawnを使っているはず）
+    public spawnBullet(
         x: number, 
         y: number,
-    ): EnemyBullet | undefined;
-
-    public spawn(
-        type: typeof ENTITY_KEYS.BULLET,
-        x: number,
-        y: number,
-        velX: number,
-        velY: number,
-        textureKey: string, 
-        scaleOpt?: ScaleOption | null,
-        speedOpt?: SpeedOption | null,
-        onDeathShotSpec?: ShotSpec | null
-    ): Bullet | undefined;
-
-    // 実装シグネチャ
-    public spawn(
-        type: EntityType, 
-        x: number, 
-        y: number, 
-        velX?: number, 
-        velY?: number,
-        textureKey?: string, 
-        scaleOpt: ScaleOption | null = null, 
+        velX: number, 
+        velY: number, 
+        scaleOpt: ScaleOption | null = null,
         speedOpt: SpeedOption | null = null,
-        onDeathShotSpec: ShotSpec | null = null
-    ): ManagedObject | undefined {
-        const pool = this._pools[type] as ObjectPool<ManagedObject>;
-        if (!pool) return undefined;
+        onDeathShotSpec: ShotSpec | null = null,
+    ): Bullet | null {
+        // テクスチャキーがない場合のフォールバック（デフォルト弾）
+        return this.spawn(
+            ENTITY_KEYS.BULLET, 
+            x, y, velX, velY, 
+            CONFIG.ASSETS.TEXTURES.BULLET, 
+            scaleOpt, speedOpt, onDeathShotSpec
+        );
+    }
 
-        const activeList = this._activeObjects[type] as ManagedObject[];
-        
-        switch (type) {
-            case ENTITY_KEYS.BULLET:
-                if (velX === undefined || velY === undefined || !textureKey) {
-                    return undefined;
-                }
-                
-                const bullet = pool.get(x, y, velX, velY, scaleOpt, speedOpt, onDeathShotSpec) as Bullet;
-                
-                const texture = this.textures[textureKey];
-                if (texture) {
-                    bullet.setTexture(texture); 
-                }
-                
-                activeList.push(bullet);
-                return bullet;
-
-            case ENTITY_KEYS.ENEMY:
-                const enemy = pool.get(x, y) as Enemy;
-                activeList.push(enemy);
-                return enemy;
-            
-            case ENTITY_KEYS.EXPLOSION:
-                const explosion = pool.get(x, y) as Explosion;
-                activeList.push(explosion);
-                return explosion;
-
-            case ENTITY_KEYS.ENEMY_BULLET:
-                const enemyBullet = pool.get(x, y) as EnemyBullet;
-                activeList.push(enemyBullet);
-                return enemyBullet;
-        }
-        return undefined; 
+    public fireDeathShot(x: number, y: number, spec: ShotSpec): void {
+        this.emit(Player.SHOOT_EVENT, x, y, spec);
     }
     
-    // 💡 新規: 弾の死亡時イベントから子弾を発射するためのロジック (Player.fireの簡略版)
-    public fireDeathShot(
-        x: number,
-        y: number,
-        spec: ShotSpec
-    ) {
-        const { pattern, count, speed, angle, spacing, speedMod, scale, textureKey: specTextureKey } = spec; 
-        
-        // 💡 修正: ShotSpecからonDeathShotを取得
-        const deathShotSpec = spec.onDeathShot ?? null; 
-        
-        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
-        const scaleOpt = scale ?? null;
-        const speedOpt = speedMod ?? null; 
-        
+    private addEnemySpawner(delta: number) {
+        this.timeSinceLastEnemySpawn += delta * 1000;
 
-        let baseAngle = 270; // 死亡時の発射はデフォルト上向き
-        let angleStep = 0;
-        let startAngle = baseAngle;
-        
-        // 死亡時のショットはTrajectory（連続的な回転や揺らぎ）は無視する
-        
-        switch (pattern) {
-            case ShotPatterns.FAN:
-                const arc = angle || 60; 
-                startAngle -= (arc / 2); 
-                angleStep = count > 1 ? arc / (count - 1) : 0;
-                break;
-                
-            case ShotPatterns.RING:
-                baseAngle = Math.random() * 360; 
-                angleStep = 360 / count;
-                startAngle = baseAngle;
-                break;
-                
-            case ShotPatterns.LINE:
-            default:
-                angleStep = 0;
-                break;
-        }
-        
-        // --- 弾丸生成ループ ---
-        for (let i = 0; i < count; i++) {
-            const currentAngleDeg = startAngle + (i * angleStep);
-            
-            const angleRad = currentAngleDeg * (Math.PI / 180);
-
-            const velX = speed * Math.cos(angleRad);
-            const velY = speed * Math.sin(angleRad);
-            
-            const finalX = (pattern === ShotPatterns.LINE && spacing)
-                ? x + (i - (count - 1) / 2) * spacing
-                : x;
-
-            this.spawn(
-                ENTITY_KEYS.BULLET,
-                finalX,
-                y,
-                velX,
-                velY,
-                textureKey,
-                scaleOpt,
-                speedOpt,
-                deathShotSpec // 子弾の子弾仕様
-            );
+        if (this.timeSinceLastEnemySpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
+            this.timeSinceLastEnemySpawn = 0;
+            const x = Math.random() * (CONFIG.SCREEN.WIDTH - 100) + 50; 
+            const y = CONFIG.ENEMY.INITIAL_Y;
+            this.spawn(ENTITY_KEYS.ENEMY, x, y);
         }
     }
 
-    public update(delta: number) {
-        const deltaMS = delta * 1000;
+    public update(delta: number): void {
+        this.addEnemySpawner(delta);
 
-        // Enemy Spawner
-        this.timeSinceLastSpawn += deltaMS;
-        if (this.timeSinceLastSpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
-            this.spawnEnemy();
-            this.timeSinceLastSpawn = 0;
+        for (const key of Object.keys(this._activeObjects) as EntityType[]) {
+            const list = this._activeObjects[key];
+            for (const obj of list) {
+                if (obj.active) {
+                    obj.update(delta);
+                }
+            }
         }
 
-        // Update all active entities
-        for (const list of Object.values(this._activeObjects)) {
-            list.forEach((obj) => obj.update(delta));
-        }
-
-        this.handleCollisions();
+        this.collisionCheck();
         this.cleanup();
     }
 
-    private handleCollisions() {
+    private collisionCheck(): void {
         const activeBullets = this._activeObjects[ENTITY_KEYS.BULLET] as Bullet[];
         const activeEnemies = this._activeObjects[ENTITY_KEYS.ENEMY] as Enemy[];
-        const activeEnemyBullets = this._activeObjects[ENTITY_KEYS.ENEMY_BULLET] as EnemyBullet[]; 
+        const activeEnemyBullets = this._activeObjects[ENTITY_KEYS.ENEMY_BULLET] as EnemyBullet[];
 
-        // 1. Player Bullet vs. Enemy
         if (activeBullets && activeEnemies) {
             for (const b of activeBullets) {
                 if (!b.active) continue;
-
                 for (const e of activeEnemies) {
                     if (!e.active) continue;
-
                     if (checkAABBCollision(b, e)) {
-                        b.deactivateAndFireDeathShot(); // 💡 変更: 死亡時子弾をチェック
+                        b.deactivateAndFireDeathShot(); 
                         e.active = false;
-
                         this.spawn(ENTITY_KEYS.EXPLOSION, e.x, e.y);
                         this.emit(
                             EntityManager.ENEMY_DESTROYED_EVENT,
@@ -304,11 +176,9 @@ export class EntityManager extends EventEmitter {
             }
         }
 
-        // 2. Enemy Bullet vs. Player
         if (this.player.active && activeEnemyBullets) {
             for (const eb of activeEnemyBullets) {
                 if (!eb.active) continue;
-
                 if (checkAABBCollision(eb, this.player)) { 
                     eb.active = false; 
                     this.player.takeHit(); 
@@ -320,21 +190,19 @@ export class EntityManager extends EventEmitter {
     }
 
     private cleanup() {
-        for (const [key, list] of Object.entries(this._activeObjects) as [EntityType, ManagedObject[]][]) {
+        for (const key of Object.keys(this._activeObjects) as EntityType[]) {
+            const list = this._activeObjects[key];
             const pool = this._pools[key] as ObjectPool<ManagedObject>;
             this.cleanupList(list, pool);
         }
     }
 
-    private cleanupList(
-        list: ManagedObject[],
-        pool: ObjectPool<ManagedObject>
-    ) {
+    private cleanupList(list: ManagedObject[], pool: ObjectPool<ManagedObject>) {
         for (let i = list.length - 1; i >= 0; i--) {
             const obj = list[i];
             if (!obj.active) {
-                pool.release(obj); 
-                list.splice(i, 1); 
+                pool.release(obj);
+                list.splice(i, 1);
             }
         }
     }

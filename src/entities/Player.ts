@@ -5,7 +5,6 @@ import { GameObject } from "./GameObject";
 import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
-// 💡 修正: 使用されていない型は 'import type' に変更し、未使用警告を解消
 import type { ShotSpec } from "../types/ShotTypes"; 
 import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
 
@@ -17,8 +16,16 @@ export class Player extends GameObject implements Collider {
     public active: boolean = true;
     private emitter: EventEmitter = new EventEmitter();
 
+    // 弾丸軌道に必要なタイマー
     private _shotWavyTimer: number = 0; 
     private _rotaryShotAngle: number = 0; 
+
+    // HPに関するプロパティ (移動、衝突処理がシンプルなため、これらは未使用の可能性があります)
+    private hitPoints: number = 3;
+    private isInvincible: boolean = false;
+    private blinkTimer: number = 0;
+    private INVINCIBILITY_DURATION = 2000;
+    private BLINK_RATE = 100;
 
     constructor(texture: Texture) { 
         const w = texture.width;
@@ -26,6 +33,13 @@ export class Player extends GameObject implements Collider {
         super(texture, w, h); 
         
         this.active = true;
+        // 🚀 初期位置設定のためにresetPositionの呼び出しを推奨
+        this.resetPosition();
+    }
+
+    public resetPosition(): void {
+        this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
+        this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
     
     public on(event: string | symbol, fn: (...args: any[]) => void, context?: any): this {
@@ -43,16 +57,46 @@ export class Player extends GameObject implements Collider {
         this.lastShotTime = 0;
         this._shotWavyTimer = 0;
         this._rotaryShotAngle = 0;
-        this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
-        this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
+        
+        // 🚀 HP/無敵関連のプロパティをリセット
+        this.hitPoints = 3;
+        this.isInvincible = false;
+        this.blinkTimer = 0;
+        
+        this.resetPosition();
     }
 
     public update(delta: number) {
+        // 🚀 無敵時間中の点滅処理
+        if (this.isInvincible) {
+            const deltaMS = delta * 1000;
+            this.blinkTimer += deltaMS;
+            
+            if (this.blinkTimer >= this.INVINCIBILITY_DURATION) {
+                this.isInvincible = false;
+                this.sprite.visible = true;
+            } else {
+                const isVisible = (this.blinkTimer % this.BLINK_RATE) < (this.BLINK_RATE / 2);
+                this.sprite.visible = isVisible;
+            }
+        }
+        
         this._shotWavyTimer += delta; 
     }
 
     public takeHit() {
-        if (!this.active) return;
+        if (!this.active || this.isInvincible) return;
+        
+        // 🚀 ダメージ処理を復元
+        this.hitPoints--;
+        
+        if (this.hitPoints <= 0) {
+            this.active = false;
+            this.sprite.visible = false;
+        } else {
+            this.isInvincible = true;
+            this.blinkTimer = 0;
+        }
     }
     
     public fire(spec: ShotSpec) {
@@ -66,7 +110,9 @@ export class Player extends GameObject implements Collider {
             speedMod, 
             scale, 
             textureKey: specTextureKey,
-            onDeathShot, // 💡 修正: onDeathShotを取得
+            onDeathShot, 
+            // 🚀 baseAngleDeg を取得
+            baseAngleDeg: specBaseAngleDeg
         } = spec; 
         
         const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
@@ -74,7 +120,8 @@ export class Player extends GameObject implements Collider {
         const speedOpt = speedMod ?? null; 
         const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
 
-        let baseAngle = 270; // 真上 (度数)
+        // baseAngleDegが指定されていなければデフォルトの270度（真上）を使用
+        let baseAngle = specBaseAngleDeg ?? 270; 
 
         // --- 2. 方向の動かし方 (Trajectory) の計算 ---
         let trajectoryOffsetDeg = 0;
@@ -84,6 +131,7 @@ export class Player extends GameObject implements Collider {
                 case TrajectoryModes.ROTARY:
                     // 発射角度を更新し、今回の発射角度として使用
                     this._rotaryShotAngle = (this._rotaryShotAngle + trajectory.rate) % 360;
+                    // baseAngleを上書き
                     baseAngle = this._rotaryShotAngle;
                     break;
                     
@@ -143,17 +191,23 @@ export class Player extends GameObject implements Collider {
                 velX,
                 velY,
                 textureKey, 
-                scaleOpt,   
+                scaleOpt,   
                 speedOpt,
-                onDeathShot ?? null // 💡 修正: onDeathShotを渡す
+                onDeathShot ?? null 
             );
         }
     }
 
+    /**
+     * @param input InputManagerインスタンス
+     * @param delta デルタタイム（秒）
+     */
     public handleInput(input: InputManager, delta: number): void {
+        if (!this.active) return;
+        
         const moveSpeed = CONFIG.PLAYER.SPEED * delta;
 
-        // --- 移動ロジック ---
+        // --- 移動ロジック (水平移動のみ) ---
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
             this.sprite.x = Math.max(
                 this.sprite.x - moveSpeed,
@@ -168,8 +222,11 @@ export class Player extends GameObject implements Collider {
         }
 
         const now = performance.now();
+        
+        // 無敵時間中は射撃不可
+        if (this.isInvincible) return;
 
-        // --- 新しいショット定義 ---
+        // --- ショット定義 ---
 
         // KeyA: 基本の直線ショット (LINE + FIXED)
         if (input.isDown("KeyA")) {
@@ -190,6 +247,7 @@ export class Player extends GameObject implements Collider {
         // KeyD: ロータリーショット (LINE + ROTARY)
         if (input.isDown("KeyD")) {
             if (now - this.lastShotTime > 20) {
+                // 🚀 この定義により、以前の CONFIG 参照エラーは発生しなくなりました
                 this.fire({
                     pattern: "LINE",
                     count: 1,

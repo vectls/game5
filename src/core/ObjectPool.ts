@@ -1,7 +1,9 @@
-// src/core/ObjectPool.ts
+// src/core/ObjectPool.ts (修正後)
+
 import { Container } from "pixi.js"; 
 
-type ResetArgs<T extends Poolable> = T extends { reset(...args: infer A): void } ? A : never;
+// 💡 修正: EntityManagerで利用するため export する
+export type ResetArgs<T extends Poolable> = T extends { reset(...args: infer A): void } ? A : never;
 
 export interface Poolable {
   active: boolean;
@@ -41,12 +43,18 @@ export class ObjectPool<T extends Poolable> {
     obj.sprite.visible = true;
     
     obj.reset(...args);
+    
     return obj;
   }
-
+  
   public release(obj: T) {
     obj.active = false;
     obj.sprite.visible = false;
     this.freeObjects.push(obj);
+  }
+
+  // 🚀 修正箇所 1: EntityManagerで使用されている getAllObjects を追加
+  public getAllObjects(): T[] {
+    return this.allObjects;
   }
 }

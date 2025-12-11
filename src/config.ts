@@ -1,4 +1,4 @@
-// src/config.ts
+// src/config.ts (修正後)
 export const CONFIG = {
     SCREEN: {
         WIDTH: 800,
@@ -22,12 +22,12 @@ export const CONFIG = {
         INITIAL_X_RATIO: 0.5, // 画面幅に対する比率 (0.5 = 中央)
         INITIAL_Y: 500, // 初期Y座標
         BULLET_OFFSET_Y: 20, // 機体から弾が出る位置のオフセット
-        // 💡 削除: FAN_SHOT, ROTARY_SHOT, WAVY_ROTARY_SHOT, GROWING_SHOT 
-        //     これらの設定はPlayer.tsのfireメソッドに直接渡す形式に移行したため削除
     },
     BULLET: {
         SPEED: 600,
-        POOL_SIZE: 30, // 同時に出せる弾の上限数
+        POOL_SIZE: 100, // 同時に出せる弾の上限数
+        // 🚀 修正箇所: LIFE_TIME_MS を再追加
+        LIFE_TIME_MS: 3000, // 弾丸の寿命（ミリ秒）
     },
     ENEMY: {
         SPEED: 120,
@@ -47,7 +47,6 @@ export const CONFIG = {
         SPEED: 400, // 敵弾の速度 (PlayerBulletより速くても良い)
         POOL_SIZE: 50,
     },
-    // 💡 保持: Player.tsで参照されるため必須
     INPUT: {
         MOVE_LEFT: "ArrowLeft",
         MOVE_RIGHT: "ArrowRight",
