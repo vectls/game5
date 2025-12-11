@@ -2,11 +2,10 @@
 
 import { Texture, EventEmitter } from "pixi.js";
 import { GameObject } from "./GameObject";
-import type { Collider } from "./GameObject"; // Colliderインターフェースをインポート
+import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
 import type { ShotSpec, ScaleOption, SpeedOption } from "../types/ShotTypes"; 
-import { ShotPatterns, ScaleModes } from "../types/ShotTypes"; // 💡 定数をインポート
 
 export class Player extends GameObject implements Collider {
 
@@ -65,8 +64,10 @@ export class Player extends GameObject implements Collider {
      * 💎 汎用ショット発射メソッド
      */
     public fire(spec: ShotSpec) {
-        const { pattern, count, speed, scale, wave, speedMod } = spec; 
+        const { pattern, count, speed, scale, wave, speedMod, textureKey: specTextureKey } = spec; 
         
+        // 💡 修正: textureKeyにデフォルト値（CONFIG.ASSETS.TEXTURES.BULLET）を設定
+        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
         const scaleOpt = scale ?? null;
         const speedOpt = speedMod ?? null; 
         const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
@@ -75,23 +76,23 @@ export class Player extends GameObject implements Collider {
         let angleStep = 0;
         let startAngle = 270; 
 
-        if (pattern === ShotPatterns.SPIRAL) { // 💡 定数化
+        if (pattern === 'SPIRAL') {
             startAngle = this._rotaryShotAngle; 
         }
         
         // 1. パターンごとの基本角度群を決定
         switch (pattern) {
-            case ShotPatterns.FAN: // 💡 定数化
-            case ShotPatterns.RANDOM: // 💡 定数化
+            case 'FAN':
+            case 'RANDOM':
                 const arc = spec.angle || 60;
                 startAngle = baseAngle - (arc / 2);
                 angleStep = count > 1 ? arc / (count - 1) : 0;
                 break;
-            case ShotPatterns.RING: // 💡 定数化
+            case 'RING':
                 angleStep = 360 / count;
                 startAngle = baseAngle;
                 break;
-            case ShotPatterns.STRAIGHT: // 💡 定数化
+            case 'STRAIGHT':
             default:
                 angleStep = 0;
                 break;
@@ -110,7 +111,7 @@ export class Player extends GameObject implements Collider {
             let currentAngleDeg = startAngle + (i * angleStep);
             
             // RANDOM の場合、角度をランダムにずらす
-            if (pattern === ShotPatterns.RANDOM && spec.angle) { // 💡 定数化
+            if (pattern === 'RANDOM' && spec.angle) {
                 const maxAngle = spec.angle / 2;
                 const randomOffset = (Math.random() - 0.5) * maxAngle; 
                 currentAngleDeg = baseAngle + randomOffset;
@@ -126,133 +127,152 @@ export class Player extends GameObject implements Collider {
             
             const finalX = spec.spacing ? this.sprite.x + (i - (count - 1) / 2) * spec.spacing : this.sprite.x;
 
-            // 発射イベント (speedOpt を渡す)
+            // 💡 修正: 発射イベントの引数に textureKey を追加
             this.emit(
                 Player.SHOOT_EVENT,
                 finalX,
                 this.sprite.y - offsetY,
                 velX,
                 velY,
-                scaleOpt,
-                speedOpt 
+                textureKey, // 💡 New: 第6引数にテクスチャキー (string)
+                scaleOpt,   // 💡 第7引数にスケールオプション
+                speedOpt    // 💡 第8引数にスピードオプション
             );
         }
         
         // 4. SPIRAL の場合、次の発射のために角度を更新
-        if (pattern === ShotPatterns.SPIRAL && spec.angle) { // 💡 定数化
+        if (pattern === 'SPIRAL' && spec.angle) {
             this._rotaryShotAngle = (this._rotaryShotAngle + spec.angle) % 360;
         }
     }
 
-
+    // handleInput (KeyG) の呼び出しはそのまま (textureKey はデフォルトでOK)
     public handleInput(input: InputManager, delta: number): void {
         const moveSpeed = CONFIG.PLAYER.SPEED * delta;
-        
+
         // 1. 移動処理 (省略)
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
-            this.sprite.x = Math.max(this.sprite.x - moveSpeed, this.hitWidth / 2);
+            this.sprite.x = Math.max(
+                this.sprite.x - moveSpeed,
+                this.hitWidth / 2
+            );
         }
         if (input.isDown(CONFIG.INPUT.MOVE_RIGHT)) {
-            this.sprite.x = Math.min(this.sprite.x + moveSpeed, CONFIG.SCREEN.WIDTH - this.hitWidth / 2);
+            this.sprite.x = Math.min(
+                this.sprite.x + moveSpeed,
+                CONFIG.SCREEN.WIDTH - this.hitWidth / 2
+            );
         }
-        
+
         const now = performance.now();
-        
+
         // --- ショット定義 ---
 
         // KeyA: 基本ショット (STRAIGHT)
-        if (input.isDown('KeyA')) {
-            if (now - this.lastShotTime > 150) { 
-                this.fire({ pattern: ShotPatterns.STRAIGHT, count: 1, speed: 600 }); // 💡 定数化
+        if (input.isDown("KeyA")) {
+            if (now - this.lastShotTime > 150) {
+                this.fire({ pattern: "STRAIGHT", count: 1, speed: 600 });
                 this.lastShotTime = now;
             }
         }
 
         // KeyS: 扇形ショット (FAN)
-        if (input.isDown('KeyS')) {
-            if (now - this.lastShotTime > 250) { 
-                this.fire({ pattern: ShotPatterns.FAN, count: 7, speed: 550, angle: 90 }); // 💡 定数化
+        if (input.isDown("KeyS")) {
+            if (now - this.lastShotTime > 250) {
+                this.fire({ pattern: "FAN", count: 7, speed: 550, angle: 90 });
                 this.lastShotTime = now;
             }
         }
-        
+
         // KeyD: ロータリーショット (SPIRAL)
-        if (input.isDown('KeyD')) {
-            if (now - this.lastShotTime > 20) { 
-                this.fire({ pattern: ShotPatterns.SPIRAL, count: 1, speed: 400, angle: 15 }); // 💡 定数化
+        if (input.isDown("KeyD")) {
+            if (now - this.lastShotTime > 20) {
+                this.fire({
+                    pattern: "SPIRAL",
+                    count: 1,
+                    speed: 400,
+                    angle: 15,
+                });
                 this.lastShotTime = now;
             }
         }
 
         // KeyF: 行ったり来たりする直線弾 (Wavy Straight Shot)
-        if (input.isDown('KeyF')) {
-            if (now - this.lastShotTime > 100) { 
+        if (input.isDown("KeyF")) {
+            if (now - this.lastShotTime > 100) {
                 this.fire({
-                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
-                    count: 1,
+                    pattern: "STRAIGHT",
+                    count: 4,
+                    spacing: 30,
                     speed: 600,
                     wave: { speed: 5, range: 30 },
-                    scale: { rate: -0.5, initial: 1.2 }
+                    scale: { rate: -0.5, initial: 1.2 },
                 });
                 this.lastShotTime = now;
             }
         }
-        
+
         // KeyG: 🚀 【新規デモ】加速しながら縮小するショット
-        if (input.isDown('KeyG')) {
-            if (now - this.lastShotTime > 150) { 
+        if (input.isDown("KeyG")) {
+            if (now - this.lastShotTime > 150) {
                 this.fire({
-                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
+                    pattern: "STRAIGHT",
                     count: 1,
                     speed: 150, // 初期速度は遅め
+                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, // 💡 EnemyBulletのテクスチャを試す
                     speedMod: {
                         rate: 400, // 1秒あたり 400px/s で加速
                     },
                     scale: {
                         rate: -0.8, // 1秒あたり 0.8 縮小
                         initial: 2.0, // 初期サイズは大きめ
-                        minScale: 0.1
-                    }
+                        minScale: 0.1,
+                    },
                 });
                 this.lastShotTime = now;
             }
         }
-        
+
         // KeyW: 鼓動する全方位ショット (Pulsing Ring)
-        if (input.isDown('KeyW')) {
-            if (now - this.lastShotTime > 1000) { 
+        if (input.isDown("KeyW")) {
+            if (now - this.lastShotTime > 1000) {
                 this.fire({
-                    pattern: ShotPatterns.RING, // 💡 定数化
+                    pattern: "RING",
                     count: 16,
                     speed: 150,
-                    scale: { mode: ScaleModes.SINE, rate: 4.0, minScale: 0.8, maxScale: 1.8 } // 💡 定数化
+                    scale: {
+                        mode: "SINE",
+                        rate: 4.0,
+                        minScale: 0.8,
+                        maxScale: 1.8,
+                    },
+                    wave: { speed: 3, range: 15 },
                 });
                 this.lastShotTime = now;
             }
         }
-        
+
         // KeyQ: 複合ショット (Wavy Fan + Growing Straight)
-        if (input.isDown('KeyQ')) {
-            if (now - this.lastShotTime > 500) { 
-                
-                // 1/2: 角度が揺らぐ扇形 
+        if (input.isDown("KeyQ")) {
+            if (now - this.lastShotTime > 500) {
+                // 1/2: 角度が揺らぐ扇形
                 this.fire({
-                    pattern: ShotPatterns.FAN, // 💡 定数化
+                    pattern: "FAN",
                     count: 5,
                     speed: 400,
                     angle: 45,
-                    wave: { speed: 3, range: 15 } 
+                    wave: { speed: 3, range: 15 },
                 });
 
                 // 2/2: 巨大化する並行ショット
                 this.fire({
-                    pattern: ShotPatterns.STRAIGHT, // 💡 定数化
+                    pattern: "STRAIGHT",
                     count: 2,
                     speed: 300,
                     spacing: 30,
-                    scale: { mode: ScaleModes.LINEAR, rate: 1.0, maxScale: 3.0 } // 💡 定数化
+                    scale: { mode: "LINEAR", rate: 1.0, maxScale: 3.0 },
                 });
-                
+
                 this.lastShotTime = now;
             }
         }

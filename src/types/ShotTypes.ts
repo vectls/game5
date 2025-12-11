@@ -20,7 +20,7 @@ export const ScaleModes = {
 } as const;
 
 /** サイズ変化のモード */
-export type ScaleMode = typeof ScaleModes[keyof typeof ScaleModes]; // 💡 型定義を定数オブジェクトから抽出
+export type ScaleMode = typeof ScaleModes[keyof typeof ScaleModes];
 
 /** 弾丸のサイズ変化オプション */
 export interface ScaleOption {
@@ -50,6 +50,10 @@ export interface ShotSpec {
     pattern: ShotPattern; // 拡散パターン
     count: number;        // 弾数
     speed: number;        // 初期弾速
+    
+    // 💡 オプショナルに変更: textureKeyが指定されない場合はPlayer側でデフォルト値を使用
+    textureKey?: string; 
+
     angle?: number;       // 拡散角度 or 回転速度
     spacing?: number;     // 横幅の間隔
     offsetY?: number;     // 発射位置調整
@@ -57,5 +61,5 @@ export interface ShotSpec {
     // 修飾オプション
     scale?: ScaleOption;     // サイズ変化
     wave?: WavyAngleOption;  // 発射時の角度揺らぎ (Player側で処理)
-    speedMod?: SpeedOption;  // 🚀 【新規】速度変化 (Bullet側で処理)
+    speedMod?: SpeedOption;  // 速度変化 (Bullet側で処理)
 }

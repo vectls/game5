@@ -11,7 +11,7 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player"; 
-import type { ScaleOption, SpeedOption } from "../types/ShotTypes"; // 🚀 【修正】SpeedOptionを追加
+import type { ScaleOption, SpeedOption } from "../types/ShotTypes";
 
 // 🚀 【import type に修正】型エイリアス
 type ManagedObject = GameObject & Poolable;
@@ -20,7 +20,7 @@ export const ENTITY_KEYS = {
     BULLET: "bullet",
     ENEMY: "enemy",
     EXPLOSION: "explosion",
-    ENEMY_BULLET: "enemy_bullet", // 👈 追加
+    ENEMY_BULLET: "enemy_bullet",
 } as const; 
 
 export type EntityType = typeof ENTITY_KEYS[keyof typeof ENTITY_KEYS];
@@ -33,8 +33,7 @@ interface EntityMap {
     [ENTITY_KEYS.ENEMY_BULLET]: EnemyBullet;
 }
 
-// 🚀 【import type に修正】型エイリアス
-type EntityFactory<T extends ManagedObject> = (texture: Texture, manager: EntityManager) => T;
+// 💡 削除: 未使用エラー (Code 6196) のため EntityFactory 型定義を削除
 
 export class EntityManager extends EventEmitter {
     private stage: Container;
@@ -55,19 +54,43 @@ export class EntityManager extends EventEmitter {
         this.textures = textures;
         this.player = player; 
         this.initializePools();
-        this.timeSinceLastSpawn = CONFIG.ENEMY.SPAWN_INTERVAL_MS; // 初期スポーンまでの待機時間を設定
+        this.timeSinceLastSpawn = CONFIG.ENEMY.SPAWN_INTERVAL_MS;
+        
+        // 💡 修正: プレイヤーのショットイベントを購読 (main.tsにリスナーがあるが、こちらにも必要)
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this);
+    }
+    
+    // 💡 新規追加: プレイヤーのショットイベントを処理するハンドラ
+    private handlePlayerShoot(
+        x: number, 
+        y: number, 
+        velX: number, 
+        velY: number, 
+        textureKey: string, // Player.tsから渡される
+        scaleOpt: ScaleOption | null, 
+        speedOpt: SpeedOption | null
+    ) {
+        // Bulletのspawnを呼び出す
+        this.spawn(
+            ENTITY_KEYS.BULLET, 
+            x, y, 
+            velX, velY, 
+            textureKey, // textureKeyを渡す
+            scaleOpt, 
+            speedOpt
+        );
     }
 
     private initializePools() {
         // プレイヤー弾 (Bullet)
         this.initEntity(
             ENTITY_KEYS.BULLET,
-            (texture, manager) => new Bullet(texture), 
+            (texture) => new Bullet(texture), // 💡 修正: manager引数を削除
             CONFIG.ASSETS.TEXTURES.BULLET,
             CONFIG.BULLET.POOL_SIZE
         );
         
-        // 敵 (Enemy) - EntityManager自身を依存性として注入
+        // 敵 (Enemy) - managerを渡す必要がある場合はfactoryを維持
         this.initEntity(
             ENTITY_KEYS.ENEMY,
             (texture, manager) => new Enemy(texture, manager), 
@@ -75,10 +98,10 @@ export class EntityManager extends EventEmitter {
             CONFIG.ENEMY.POOL_SIZE
         );
 
-        // 敵弾 (EnemyBullet) - 新規追加
+        // 敵弾 (EnemyBullet)
         this.initEntity(
             ENTITY_KEYS.ENEMY_BULLET,
-            (texture, manager) => new EnemyBullet(texture),
+            (texture) => new EnemyBullet(texture), // 💡 修正: manager引数を削除
             CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
             CONFIG.ENEMY_BULLET.POOL_SIZE
         );
@@ -86,7 +109,7 @@ export class EntityManager extends EventEmitter {
         // 爆発 (Explosion)
         this.initEntity(
             ENTITY_KEYS.EXPLOSION,
-            (texture, manager) => new Explosion(texture),
+            (texture) => new Explosion(texture), // 💡 修正: manager引数を削除
             CONFIG.ASSETS.TEXTURES.EXPLOSION,
             CONFIG.EXPLOSION.POOL_SIZE
         );
@@ -94,13 +117,16 @@ export class EntityManager extends EventEmitter {
 
     private initEntity<T extends EntityType>(
         key: T,
-        factory: (texture: Texture, manager: EntityManager) => EntityMap[T], 
+        // 💡 修正: managerが不要な場合は削除 (Code 6133 対策)
+        factory: (texture: Texture, manager?: EntityManager) => EntityMap[T], 
         textureKey: string,
         size: number
     ) {
         // ObjectPoolに渡す引数なしのファクトリ関数を生成し、依存関係を注入する
         const poolFactory = () => {
-            const obj = factory(this.textures[textureKey], this);
+            // Enemyの場合は this を渡し、それ以外は渡さない
+            const managerArg = key === ENTITY_KEYS.ENEMY ? this : undefined;
+            const obj = factory(this.textures[textureKey], managerArg as EntityManager);
             this.stage.addChild(obj.sprite);
             return obj;
         };
@@ -123,18 +149,14 @@ export class EntityManager extends EventEmitter {
         return obj;
     }
 
-    // 🚀 修正: 速度(X, Y)を受け取るように変更
-    // 🚀 【修正】成長パラメータ (growthRate, maxScale) を追加
-    public spawnBullet(x: number, y: number, velX: number, velY: number, growthRate: number = 0, maxScale: number = 1.0) {
-        // 修正: 速度引数に加えて、成長引数もgetEntity経由でBulletのresetに渡す
-        this.getEntity(ENTITY_KEYS.BULLET, x, y, velX, velY, growthRate, maxScale); 
+    // 💡 削除: 旧式の spawnBullet は不要
+    // public spawnBullet(...) {...}
+
+    // 💡 修正: 速度を受け取らないオーバーロード
+    public spawnEnemyBullet(x: number, y: number, velX: number, velY: number) {
+        // EnemyBulletはreset(x, y, velX, velY)を受け取ると仮定
+        this.getEntity(ENTITY_KEYS.ENEMY_BULLET, x, y, velX, velY);
     }
-
-    public spawnEnemyBullet(x: number, y: number) {
-        this.getEntity(ENTITY_KEYS.ENEMY_BULLET, x, y);
-    }
-
-
     
     private spawnEnemy() {
         const x = Math.random() * CONFIG.SCREEN.WIDTH;
@@ -146,6 +168,8 @@ export class EntityManager extends EventEmitter {
         this.getEntity(ENTITY_KEYS.EXPLOSION, x, y);
     }
 
+    // --- spawnメソッドのオーバーロード ---
+
     // Enemy / Explosion (座標のみを受け取る)
     public spawn(
         type: typeof ENTITY_KEYS.ENEMY | typeof ENTITY_KEYS.EXPLOSION, 
@@ -153,15 +177,37 @@ export class EntityManager extends EventEmitter {
         y: number
     ): Enemy | Explosion | undefined;
 
-    // 🚀 実装シグネチャ (全ての引数を網羅し、デフォルト値はここで設定)
+    // EnemyBullet (座標と速度を受け取る)
+    public spawn(
+        type: typeof ENTITY_KEYS.ENEMY_BULLET, 
+        x: number, 
+        y: number,
+        velX: number,
+        velY: number,
+    ): EnemyBullet | undefined;
+
+    // 💡 Bullet (テクスチャキーとオプションを受け取る)
+    public spawn(
+        type: typeof ENTITY_KEYS.BULLET,
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        textureKey: string, // 💡 textureKeyを必須に
+        scaleOpt?: ScaleOption | null,
+        speedOpt?: SpeedOption | null
+    ): Bullet | undefined;
+
+    // 実装シグネチャ (全ての引数を網羅)
     public spawn(
         type: EntityType, 
         x: number, 
         y: number, 
         velX?: number, 
         velY?: number,
+        textureKey?: string, // 💡 textureKeyを導入
         scaleOpt: ScaleOption | null = null, 
-        speedOpt: SpeedOption | null = null // デフォルト値は実装でのみ使用
+        speedOpt: SpeedOption | null = null 
     ): ManagedObject | undefined {
         const pool = this._pools[type] as ObjectPool<ManagedObject>;
         if (!pool) return undefined;
@@ -171,10 +217,21 @@ export class EntityManager extends EventEmitter {
         switch (type) {
             case ENTITY_KEYS.BULLET:
                 const bullet = pool.get() as Bullet;
-                if (velX !== undefined && velY !== undefined) {
+                
+                if (velX !== undefined && velY !== undefined && textureKey) {
+                    const texture = this.textures[textureKey]; // 💡 テクスチャキーでアセットを取得
+                    if (texture) {
+                        // 💡 BulletのsetTextureを呼び出し、テクスチャとヒットボックスを更新
+                        bullet.setTexture(texture); 
+                    } else {
+                         console.warn(`Texture key ${textureKey} not found for bullet. Using default pool texture.`);
+                         // プールで初期化されたデフォルトのテクスチャが使用されます
+                    }
+                    
+                    // 💡 resetにテクスチャキーを渡さない
                     bullet.reset(x, y, velX, velY, scaleOpt, speedOpt); 
                 } else {
-                    console.error("Bullet spawn called without velocity.");
+                    console.error("Bullet spawn called without required parameters for BULLET type.");
                     return undefined;
                 }
                 activeList.push(bullet);
@@ -195,10 +252,12 @@ export class EntityManager extends EventEmitter {
             case ENTITY_KEYS.ENEMY_BULLET:
                 const enemyBullet = pool.get() as EnemyBullet;
                 if (velX !== undefined && velY !== undefined) {
-                    // EnemyBulletはreset(x, y)のみを受け取る想定
-                    enemyBullet.reset(x, y); 
+                    // EnemyBulletはreset(x, y, velX, velY)を受け取ることを想定
+                    enemyBullet.reset(x, y, velX, velY); 
                 } else {
-                    enemyBullet.reset(x, y); 
+                    // 速度引数が不足している場合は、リセットしないか、reset(x,y)のみ呼び出す (実装依存)
+                    // 仮に reset(x, y) で初期化すると仮定
+                    enemyBullet.reset(x, y, velX ?? 0, velY ?? 0); // ゼロ速度でリセット
                 }
                 activeList.push(enemyBullet);
                 return enemyBullet;

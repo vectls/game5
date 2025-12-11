@@ -35,7 +35,7 @@ class Game {
         this.app.stage.addChild(this.player.sprite);
 
         // Playerの発射イベントを購読する
-        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this);
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot, this); // 修正は不要
 
         this.player.reset();
 
@@ -71,30 +71,26 @@ class Game {
      * PlayerのSHOOT_EVENTハンドラ
      * Bulletの初期速度、サイズ変化オプション、速度変化オプションを受け取り、EntityManagerに弾丸の生成を依頼する
      */
-    // src/main.ts の handlePlayerShoot メソッド
-
     private handlePlayerShoot(
         x: number,
         y: number,
         velX: number,
         velY: number,
+        textureKey: string, // 💡 修正: textureKeyを受け取る
         scaleOpt: ScaleOption | null,
         speedOpt: SpeedOption | null // 🚀 速度変化オプション
     ) {
-        // 💡 【修正点】this.entityManagerがnullでないことを保証し、型をEntityManagerに絞り込む
+        // 💡 修正: this.entityManagerがnullでないことを保証し、型をEntityManagerに絞り込む
         const entityManager = this.entityManager;
         if (!entityManager) return; // nullチェック
 
-        // 型が絞り込まれた entityManager を使用するため、オプショナルチェイニングは不要
-        // これにより、コンパイラは ENTITY_KEYS.BULLET (リテラル型 'bullet') に一致する
-        // 7引数のオーバーロードを正しく選択できます。
+        // 💡 修正: 正しい引数順序で spawn を呼び出す
         entityManager.spawn(
-            ENTITY_KEYS.BULLET,
-            x,
-            y,
-            velX,
-            velY,
-            scaleOpt,
+            ENTITY_KEYS.BULLET, 
+            x, y, 
+            velX, velY, 
+            textureKey, // 💡 textureKeyを渡す
+            scaleOpt,   
             speedOpt
         );
     }

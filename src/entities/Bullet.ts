@@ -3,18 +3,8 @@
 import { Texture } from "pixi.js";
 import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
-import type { ScaleOption, SpeedOption } from "../types/ShotTypes"; 
-import { ScaleModes } from "../types/ShotTypes"; // 💡 ScaleModes定数をインポート
-
-// 💎 弾丸設定の定数
-const BULLET_CONFIG = {
-    DEFAULT_SCALE: 1.0, 
-    DEFAULT_MIN_SCALE: 0.1, 
-    HITBOX_SCALE_FACTOR: 0.5, 
-    DEACTIVATE_THRESHOLD_RATIO: 0.2, // currentMinScaleに対する非アクティブ化しきい値
-    ROTATION_OFFSET: Math.PI / 2, 
-} as const;
-
+// 💡 修正: ScaleModes 定数と型をインポート
+import { ScaleModes, type ScaleOption, type SpeedOption } from "../types/ShotTypes"; 
 
 export class Bullet extends GameObject {
   private velX: number = 0; 
@@ -23,21 +13,24 @@ export class Bullet extends GameObject {
 
   // サイズ変化用のプロパティ
   private scaleOpt: ScaleOption | null = null;
-  private currentMinScale: number = BULLET_CONFIG.DEFAULT_MIN_SCALE; // 💡 定数化
+  private currentMinScale: number = 0.1; 
 
   // 速度変化用のプロパティ
   private speedOpt: SpeedOption | null = null; 
 
   constructor(texture: Texture) {
-    const initialScale = BULLET_CONFIG.DEFAULT_SCALE; // 💡 定数化
-    super(
-      texture, 
-      texture.width * initialScale * BULLET_CONFIG.HITBOX_SCALE_FACTOR, // 💡 定数化
-      texture.height * initialScale * BULLET_CONFIG.HITBOX_SCALE_FACTOR // 💡 定数化
-    );
+    const initialScale = 1.0; 
+    super(texture, texture.width * initialScale * 0.5, texture.height * initialScale * 0.5);
     this.sprite.scale.set(initialScale); 
   }
 
+  // 💡 新規追加: 外部からテクスチャを設定し、ヒットボックスを更新する
+  public setTexture(texture: Texture): void {
+      this.sprite.texture = texture;
+      // 現在のスケールを維持し、新しいテクスチャのサイズに合わせてヒットボックスを更新
+      this.updateHitbox(this.sprite.scale.x); 
+  }
+  
   // resetメソッド: speedOptを受け取る
   reset(
     x: number, 
@@ -55,20 +48,20 @@ export class Bullet extends GameObject {
 
     this.scaleOpt = scaleOpt;
     this.speedOpt = speedOpt; 
-    const initialScale = scaleOpt?.initial ?? BULLET_CONFIG.DEFAULT_SCALE; // 💡 定数化
-    this.currentMinScale = scaleOpt?.minScale ?? BULLET_CONFIG.DEFAULT_MIN_SCALE; // 💡 定数化
+    const initialScale = scaleOpt?.initial ?? 1.0;
+    this.currentMinScale = scaleOpt?.minScale ?? 0.1; 
     this.sprite.scale.set(initialScale);
     
     this.velX = velX;
     this.velY = velY;
 
     this.updateHitbox(initialScale);
-    this.sprite.rotation = Math.atan2(velY, velX) + BULLET_CONFIG.ROTATION_OFFSET; // 💡 定数化
+    this.sprite.rotation = Math.atan2(velY, velX) + Math.PI / 2;
   }
 
   private updateHitbox(newScale: number) {
-    this._hitWidth = this.sprite.texture.width * newScale * BULLET_CONFIG.HITBOX_SCALE_FACTOR; // 💡 定数化
-    this._hitHeight = this.sprite.texture.height * newScale * BULLET_CONFIG.HITBOX_SCALE_FACTOR; // 💡 定数化
+    this._hitWidth = this.sprite.texture.width * newScale * 0.5;
+    this._hitHeight = this.sprite.texture.height * newScale * 0.5;
   }
 
   // 速度変化ロジック (handleSpeed)
@@ -103,14 +96,15 @@ export class Bullet extends GameObject {
       if (!this.scaleOpt) return;
       let newScale = this.sprite.scale.x;
       const opt = this.scaleOpt;
-      const maxScale = opt.maxScale ?? BULLET_CONFIG.DEFAULT_SCALE; // 💡 定数利用
+      const maxScale = opt.maxScale ?? 1.0;
 
-      if (opt.mode === ScaleModes.SINE) { // 💡 定数化
-          const minScale = opt.minScale ?? BULLET_CONFIG.DEFAULT_MIN_SCALE; // 💡 定数化
+      // 💡 修正: ScaleModes.SINE 定数を使用
+      if (opt.mode === ScaleModes.SINE) {
+          const minScale = opt.minScale ?? 0.1;
           const range = maxScale - minScale;
           const base = minScale + range / 2;
           newScale = base + (range / 2) * Math.sin(this.lifeTime * opt.rate);
-      } else { // 'LINEAR' または未指定の場合
+      } else { 
           newScale = this.sprite.scale.x + opt.rate * delta;
           
           if (opt.rate > 0) { 
@@ -125,7 +119,7 @@ export class Bullet extends GameObject {
           this.updateHitbox(newScale);
       }
       
-      if (newScale <= this.currentMinScale * BULLET_CONFIG.DEACTIVATE_THRESHOLD_RATIO) { // 💡 定数化
+      if (newScale <= this.currentMinScale * 0.2) { 
           this.active = false;
           this.sprite.visible = false;
       }
