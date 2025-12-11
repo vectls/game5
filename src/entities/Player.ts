@@ -17,16 +17,11 @@ export class Player extends GameObject implements Collider {
 
     private _shotWavyTimer: number = 0; 
     private _rotaryShotAngle: number = 0; 
-    
-    // ⚠️ 修正: hitWidth, hitHeightのプロパティ宣言を削除 (GameObjectのゲッターを使用)
 
     constructor(texture: Texture) { 
         const w = texture.width;
         const h = texture.height;
-        // GameObjectのコンストラクタで _hitWidth, _hitHeightを設定する
         super(texture, w, h); 
-        
-        // ⚠️ 修正: プロパティへの代入を削除
         
         this.active = true;
     }
@@ -60,13 +55,9 @@ export class Player extends GameObject implements Collider {
         // TODO: ここにHP減少や無敵時間、ゲームオーバー判定のロジックを実装します
     }
     
-    /**
-     * 💎 汎用ショット発射メソッド
-     */
     public fire(spec: ShotSpec) {
         const { pattern, count, speed, scale, wave, speedMod, textureKey: specTextureKey } = spec; 
         
-        // 💡 修正: textureKeyにデフォルト値（CONFIG.ASSETS.TEXTURES.BULLET）を設定
         const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
         const scaleOpt = scale ?? null;
         const speedOpt = speedMod ?? null; 
@@ -80,7 +71,6 @@ export class Player extends GameObject implements Collider {
             startAngle = this._rotaryShotAngle; 
         }
         
-        // 1. パターンごとの基本角度群を決定
         switch (pattern) {
             case 'FAN':
             case 'RANDOM':
@@ -98,7 +88,6 @@ export class Player extends GameObject implements Collider {
                 break;
         }
 
-        // 2. 発射時の角度揺らぎオフセットを一意に決定
         let wavyOffset = 0;
         if (wave) {
             const { speed: wavySpeed, range: wavyRange } = wave;
@@ -106,18 +95,15 @@ export class Player extends GameObject implements Collider {
             wavyOffset = sineValue * wavyRange; 
         }
 
-        // 3. 弾の生成ループ
         for (let i = 0; i < count; i++) {
             let currentAngleDeg = startAngle + (i * angleStep);
             
-            // RANDOM の場合、角度をランダムにずらす
             if (pattern === 'RANDOM' && spec.angle) {
                 const maxAngle = spec.angle / 2;
                 const randomOffset = (Math.random() - 0.5) * maxAngle; 
                 currentAngleDeg = baseAngle + randomOffset;
             }
             
-            // 発射角度に揺らぎオフセットを適用
             currentAngleDeg += wavyOffset;
 
             const angleRad = currentAngleDeg * (Math.PI / 180);
@@ -127,30 +113,26 @@ export class Player extends GameObject implements Collider {
             
             const finalX = spec.spacing ? this.sprite.x + (i - (count - 1) / 2) * spec.spacing : this.sprite.x;
 
-            // 💡 修正: 発射イベントの引数に textureKey を追加
             this.emit(
                 Player.SHOOT_EVENT,
                 finalX,
                 this.sprite.y - offsetY,
                 velX,
                 velY,
-                textureKey, // 💡 New: 第6引数にテクスチャキー (string)
-                scaleOpt,   // 💡 第7引数にスケールオプション
-                speedOpt    // 💡 第8引数にスピードオプション
+                textureKey, 
+                scaleOpt,   
+                speedOpt    
             );
         }
         
-        // 4. SPIRAL の場合、次の発射のために角度を更新
         if (pattern === 'SPIRAL' && spec.angle) {
             this._rotaryShotAngle = (this._rotaryShotAngle + spec.angle) % 360;
         }
     }
 
-    // handleInput (KeyG) の呼び出しはそのまま (textureKey はデフォルトでOK)
     public handleInput(input: InputManager, delta: number): void {
         const moveSpeed = CONFIG.PLAYER.SPEED * delta;
 
-        // 1. 移動処理 (省略)
         if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
             this.sprite.x = Math.max(
                 this.sprite.x - moveSpeed,
@@ -212,20 +194,20 @@ export class Player extends GameObject implements Collider {
             }
         }
 
-        // KeyG: 🚀 【新規デモ】加速しながら縮小するショット
+        // KeyG: 加速しながら縮小するショット
         if (input.isDown("KeyG")) {
             if (now - this.lastShotTime > 150) {
                 this.fire({
                     pattern: "STRAIGHT",
                     count: 1,
-                    speed: 150, // 初期速度は遅め
-                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, // 💡 EnemyBulletのテクスチャを試す
+                    speed: 150, 
+                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, 
                     speedMod: {
-                        rate: 400, // 1秒あたり 400px/s で加速
+                        rate: 400, 
                     },
                     scale: {
-                        rate: -0.8, // 1秒あたり 0.8 縮小
-                        initial: 2.0, // 初期サイズは大きめ
+                        rate: -0.8, 
+                        initial: 2.0, 
                         minScale: 0.1,
                     },
                 });
@@ -255,7 +237,6 @@ export class Player extends GameObject implements Collider {
         // KeyQ: 複合ショット (Wavy Fan + Growing Straight)
         if (input.isDown("KeyQ")) {
             if (now - this.lastShotTime > 500) {
-                // 1/2: 角度が揺らぐ扇形
                 this.fire({
                     pattern: "FAN",
                     count: 5,
@@ -264,7 +245,6 @@ export class Player extends GameObject implements Collider {
                     wave: { speed: 3, range: 15 },
                 });
 
-                // 2/2: 巨大化する並行ショット
                 this.fire({
                     pattern: "STRAIGHT",
                     count: 2,

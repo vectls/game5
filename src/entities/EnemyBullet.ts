@@ -2,7 +2,7 @@
 import { Texture } from "pixi.js";
 import { GameObject} from "./GameObject";
 import type { Collider } from "./GameObject";
-import type { Poolable } from "../core/ObjectPool"; // 🚀 【import type に修正】
+import type { Poolable } from "../core/ObjectPool"; 
 import { CONFIG } from "../config";
 
 export class EnemyBullet extends GameObject implements Poolable, Collider {
@@ -29,10 +29,8 @@ export class EnemyBullet extends GameObject implements Poolable, Collider {
     public update(delta: number): void {
         if (!this.active) return;
 
-        // sprite.y を使用
         this.sprite.y += CONFIG.ENEMY_BULLET.SPEED * delta;
 
-        // 🚀 【エラー修正】CONFIG.SCREEN.HEIGHT を使用
         if (this.sprite.y > CONFIG.SCREEN.HEIGHT) { 
             this.active = false;
         }

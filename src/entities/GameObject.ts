@@ -2,14 +2,12 @@
 import { Sprite, Texture } from "pixi.js";
 import type { Poolable } from "../core/ObjectPool";
 
-// 衝突判定に必要なプロパティをインターフェースとして定義
 export interface Collider {
     x: number;
     y: number;
     hitWidth: number;
     hitHeight: number;
 
-    // 衝突判定に便利な境界線座標 (ゲッターとして実装)
     get top(): number;
     get bottom(): number;
     get left(): number;
@@ -20,11 +18,9 @@ export abstract class GameObject implements Poolable, Collider {
     public sprite: Sprite;
     public active: boolean = false;
 
-    // 衝突判定用のプロパティをインスタンス変数として定義
     protected _hitWidth: number;
     protected _hitHeight: number;
 
-    // 衝突判定のために位置とサイズを公開
     public get x() {
         return this.sprite.x;
     }
@@ -32,7 +28,6 @@ export abstract class GameObject implements Poolable, Collider {
         return this.sprite.y;
     }
 
-    // 描画サイズ（sprite.width）ではなく、定義したヒットボックスサイズを返す
     public get hitWidth() {
         return this._hitWidth;
     }
@@ -40,7 +35,6 @@ export abstract class GameObject implements Poolable, Collider {
         return this._hitHeight;
     }
 
-    // 衝突判定に特化した境界線座標ゲッターを導入
     public get top(): number {
         return this.y - this.hitHeight / 2;
     }
@@ -59,7 +53,6 @@ export abstract class GameObject implements Poolable, Collider {
         this.sprite.anchor.set(0.5);
         this.sprite.visible = false;
 
-        // コンストラクタで引数からヒットボックスの初期値を設定
         this._hitWidth = hitWidth;
         this._hitHeight = hitHeight;
     }

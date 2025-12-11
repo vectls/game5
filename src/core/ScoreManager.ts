@@ -17,8 +17,6 @@ export class ScoreManager extends EventEmitter{
     }
 
     private notifyScoreUpdate() {
-        // 🚀 【修正】console.logを削除
-        // イベントを発火してリスナーに通知
         this.emit(ScoreManager.SCORE_CHANGED_EVENT, this.score);
     }
 }

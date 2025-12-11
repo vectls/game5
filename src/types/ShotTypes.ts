@@ -45,21 +45,22 @@ export interface SpeedOption {
 }
 
 // --- 最終仕様書 ---
-/** 弾丸の発射仕様書（Shot Specification） */
+/** Playerのfireメソッドに渡すショットの仕様書 */
 export interface ShotSpec {
-    pattern: ShotPattern; // 拡散パターン
-    count: number;        // 弾数
-    speed: number;        // 初期弾速
+    pattern: ShotPattern;
+    count: number;
+    speed: number; // 発射速度 (ピクセル/秒)
     
-    // 💡 オプショナルに変更: textureKeyが指定されない場合はPlayer側でデフォルト値を使用
-    textureKey?: string; 
+    // FAN, RANDOM, SPIRALで使用
+    angle?: number; // FAN/RANDOMの場合は扇形の角度(度数)。SPIRALの場合は回転ステップの角度。
 
-    angle?: number;       // 拡散角度 or 回転速度
-    spacing?: number;     // 横幅の間隔
-    offsetY?: number;     // 発射位置調整
-    
-    // 修飾オプション
-    scale?: ScaleOption;     // サイズ変化
-    wave?: WavyAngleOption;  // 発射時の角度揺らぎ (Player側で処理)
-    speedMod?: SpeedOption;  // 速度変化 (Bullet側で処理)
+    // STRAIGHTで使用
+    spacing?: number; // 複数弾発射時のX軸方向の間隔
+
+    // オプション
+    scale?: ScaleOption; // サイズ変化
+    wave?: WavyAngleOption; // 発射角度の揺らぎ
+    speedMod?: SpeedOption; // 速度変化（加速/減速）
+    textureKey?: string; // 使用するテクスチャのキー
+    offsetY?: number; // プレイヤーからのY軸オフセット
 }
