@@ -6,7 +6,8 @@ import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
 import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
 import { Player } from "./entities/Player";
-import type { ScaleOption, SpeedOption, ShotSpec } from "./types/ShotTypes";
+// 🚀 修正 1: TrajectoryOption の型をインポート
+import type { ScaleOption, SpeedOption, ShotSpec, TrajectoryOption } from "./types/ShotTypes";
 
 class Game {
     private app: Application;
@@ -60,7 +61,7 @@ class Game {
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    // onDeathShotSpecを引数に追加
+    // 🚀 修正 2: trajectoryOpt と initialAngleDeg を引数に追加
     private handlePlayerShoot(
         x: number,
         y: number,
@@ -69,11 +70,14 @@ class Game {
         textureKey: string,
         scaleOpt: ScaleOption | null,
         speedOpt: SpeedOption | null,
+        trajectoryOpt: TrajectoryOption | null,   // 【新規】軌道オプション
+        initialAngleDeg: number,                  // 【新規】初速角度
         onDeathShotSpec: ShotSpec | null
     ) {
         const entityManager = this.entityManager;
         if (!entityManager) return;
 
+        // 🚀 修正 3: 新しい引数を spawn メソッドに渡す
         entityManager.spawn(
             ENTITY_KEYS.BULLET,
             x,
@@ -83,6 +87,8 @@ class Game {
             textureKey,
             scaleOpt,
             speedOpt,
+            trajectoryOpt,   // 【新規】
+            initialAngleDeg, // 【新規】
             onDeathShotSpec
         );
     }

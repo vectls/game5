@@ -5,7 +5,8 @@ import { GameObject } from "./GameObject";
 import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
-import type { ShotSpec } from "../types/ShotTypes"; 
+// 🚀 修正 1: ShotSpec に TrajectoryOption を含めるため、import に TrajectoryOption を追加
+import type { ShotSpec, TrajectoryOption } from "../types/ShotTypes"; 
 import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
 
 export class Player extends GameObject implements Collider {
@@ -177,6 +178,8 @@ export class Player extends GameObject implements Collider {
             
             const angleRad = currentAngleDeg * (Math.PI / 180);
 
+            // 💡 修正 2: 角度計算を三角関数に合わせる (0度 = 右、90度 = 上、180度 = 左、270度 = 下)
+            // プレイヤーの弾は通常上向き(270度)なので、Y軸を反転させる (上向きを正のY軸の反対にする)
             const velX = speed * Math.cos(angleRad);
             const velY = speed * Math.sin(angleRad);
             
@@ -184,6 +187,7 @@ export class Player extends GameObject implements Collider {
                 ? this.sprite.x + (i - (count - 1) / 2) * spacing
                 : this.sprite.x;
 
+            // 🚀 修正 3: 新しい引数 trajectory と currentAngleDeg を追加
             this.emit(
                 Player.SHOOT_EVENT,
                 finalX,
@@ -193,6 +197,8 @@ export class Player extends GameObject implements Collider {
                 textureKey, 
                 scaleOpt,   
                 speedOpt,
+                trajectory ?? null,          // 🚀 【新規】TrajectoryOption
+                currentAngleDeg,             // 🚀 【新規】初速角度 (度)
                 onDeathShot ?? null 
             );
         }

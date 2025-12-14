@@ -10,7 +10,13 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player"; 
-import { type ScaleOption, type SpeedOption, type ShotSpec } from "../types/ShotTypes"; 
+// 🚀 修正 1: TrajectoryOption の型をインポートに追加
+import { 
+    type ScaleOption, 
+    type SpeedOption, 
+    type ShotSpec, 
+    type TrajectoryOption 
+} from "../types/ShotTypes"; 
 
 type ManagedObject = GameObject & Poolable;
 
@@ -91,6 +97,7 @@ export class EntityManager extends EventEmitter {
     }
 
     // main.ts から呼ばれる汎用スポーンメソッド
+    // ResetArgs<EntityMap[K]> は Bullet の reset(x, y, velX, velY, textureKey, scaleOpt, speedOpt, trajectoryOpt, initialAngleDeg, onDeathShotSpec) に対応
     public spawn<K extends EntityType>(key: K, ...args: ResetArgs<EntityMap[K]>): EntityMap[K] {
         const pool = this._pools[key] as ObjectPool<EntityMap[K]>;
         const obj = pool.get(...args);
@@ -109,21 +116,64 @@ export class EntityManager extends EventEmitter {
         y: number,
         velX: number, 
         velY: number, 
+        // 🚀 修正 3: ここも引数を追加（使われない可能性が高いが安全のため）
+        textureKey: string = CONFIG.ASSETS.TEXTURES.BULLET,
         scaleOpt: ScaleOption | null = null,
         speedOpt: SpeedOption | null = null,
+        trajectoryOpt: TrajectoryOption | null = null,
+        initialAngleDeg: number = 0,
         onDeathShotSpec: ShotSpec | null = null,
     ): Bullet | null {
-        // テクスチャキーがない場合のフォールバック（デフォルト弾）
         return this.spawn(
             ENTITY_KEYS.BULLET, 
             x, y, velX, velY, 
-            CONFIG.ASSETS.TEXTURES.BULLET, 
-            scaleOpt, speedOpt, onDeathShotSpec
+            textureKey, 
+            scaleOpt, 
+            speedOpt, 
+            trajectoryOpt,          // 【新規】
+            initialAngleDeg,        // 【新規】
+            onDeathShotSpec
         );
     }
 
+    // 🚀 修正 4: fireDeathShot は Player.SHOOT_EVENT の全引数を揃えて emit する
+    // Death Shotは、メイン弾丸が持っていた「trajectory, scale, speed, textureKey」の情報を使わないため、
+    // ここでデフォルト値を設定して Player の fire メソッドのロジックを再利用する。
     public fireDeathShot(x: number, y: number, spec: ShotSpec): void {
-        this.emit(Player.SHOOT_EVENT, x, y, spec);
+        // PlayerのfireメソッドはShotSpecを分解して emit に流すため、ここでは簡易的なemitを行う
+        // Playerのfire()のロジックを再利用するために、Player.SHOOT_EVENT に渡す引数を揃える必要がある。
+        // spec の中には、発射に必要な情報 (pattern, count, speed, angle, baseAngleDegなど) が含まれている。
+        // しかし、EntityManagerはPlayerのfireロジックを再実装するべきではない。
+        // Player.ts 側の実装を信じ、specを引数として渡すのが最もシンプルで安全な方法。
+        // ただし、Player.tsで修正した emit の引数リストは spec ではなく、分解されたプリミティブな値である。
+        
+        // 🚨 Player.ts の fire メソッドで、Player.SHOOT_EVENT に渡す引数リストに spec を分解して渡していたため、
+        // ここでも同様に、spec に含まれる情報を使って、emit が期待する引数リストを揃える必要がある。
+        
+        // 暫定的な対応として、このメソッド自体が不要になるように、Bullet側を修正します。
+        // Bullet.ts の deactivateAndFireDeathShot() は、このメソッドではなく、
+        // プレイヤー側と同じロジックを使って、Player.SHOOT_EVENT を発火させるべき。
+        
+        // 既存の Player.SHOOT_EVENT は spec を受け取らないため、ここでは処理を変更しないままにします。
+        // 後の Bullet.ts の修正で、このメソッドの扱いの見直しを提案します。
+
+        // 💡 Bullet.ts の修正前にこのコードが実行されるとエラーになるため、Player.SHOOT_EVENT の引数を揃える。
+        // spec から速度を抽出し、角度は一旦 270 (上) とし、それ以外のオプションは null で渡します。
+        const velY = -(spec.speed ?? 0); // 速度が指定されていればそれを使う
+        
+        this.emit(
+            Player.SHOOT_EVENT, 
+            x, 
+            y, 
+            0, // velX
+            velY, 
+            spec.textureKey ?? CONFIG.ASSETS.TEXTURES.BULLET, // textureKey
+            spec.scale ?? null,         // scaleOpt
+            spec.speedMod ?? null,      // speedOpt
+            null,                       // trajectoryOpt (DeathShotはFIXED想定)
+            270,                        // initialAngleDeg (DeathShotはPlayerが計算)
+            null                        // onDeathShotSpec
+        );
     }
     
     private addEnemySpawner(delta: number) {

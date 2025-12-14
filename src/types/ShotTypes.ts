@@ -69,4 +69,7 @@ export interface ShotSpec {
     
     // 💡 修正: 弾が消える際に発射する子弾の仕様 (再帰的にShotSpecを保持)
     onDeathShot?: ShotSpec;
+    
+    // 🚀 【新規追加】基本の発射角度（度数）
+    baseAngleDeg?: number;
 }
