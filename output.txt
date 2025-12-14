@@ -1,0 +1,5782 @@
+======== FILE START: .gitignore ========
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+======== FILE END: .gitignore ========
+
+======== FILE START: index.html ========
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>game5</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+
+======== FILE END: index.html ========
+
+======== FILE START: package-lock.json ========
+{
+  "name": "game5",
+  "version": "0.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "game5",
+      "version": "0.0.0",
+      "dependencies": {
+        "pixi.js": "^8.14.3"
+      },
+      "devDependencies": {
+        "typescript": "~5.9.3",
+        "vite": "^7.2.4"
+      }
+    },
+    "node_modules/@esbuild/aix-ppc64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/aix-ppc64/-/aix-ppc64-0.25.12.tgz",
+      "integrity": "sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==",
+      "cpu": [
+        "ppc64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "aix"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/android-arm": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.25.12.tgz",
+      "integrity": "sha512-VJ+sKvNA/GE7Ccacc9Cha7bpS8nyzVv0jdVgwNDaR4gDMC/2TTRc33Ip8qrNYUcpkOHUT5OZ0bUcNNVZQ9RLlg==",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "android"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/android-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.25.12.tgz",
+      "integrity": "sha512-6AAmLG7zwD1Z159jCKPvAxZd4y/VTO0VkprYy+3N2FtJ8+BQWFXU+OxARIwA46c5tdD9SsKGZ/1ocqBS/gAKHg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "android"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/android-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.25.12.tgz",
+      "integrity": "sha512-5jbb+2hhDHx5phYR2By8GTWEzn6I9UqR11Kwf22iKbNpYrsmRB18aX/9ivc5cabcUiAT/wM+YIZ6SG9QO6a8kg==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "android"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/darwin-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.25.12.tgz",
+      "integrity": "sha512-N3zl+lxHCifgIlcMUP5016ESkeQjLj/959RxxNYIthIg+CQHInujFuXeWbWMgnTo4cp5XVHqFPmpyu9J65C1Yg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/darwin-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.25.12.tgz",
+      "integrity": "sha512-HQ9ka4Kx21qHXwtlTUVbKJOAnmG1ipXhdWTmNXiPzPfWKpXqASVcWdnf2bnL73wgjNrFXAa3yYvBSd9pzfEIpA==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/freebsd-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.25.12.tgz",
+      "integrity": "sha512-gA0Bx759+7Jve03K1S0vkOu5Lg/85dou3EseOGUes8flVOGxbhDDh/iZaoek11Y8mtyKPGF3vP8XhnkDEAmzeg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/freebsd-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.25.12.tgz",
+      "integrity": "sha512-TGbO26Yw2xsHzxtbVFGEXBFH0FRAP7gtcPE7P5yP7wGy7cXK2oO7RyOhL5NLiqTlBh47XhmIUXuGciXEqYFfBQ==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-arm": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.25.12.tgz",
+      "integrity": "sha512-lPDGyC1JPDou8kGcywY0YILzWlhhnRjdof3UlcoqYmS9El818LLfJJc3PXXgZHrHCAKs/Z2SeZtDJr5MrkxtOw==",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.25.12.tgz",
+      "integrity": "sha512-8bwX7a8FghIgrupcxb4aUmYDLp8pX06rGh5HqDT7bB+8Rdells6mHvrFHHW2JAOPZUbnjUpKTLg6ECyzvas2AQ==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-ia32": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.25.12.tgz",
+      "integrity": "sha512-0y9KrdVnbMM2/vG8KfU0byhUN+EFCny9+8g202gYqSSVMonbsCfLjUO+rCci7pM0WBEtz+oK/PIwHkzxkyharA==",
+      "cpu": [
+        "ia32"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-loong64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.25.12.tgz",
+      "integrity": "sha512-h///Lr5a9rib/v1GGqXVGzjL4TMvVTv+s1DPoxQdz7l/AYv6LDSxdIwzxkrPW438oUXiDtwM10o9PmwS/6Z0Ng==",
+      "cpu": [
+        "loong64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-mips64el": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.25.12.tgz",
+      "integrity": "sha512-iyRrM1Pzy9GFMDLsXn1iHUm18nhKnNMWscjmp4+hpafcZjrr2WbT//d20xaGljXDBYHqRcl8HnxbX6uaA/eGVw==",
+      "cpu": [
+        "mips64el"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-ppc64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.25.12.tgz",
+      "integrity": "sha512-9meM/lRXxMi5PSUqEXRCtVjEZBGwB7P/D4yT8UG/mwIdze2aV4Vo6U5gD3+RsoHXKkHCfSxZKzmDssVlRj1QQA==",
+      "cpu": [
+        "ppc64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-riscv64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.25.12.tgz",
+      "integrity": "sha512-Zr7KR4hgKUpWAwb1f3o5ygT04MzqVrGEGXGLnj15YQDJErYu/BGg+wmFlIDOdJp0PmB0lLvxFIOXZgFRrdjR0w==",
+      "cpu": [
+        "riscv64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-s390x": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.25.12.tgz",
+      "integrity": "sha512-MsKncOcgTNvdtiISc/jZs/Zf8d0cl/t3gYWX8J9ubBnVOwlk65UIEEvgBORTiljloIWnBzLs4qhzPkJcitIzIg==",
+      "cpu": [
+        "s390x"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/linux-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.25.12.tgz",
+      "integrity": "sha512-uqZMTLr/zR/ed4jIGnwSLkaHmPjOjJvnm6TVVitAa08SLS9Z0VM8wIRx7gWbJB5/J54YuIMInDquWyYvQLZkgw==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/netbsd-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-arm64/-/netbsd-arm64-0.25.12.tgz",
+      "integrity": "sha512-xXwcTq4GhRM7J9A8Gv5boanHhRa/Q9KLVmcyXHCTaM4wKfIpWkdXiMog/KsnxzJ0A1+nD+zoecuzqPmCRyBGjg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "netbsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/netbsd-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.25.12.tgz",
+      "integrity": "sha512-Ld5pTlzPy3YwGec4OuHh1aCVCRvOXdH8DgRjfDy/oumVovmuSzWfnSJg+VtakB9Cm0gxNO9BzWkj6mtO1FMXkQ==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "netbsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/openbsd-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-arm64/-/openbsd-arm64-0.25.12.tgz",
+      "integrity": "sha512-fF96T6KsBo/pkQI950FARU9apGNTSlZGsv1jZBAlcLL1MLjLNIWPBkj5NlSz8aAzYKg+eNqknrUJ24QBybeR5A==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/openbsd-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.25.12.tgz",
+      "integrity": "sha512-MZyXUkZHjQxUvzK7rN8DJ3SRmrVrke8ZyRusHlP+kuwqTcfWLyqMOE3sScPPyeIXN/mDJIfGXvcMqCgYKekoQw==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "openbsd"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/openharmony-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/openharmony-arm64/-/openharmony-arm64-0.25.12.tgz",
+      "integrity": "sha512-rm0YWsqUSRrjncSXGA7Zv78Nbnw4XL6/dzr20cyrQf7ZmRcsovpcRBdhD43Nuk3y7XIoW2OxMVvwuRvk9XdASg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "openharmony"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/sunos-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.25.12.tgz",
+      "integrity": "sha512-3wGSCDyuTHQUzt0nV7bocDy72r2lI33QL3gkDNGkod22EsYl04sMf0qLb8luNKTOmgF/eDEDP5BFNwoBKH441w==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "sunos"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/win32-arm64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.25.12.tgz",
+      "integrity": "sha512-rMmLrur64A7+DKlnSuwqUdRKyd3UE7oPJZmnljqEptesKM8wx9J8gx5u0+9Pq0fQQW8vqeKebwNXdfOyP+8Bsg==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/win32-ia32": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.25.12.tgz",
+      "integrity": "sha512-HkqnmmBoCbCwxUKKNPBixiWDGCpQGVsrQfJoVGYLPT41XWF8lHuE5N6WhVia2n4o5QK5M4tYr21827fNhi4byQ==",
+      "cpu": [
+        "ia32"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@esbuild/win32-x64": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz",
+      "integrity": "sha512-alJC0uCZpTFrSL0CCDjcgleBXPnCrEAhTBILpeAp7M/OFgoqtAetfBzX0xM00MUsVVPpVjlPuMbREqnZCXaTnA==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ],
+      "engines": {
+        "node": ">=18"
+      }
+    },
+    "node_modules/@pixi/colord": {
+      "version": "2.9.6",
+      "resolved": "https://registry.npmjs.org/@pixi/colord/-/colord-2.9.6.tgz",
+      "integrity": "sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==",
+      "license": "MIT"
+    },
+    "node_modules/@rollup/rollup-android-arm-eabi": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.53.3.tgz",
+      "integrity": "sha512-mRSi+4cBjrRLoaal2PnqH82Wqyb+d3HsPUN/W+WslCXsZsyHa9ZeQQX/pQsZaVIWDkPcpV6jJ+3KLbTbgnwv8w==",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "android"
+      ]
+    },
+    "node_modules/@rollup/rollup-android-arm64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-android-arm64/-/rollup-android-arm64-4.53.3.tgz",
+      "integrity": "sha512-CbDGaMpdE9sh7sCmTrTUyllhrg65t6SwhjlMJsLr+J8YjFuPmCEjbBSx4Z/e4SmDyH3aB5hGaJUP2ltV/vcs4w==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "android"
+      ]
+    },
+    "node_modules/@rollup/rollup-darwin-arm64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-arm64/-/rollup-darwin-arm64-4.53.3.tgz",
+      "integrity": "sha512-Nr7SlQeqIBpOV6BHHGZgYBuSdanCXuw09hon14MGOLGmXAFYjx1wNvquVPmpZnl0tLjg25dEdr4IQ6GgyToCUA==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "darwin"
+      ]
+    },
+    "node_modules/@rollup/rollup-darwin-x64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-darwin-x64/-/rollup-darwin-x64-4.53.3.tgz",
+      "integrity": "sha512-DZ8N4CSNfl965CmPktJ8oBnfYr3F8dTTNBQkRlffnUarJ2ohudQD17sZBa097J8xhQ26AwhHJ5mvUyQW8ddTsQ==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "darwin"
+      ]
+    },
+    "node_modules/@rollup/rollup-freebsd-arm64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-arm64/-/rollup-freebsd-arm64-4.53.3.tgz",
+      "integrity": "sha512-yMTrCrK92aGyi7GuDNtGn2sNW+Gdb4vErx4t3Gv/Tr+1zRb8ax4z8GWVRfr3Jw8zJWvpGHNpss3vVlbF58DZ4w==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ]
+    },
+    "node_modules/@rollup/rollup-freebsd-x64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-freebsd-x64/-/rollup-freebsd-x64-4.53.3.tgz",
+      "integrity": "sha512-lMfF8X7QhdQzseM6XaX0vbno2m3hlyZFhwcndRMw8fbAGUGL3WFMBdK0hbUBIUYcEcMhVLr1SIamDeuLBnXS+Q==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "freebsd"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-arm-gnueabihf": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-gnueabihf/-/rollup-linux-arm-gnueabihf-4.53.3.tgz",
+      "integrity": "sha512-k9oD15soC/Ln6d2Wv/JOFPzZXIAIFLp6B+i14KhxAfnq76ajt0EhYc5YPeX6W1xJkAdItcVT+JhKl1QZh44/qw==",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-arm-musleabihf": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm-musleabihf/-/rollup-linux-arm-musleabihf-4.53.3.tgz",
+      "integrity": "sha512-vTNlKq+N6CK/8UktsrFuc+/7NlEYVxgaEgRXVUVK258Z5ymho29skzW1sutgYjqNnquGwVUObAaxae8rZ6YMhg==",
+      "cpu": [
+        "arm"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-arm64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.53.3.tgz",
+      "integrity": "sha512-RGrFLWgMhSxRs/EWJMIFM1O5Mzuz3Xy3/mnxJp/5cVhZ2XoCAxJnmNsEyeMJtpK+wu0FJFWz+QF4mjCA7AUQ3w==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-arm64-musl": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-arm64-musl/-/rollup-linux-arm64-musl-4.53.3.tgz",
+      "integrity": "sha512-kASyvfBEWYPEwe0Qv4nfu6pNkITLTb32p4yTgzFCocHnJLAHs+9LjUu9ONIhvfT/5lv4YS5muBHyuV84epBo/A==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-loong64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-loong64-gnu/-/rollup-linux-loong64-gnu-4.53.3.tgz",
+      "integrity": "sha512-JiuKcp2teLJwQ7vkJ95EwESWkNRFJD7TQgYmCnrPtlu50b4XvT5MOmurWNrCj3IFdyjBQ5p9vnrX4JM6I8OE7g==",
+      "cpu": [
+        "loong64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-ppc64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-ppc64-gnu/-/rollup-linux-ppc64-gnu-4.53.3.tgz",
+      "integrity": "sha512-EoGSa8nd6d3T7zLuqdojxC20oBfNT8nexBbB/rkxgKj5T5vhpAQKKnD+h3UkoMuTyXkP5jTjK/ccNRmQrPNDuw==",
+      "cpu": [
+        "ppc64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-riscv64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-gnu/-/rollup-linux-riscv64-gnu-4.53.3.tgz",
+      "integrity": "sha512-4s+Wped2IHXHPnAEbIB0YWBv7SDohqxobiiPA1FIWZpX+w9o2i4LezzH/NkFUl8LRci/8udci6cLq+jJQlh+0g==",
+      "cpu": [
+        "riscv64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-riscv64-musl": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-riscv64-musl/-/rollup-linux-riscv64-musl-4.53.3.tgz",
+      "integrity": "sha512-68k2g7+0vs2u9CxDt5ktXTngsxOQkSEV/xBbwlqYcUrAVh6P9EgMZvFsnHy4SEiUl46Xf0IObWVbMvPrr2gw8A==",
+      "cpu": [
+        "riscv64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-s390x-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-s390x-gnu/-/rollup-linux-s390x-gnu-4.53.3.tgz",
+      "integrity": "sha512-VYsFMpULAz87ZW6BVYw3I6sWesGpsP9OPcyKe8ofdg9LHxSbRMd7zrVrr5xi/3kMZtpWL/wC+UIJWJYVX5uTKg==",
+      "cpu": [
+        "s390x"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-x64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-gnu/-/rollup-linux-x64-gnu-4.53.3.tgz",
+      "integrity": "sha512-3EhFi1FU6YL8HTUJZ51imGJWEX//ajQPfqWLI3BQq4TlvHy4X0MOr5q3D2Zof/ka0d5FNdPwZXm3Yyib/UEd+w==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-linux-x64-musl": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-linux-x64-musl/-/rollup-linux-x64-musl-4.53.3.tgz",
+      "integrity": "sha512-eoROhjcc6HbZCJr+tvVT8X4fW3/5g/WkGvvmwz/88sDtSJzO7r/blvoBDgISDiCjDRZmHpwud7h+6Q9JxFwq1Q==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "linux"
+      ]
+    },
+    "node_modules/@rollup/rollup-openharmony-arm64": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-openharmony-arm64/-/rollup-openharmony-arm64-4.53.3.tgz",
+      "integrity": "sha512-OueLAWgrNSPGAdUdIjSWXw+u/02BRTcnfw9PN41D2vq/JSEPnJnVuBgw18VkN8wcd4fjUs+jFHVM4t9+kBSNLw==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "openharmony"
+      ]
+    },
+    "node_modules/@rollup/rollup-win32-arm64-msvc": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-arm64-msvc/-/rollup-win32-arm64-msvc-4.53.3.tgz",
+      "integrity": "sha512-GOFuKpsxR/whszbF/bzydebLiXIHSgsEUp6M0JI8dWvi+fFa1TD6YQa4aSZHtpmh2/uAlj/Dy+nmby3TJ3pkTw==",
+      "cpu": [
+        "arm64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ]
+    },
+    "node_modules/@rollup/rollup-win32-ia32-msvc": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-ia32-msvc/-/rollup-win32-ia32-msvc-4.53.3.tgz",
+      "integrity": "sha512-iah+THLcBJdpfZ1TstDFbKNznlzoxa8fmnFYK4V67HvmuNYkVdAywJSoteUszvBQ9/HqN2+9AZghbajMsFT+oA==",
+      "cpu": [
+        "ia32"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ]
+    },
+    "node_modules/@rollup/rollup-win32-x64-gnu": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-gnu/-/rollup-win32-x64-gnu-4.53.3.tgz",
+      "integrity": "sha512-J9QDiOIZlZLdcot5NXEepDkstocktoVjkaKUtqzgzpt2yWjGlbYiKyp05rWwk4nypbYUNoFAztEgixoLaSETkg==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ]
+    },
+    "node_modules/@rollup/rollup-win32-x64-msvc": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.53.3.tgz",
+      "integrity": "sha512-UhTd8u31dXadv0MopwGgNOBpUVROFKWVQgAg5N1ESyCz8AuBcMqm4AuTjrwgQKGDfoFuz02EuMRHQIw/frmYKQ==",
+      "cpu": [
+        "x64"
+      ],
+      "dev": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "win32"
+      ]
+    },
+    "node_modules/@types/css-font-loading-module": {
+      "version": "0.0.12",
+      "resolved": "https://registry.npmjs.org/@types/css-font-loading-module/-/css-font-loading-module-0.0.12.tgz",
+      "integrity": "sha512-x2tZZYkSxXqWvTDgveSynfjq/T2HyiZHXb00j/+gy19yp70PHCizM48XFdjBCWH7eHBD0R5i/pw9yMBP/BH5uA==",
+      "license": "MIT"
+    },
+    "node_modules/@types/earcut": {
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/@types/earcut/-/earcut-3.0.0.tgz",
+      "integrity": "sha512-k/9fOUGO39yd2sCjrbAJvGDEQvRwRnQIZlBz43roGwUZo5SHAmyVvSFyaVVZkicRVCaDXPKlbxrUcBuJoSWunQ==",
+      "license": "MIT"
+    },
+    "node_modules/@types/estree": {
+      "version": "1.0.8",
+      "resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+      "integrity": "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==",
+      "dev": true,
+      "license": "MIT"
+    },
+    "node_modules/@webgpu/types": {
+      "version": "0.1.66",
+      "resolved": "https://registry.npmjs.org/@webgpu/types/-/types-0.1.66.tgz",
+      "integrity": "sha512-YA2hLrwLpDsRueNDXIMqN9NTzD6bCDkuXbOSe0heS+f8YE8usA6Gbv1prj81pzVHrbaAma7zObnIC+I6/sXJgA==",
+      "license": "BSD-3-Clause"
+    },
+    "node_modules/@xmldom/xmldom": {
+      "version": "0.8.11",
+      "resolved": "https://registry.npmjs.org/@xmldom/xmldom/-/xmldom-0.8.11.tgz",
+      "integrity": "sha512-cQzWCtO6C8TQiYl1ruKNn2U6Ao4o4WBBcbL61yJl84x+j5sOWWFU9X7DpND8XZG3daDppSsigMdfAIl2upQBRw==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=10.0.0"
+      }
+    },
+    "node_modules/earcut": {
+      "version": "3.0.2",
+      "resolved": "https://registry.npmjs.org/earcut/-/earcut-3.0.2.tgz",
+      "integrity": "sha512-X7hshQbLyMJ/3RPhyObLARM2sNxxmRALLKx1+NVFFnQ9gKzmCrxm9+uLIAdBcvc8FNLpctqlQ2V6AE92Ol9UDQ==",
+      "license": "ISC"
+    },
+    "node_modules/esbuild": {
+      "version": "0.25.12",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz",
+      "integrity": "sha512-bbPBYYrtZbkt6Os6FiTLCTFxvq4tt3JKall1vRwshA3fdVztsLAatFaZobhkBC8/BrPetoa0oksYoKXoG4ryJg==",
+      "dev": true,
+      "hasInstallScript": true,
+      "license": "MIT",
+      "bin": {
+        "esbuild": "bin/esbuild"
+      },
+      "engines": {
+        "node": ">=18"
+      },
+      "optionalDependencies": {
+        "@esbuild/aix-ppc64": "0.25.12",
+        "@esbuild/android-arm": "0.25.12",
+        "@esbuild/android-arm64": "0.25.12",
+        "@esbuild/android-x64": "0.25.12",
+        "@esbuild/darwin-arm64": "0.25.12",
+        "@esbuild/darwin-x64": "0.25.12",
+        "@esbuild/freebsd-arm64": "0.25.12",
+        "@esbuild/freebsd-x64": "0.25.12",
+        "@esbuild/linux-arm": "0.25.12",
+        "@esbuild/linux-arm64": "0.25.12",
+        "@esbuild/linux-ia32": "0.25.12",
+        "@esbuild/linux-loong64": "0.25.12",
+        "@esbuild/linux-mips64el": "0.25.12",
+        "@esbuild/linux-ppc64": "0.25.12",
+        "@esbuild/linux-riscv64": "0.25.12",
+        "@esbuild/linux-s390x": "0.25.12",
+        "@esbuild/linux-x64": "0.25.12",
+        "@esbuild/netbsd-arm64": "0.25.12",
+        "@esbuild/netbsd-x64": "0.25.12",
+        "@esbuild/openbsd-arm64": "0.25.12",
+        "@esbuild/openbsd-x64": "0.25.12",
+        "@esbuild/openharmony-arm64": "0.25.12",
+        "@esbuild/sunos-x64": "0.25.12",
+        "@esbuild/win32-arm64": "0.25.12",
+        "@esbuild/win32-ia32": "0.25.12",
+        "@esbuild/win32-x64": "0.25.12"
+      }
+    },
+    "node_modules/eventemitter3": {
+      "version": "5.0.1",
+      "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz",
+      "integrity": "sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==",
+      "license": "MIT"
+    },
+    "node_modules/fdir": {
+      "version": "6.5.0",
+      "resolved": "https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz",
+      "integrity": "sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12.0.0"
+      },
+      "peerDependencies": {
+        "picomatch": "^3 || ^4"
+      },
+      "peerDependenciesMeta": {
+        "picomatch": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/fsevents": {
+      "version": "2.3.3",
+      "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
+      "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
+      "dev": true,
+      "hasInstallScript": true,
+      "license": "MIT",
+      "optional": true,
+      "os": [
+        "darwin"
+      ],
+      "engines": {
+        "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
+      }
+    },
+    "node_modules/gifuct-js": {
+      "version": "2.1.2",
+      "resolved": "https://registry.npmjs.org/gifuct-js/-/gifuct-js-2.1.2.tgz",
+      "integrity": "sha512-rI2asw77u0mGgwhV3qA+OEgYqaDn5UNqgs+Bx0FGwSpuqfYn+Ir6RQY5ENNQ8SbIiG/m5gVa7CD5RriO4f4Lsg==",
+      "license": "MIT",
+      "dependencies": {
+        "js-binary-schema-parser": "^2.0.3"
+      }
+    },
+    "node_modules/ismobilejs": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/ismobilejs/-/ismobilejs-1.1.1.tgz",
+      "integrity": "sha512-VaFW53yt8QO61k2WJui0dHf4SlL8lxBofUuUmwBo0ljPk0Drz2TiuDW4jo3wDcv41qy/SxrJ+VAzJ/qYqsmzRw==",
+      "license": "MIT"
+    },
+    "node_modules/js-binary-schema-parser": {
+      "version": "2.0.3",
+      "resolved": "https://registry.npmjs.org/js-binary-schema-parser/-/js-binary-schema-parser-2.0.3.tgz",
+      "integrity": "sha512-xezGJmOb4lk/M1ZZLTR/jaBHQ4gG/lqQnJqdIv4721DMggsa1bDVlHXNeHYogaIEHD9vCRv0fcL4hMA+Coarkg==",
+      "license": "MIT"
+    },
+    "node_modules/nanoid": {
+      "version": "3.3.11",
+      "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz",
+      "integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==",
+      "dev": true,
+      "funding": [
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/ai"
+        }
+      ],
+      "license": "MIT",
+      "bin": {
+        "nanoid": "bin/nanoid.cjs"
+      },
+      "engines": {
+        "node": "^10 || ^12 || ^13.7 || ^14 || >=15.0.1"
+      }
+    },
+    "node_modules/parse-svg-path": {
+      "version": "0.1.2",
+      "resolved": "https://registry.npmjs.org/parse-svg-path/-/parse-svg-path-0.1.2.tgz",
+      "integrity": "sha512-JyPSBnkTJ0AI8GGJLfMXvKq42cj5c006fnLz6fXy6zfoVjJizi8BNTpu8on8ziI1cKy9d9DGNuY17Ce7wuejpQ==",
+      "license": "MIT"
+    },
+    "node_modules/picocolors": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
+      "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==",
+      "dev": true,
+      "license": "ISC"
+    },
+    "node_modules/picomatch": {
+      "version": "4.0.3",
+      "resolved": "https://registry.npmjs.org/picomatch/-/picomatch-4.0.3.tgz",
+      "integrity": "sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==",
+      "dev": true,
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/jonschlinkert"
+      }
+    },
+    "node_modules/pixi.js": {
+      "version": "8.14.3",
+      "resolved": "https://registry.npmjs.org/pixi.js/-/pixi.js-8.14.3.tgz",
+      "integrity": "sha512-6xGYARV8D9E/fO1c2NmYn+k2dQ5oZldVm5tNlLQJ8obTlOQXdL5QpMc217qTpRyHVDFaw5eoFCLF1gr6p5ZcjQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@pixi/colord": "^2.9.6",
+        "@types/css-font-loading-module": "^0.0.12",
+        "@types/earcut": "^3.0.0",
+        "@webgpu/types": "^0.1.40",
+        "@xmldom/xmldom": "^0.8.10",
+        "earcut": "^3.0.2",
+        "eventemitter3": "^5.0.1",
+        "gifuct-js": "^2.1.2",
+        "ismobilejs": "^1.1.1",
+        "parse-svg-path": "^0.1.2",
+        "tiny-lru": "^11.4.5"
+      },
+      "funding": {
+        "type": "opencollective",
+        "url": "https://opencollective.com/pixijs"
+      }
+    },
+    "node_modules/postcss": {
+      "version": "8.5.6",
+      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz",
+      "integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
+      "dev": true,
+      "funding": [
+        {
+          "type": "opencollective",
+          "url": "https://opencollective.com/postcss/"
+        },
+        {
+          "type": "tidelift",
+          "url": "https://tidelift.com/funding/github/npm/postcss"
+        },
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/ai"
+        }
+      ],
+      "license": "MIT",
+      "dependencies": {
+        "nanoid": "^3.3.11",
+        "picocolors": "^1.1.1",
+        "source-map-js": "^1.2.1"
+      },
+      "engines": {
+        "node": "^10 || ^12 || >=14"
+      }
+    },
+    "node_modules/rollup": {
+      "version": "4.53.3",
+      "resolved": "https://registry.npmjs.org/rollup/-/rollup-4.53.3.tgz",
+      "integrity": "sha512-w8GmOxZfBmKknvdXU1sdM9NHcoQejwF/4mNgj2JuEEdRaHwwF12K7e9eXn1nLZ07ad+du76mkVsyeb2rKGllsA==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@types/estree": "1.0.8"
+      },
+      "bin": {
+        "rollup": "dist/bin/rollup"
+      },
+      "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=8.0.0"
+      },
+      "optionalDependencies": {
+        "@rollup/rollup-android-arm-eabi": "4.53.3",
+        "@rollup/rollup-android-arm64": "4.53.3",
+        "@rollup/rollup-darwin-arm64": "4.53.3",
+        "@rollup/rollup-darwin-x64": "4.53.3",
+        "@rollup/rollup-freebsd-arm64": "4.53.3",
+        "@rollup/rollup-freebsd-x64": "4.53.3",
+        "@rollup/rollup-linux-arm-gnueabihf": "4.53.3",
+        "@rollup/rollup-linux-arm-musleabihf": "4.53.3",
+        "@rollup/rollup-linux-arm64-gnu": "4.53.3",
+        "@rollup/rollup-linux-arm64-musl": "4.53.3",
+        "@rollup/rollup-linux-loong64-gnu": "4.53.3",
+        "@rollup/rollup-linux-ppc64-gnu": "4.53.3",
+        "@rollup/rollup-linux-riscv64-gnu": "4.53.3",
+        "@rollup/rollup-linux-riscv64-musl": "4.53.3",
+        "@rollup/rollup-linux-s390x-gnu": "4.53.3",
+        "@rollup/rollup-linux-x64-gnu": "4.53.3",
+        "@rollup/rollup-linux-x64-musl": "4.53.3",
+        "@rollup/rollup-openharmony-arm64": "4.53.3",
+        "@rollup/rollup-win32-arm64-msvc": "4.53.3",
+        "@rollup/rollup-win32-ia32-msvc": "4.53.3",
+        "@rollup/rollup-win32-x64-gnu": "4.53.3",
+        "@rollup/rollup-win32-x64-msvc": "4.53.3",
+        "fsevents": "~2.3.2"
+      }
+    },
+    "node_modules/source-map-js": {
+      "version": "1.2.1",
+      "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
+      "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==",
+      "dev": true,
+      "license": "BSD-3-Clause",
+      "engines": {
+        "node": ">=0.10.0"
+      }
+    },
+    "node_modules/tiny-lru": {
+      "version": "11.4.5",
+      "resolved": "https://registry.npmjs.org/tiny-lru/-/tiny-lru-11.4.5.tgz",
+      "integrity": "sha512-hkcz3FjNJfKXjV4mjQ1OrXSLAehg8Hw+cEZclOVT+5c/cWQWImQ9wolzTjth+dmmDe++p3bme3fTxz6Q4Etsqw==",
+      "license": "BSD-3-Clause",
+      "engines": {
+        "node": ">=12"
+      }
+    },
+    "node_modules/tinyglobby": {
+      "version": "0.2.15",
+      "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.15.tgz",
+      "integrity": "sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "fdir": "^6.5.0",
+        "picomatch": "^4.0.3"
+      },
+      "engines": {
+        "node": ">=12.0.0"
+      },
+      "funding": {
+        "url": "https://github.com/sponsors/SuperchupuDev"
+      }
+    },
+    "node_modules/typescript": {
+      "version": "5.9.3",
+      "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+      "dev": true,
+      "license": "Apache-2.0",
+      "bin": {
+        "tsc": "bin/tsc",
+        "tsserver": "bin/tsserver"
+      },
+      "engines": {
+        "node": ">=14.17"
+      }
+    },
+    "node_modules/vite": {
+      "version": "7.2.4",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-7.2.4.tgz",
+      "integrity": "sha512-NL8jTlbo0Tn4dUEXEsUg8KeyG/Lkmc4Fnzb8JXN/Ykm9G4HNImjtABMJgkQoVjOBN/j2WAwDTRytdqJbZsah7w==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "esbuild": "^0.25.0",
+        "fdir": "^6.5.0",
+        "picomatch": "^4.0.3",
+        "postcss": "^8.5.6",
+        "rollup": "^4.43.0",
+        "tinyglobby": "^0.2.15"
+      },
+      "bin": {
+        "vite": "bin/vite.js"
+      },
+      "engines": {
+        "node": "^20.19.0 || >=22.12.0"
+      },
+      "funding": {
+        "url": "https://github.com/vitejs/vite?sponsor=1"
+      },
+      "optionalDependencies": {
+        "fsevents": "~2.3.3"
+      },
+      "peerDependencies": {
+        "@types/node": "^20.19.0 || >=22.12.0",
+        "jiti": ">=1.21.0",
+        "less": "^4.0.0",
+        "lightningcss": "^1.21.0",
+        "sass": "^1.70.0",
+        "sass-embedded": "^1.70.0",
+        "stylus": ">=0.54.8",
+        "sugarss": "^5.0.0",
+        "terser": "^5.16.0",
+        "tsx": "^4.8.1",
+        "yaml": "^2.4.2"
+      },
+      "peerDependenciesMeta": {
+        "@types/node": {
+          "optional": true
+        },
+        "jiti": {
+          "optional": true
+        },
+        "less": {
+          "optional": true
+        },
+        "lightningcss": {
+          "optional": true
+        },
+        "sass": {
+          "optional": true
+        },
+        "sass-embedded": {
+          "optional": true
+        },
+        "stylus": {
+          "optional": true
+        },
+        "sugarss": {
+          "optional": true
+        },
+        "terser": {
+          "optional": true
+        },
+        "tsx": {
+          "optional": true
+        },
+        "yaml": {
+          "optional": true
+        }
+      }
+    }
+  }
+}
+
+======== FILE END: package-lock.json ========
+
+======== FILE START: package.json ========
+{
+  "name": "game5",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "pixi.js": "^8.14.3"
+  }
+}
+
+======== FILE END: package.json ========
+
+======== FILE START: tsconfig.json ========
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}
+
+======== FILE END: tsconfig.json ========
+
+======== FILE START: .vscode\launch.json ========
+// .vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // 🚀 修正 1: より新しいデバッガタイプ "pwa-chrome" に変更
+            "type": "pwa-chrome", 
+            "request": "launch",
+            "name": "Launch Game via npm",
+            
+            // 💡 重要: URL が 8080 以外の場合は、ここに正しいポート番号を記入してください。
+            "url": "http://localhost:8080", 
+            
+            "webRoot": "${workspaceFolder}",
+            
+            // npm run dev を実行する設定
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "dev"
+            ]
+            
+            // 🚀 修正 2: サーバー起動待ち設定 (serverReadyAction) を削除
+            // これが原因で起動しないことが多いです
+        }
+    ]
+}
+======== FILE END: .vscode\launch.json ========
+
+======== FILE START: public\sprites\sheet.json ========
+{
+  "frames": {
+    "beam0.png": {
+      "frame": {
+        "x": 143,
+        "y": 377,
+        "w": 43,
+        "h": 31
+      }
+    },
+    "beam1.png": {
+      "frame": {
+        "x": 327,
+        "y": 644,
+        "w": 40,
+        "h": 20
+      }
+    },
+    "beam2.png": {
+      "frame": {
+        "x": 262,
+        "y": 907,
+        "w": 38,
+        "h": 31
+      }
+    },
+    "beam3.png": {
+      "frame": {
+        "x": 396,
+        "y": 384,
+        "w": 29,
+        "h": 29
+      }
+    },
+    "beam4.png": {
+      "frame": {
+        "x": 177,
+        "y": 496,
+        "w": 41,
+        "h": 17
+      }
+    },
+    "beam5.png": {
+      "frame": {
+        "x": 186,
+        "y": 377,
+        "w": 40,
+        "h": 25
+      }
+    },
+    "beam6.png": {
+      "frame": {
+        "x": 120,
+        "y": 688,
+        "w": 43,
+        "h": 23
+      }
+    },
+    "beamLong1.png": {
+      "frame": {
+        "x": 828,
+        "y": 943,
+        "w": 15,
+        "h": 67
+      }
+    },
+    "beamLong2.png": {
+      "frame": {
+        "x": 307,
+        "y": 309,
+        "w": 25,
+        "h": 64
+      }
+    },
+    "bold_silver.png": {
+      "frame": {
+        "x": 810,
+        "y": 837,
+        "w": 19,
+        "h": 30
+      }
+    },
+    "bolt_bronze.png": {
+      "frame": {
+        "x": 810,
+        "y": 467,
+        "w": 19,
+        "h": 30
+      }
+    },
+    "bolt_gold.png": {
+      "frame": {
+        "x": 809,
+        "y": 437,
+        "w": 19,
+        "h": 30
+      }
+    },
+    "buttonBlue.png": {
+      "frame": {
+        "x": 0,
+        "y": 78,
+        "w": 222,
+        "h": 39
+      }
+    },
+    "buttonGreen.png": {
+      "frame": {
+        "x": 0,
+        "y": 117,
+        "w": 222,
+        "h": 39
+      }
+    },
+    "buttonRed.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 222,
+        "h": 39
+      }
+    },
+    "buttonYellow.png": {
+      "frame": {
+        "x": 0,
+        "y": 39,
+        "w": 222,
+        "h": 39
+      }
+    },
+    "cockpitBlue_0.png": {
+      "frame": {
+        "x": 586,
+        "y": 0,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "cockpitBlue_1.png": {
+      "frame": {
+        "x": 736,
+        "y": 862,
+        "w": 40,
+        "h": 40
+      }
+    },
+    "cockpitBlue_2.png": {
+      "frame": {
+        "x": 684,
+        "y": 67,
+        "w": 42,
+        "h": 56
+      }
+    },
+    "cockpitBlue_3.png": {
+      "frame": {
+        "x": 336,
+        "y": 384,
+        "w": 60,
+        "h": 61
+      }
+    },
+    "cockpitBlue_4.png": {
+      "frame": {
+        "x": 637,
+        "y": 0,
+        "w": 47,
+        "h": 67
+      }
+    },
+    "cockpitBlue_5.png": {
+      "frame": {
+        "x": 627,
+        "y": 144,
+        "w": 48,
+        "h": 75
+      }
+    },
+    "cockpitBlue_6.png": {
+      "frame": {
+        "x": 684,
+        "y": 0,
+        "w": 42,
+        "h": 67
+      }
+    },
+    "cockpitBlue_7.png": {
+      "frame": {
+        "x": 737,
+        "y": 542,
+        "w": 41,
+        "h": 71
+      }
+    },
+    "cockpitGreen_0.png": {
+      "frame": {
+        "x": 576,
+        "y": 225,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "cockpitGreen_1.png": {
+      "frame": {
+        "x": 734,
+        "y": 977,
+        "w": 40,
+        "h": 40
+      }
+    },
+    "cockpitGreen_2.png": {
+      "frame": {
+        "x": 696,
+        "y": 659,
+        "w": 42,
+        "h": 56
+      }
+    },
+    "cockpitGreen_3.png": {
+      "frame": {
+        "x": 346,
+        "y": 234,
+        "w": 60,
+        "h": 61
+      }
+    },
+    "cockpitGreen_4.png": {
+      "frame": {
+        "x": 627,
+        "y": 219,
+        "w": 47,
+        "h": 67
+      }
+    },
+    "cockpitGreen_5.png": {
+      "frame": {
+        "x": 694,
+        "y": 364,
+        "w": 42,
+        "h": 67
+      }
+    },
+    "cockpitGreen_6.png": {
+      "frame": {
+        "x": 737,
+        "y": 471,
+        "w": 41,
+        "h": 71
+      }
+    },
+    "cockpitGreen_7.png": {
+      "frame": {
+        "x": 602,
+        "y": 525,
+        "w": 48,
+        "h": 75
+      }
+    },
+    "cockpitRed_0.png": {
+      "frame": {
+        "x": 535,
+        "y": 75,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "cockpitRed_1.png": {
+      "frame": {
+        "x": 351,
+        "y": 982,
+        "w": 40,
+        "h": 40
+      }
+    },
+    "cockpitRed_2.png": {
+      "frame": {
+        "x": 718,
+        "y": 197,
+        "w": 42,
+        "h": 56
+      }
+    },
+    "cockpitRed_3.png": {
+      "frame": {
+        "x": 520,
+        "y": 661,
+        "w": 60,
+        "h": 61
+      }
+    },
+    "cockpitRed_4.png": {
+      "frame": {
+        "x": 647,
+        "y": 857,
+        "w": 47,
+        "h": 67
+      }
+    },
+    "cockpitRed_5.png": {
+      "frame": {
+        "x": 605,
+        "y": 707,
+        "w": 48,
+        "h": 75
+      }
+    },
+    "cockpitRed_6.png": {
+      "frame": {
+        "x": 736,
+        "y": 795,
+        "w": 42,
+        "h": 67
+      }
+    },
+    "cockpitRed_7.png": {
+      "frame": {
+        "x": 736,
+        "y": 329,
+        "w": 41,
+        "h": 71
+      }
+    },
+    "cockpitYellow_0.png": {
+      "frame": {
+        "x": 726,
+        "y": 80,
+        "w": 40,
+        "h": 40
+      }
+    },
+    "cockpitYellow_1.png": {
+      "frame": {
+        "x": 247,
+        "y": 309,
+        "w": 60,
+        "h": 61
+      }
+    },
+    "cockpitYellow_2.png": {
+      "frame": {
+        "x": 637,
+        "y": 67,
+        "w": 47,
+        "h": 67
+      }
+    },
+    "cockpitYellow_3.png": {
+      "frame": {
+        "x": 607,
+        "y": 782,
+        "w": 48,
+        "h": 75
+      }
+    },
+    "cockpitYellow_4.png": {
+      "frame": {
+        "x": 696,
+        "y": 262,
+        "w": 42,
+        "h": 67
+      }
+    },
+    "cockpitYellow_5.png": {
+      "frame": {
+        "x": 736,
+        "y": 400,
+        "w": 41,
+        "h": 71
+      }
+    },
+    "cockpitYellow_6.png": {
+      "frame": {
+        "x": 734,
+        "y": 921,
+        "w": 42,
+        "h": 56
+      }
+    },
+    "cockpitYellow_7.png": {
+      "frame": {
+        "x": 600,
+        "y": 375,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "cursor.png": {
+      "frame": {
+        "x": 797,
+        "y": 173,
+        "w": 30,
+        "h": 33
+      }
+    },
+    "enemyBlack1.png": {
+      "frame": {
+        "x": 423,
+        "y": 728,
+        "w": 93,
+        "h": 84
+      }
+    },
+    "enemyBlack2.png": {
+      "frame": {
+        "x": 120,
+        "y": 604,
+        "w": 104,
+        "h": 84
+      }
+    },
+    "enemyBlack3.png": {
+      "frame": {
+        "x": 144,
+        "y": 156,
+        "w": 103,
+        "h": 84
+      }
+    },
+    "enemyBlack4.png": {
+      "frame": {
+        "x": 518,
+        "y": 325,
+        "w": 82,
+        "h": 84
+      }
+    },
+    "enemyBlack5.png": {
+      "frame": {
+        "x": 346,
+        "y": 150,
+        "w": 97,
+        "h": 84
+      }
+    },
+    "enemyBlue1.png": {
+      "frame": {
+        "x": 425,
+        "y": 468,
+        "w": 93,
+        "h": 84
+      }
+    },
+    "enemyBlue2.png": {
+      "frame": {
+        "x": 143,
+        "y": 293,
+        "w": 104,
+        "h": 84
+      }
+    },
+    "enemyBlue3.png": {
+      "frame": {
+        "x": 222,
+        "y": 0,
+        "w": 103,
+        "h": 84
+      }
+    },
+    "enemyBlue4.png": {
+      "frame": {
+        "x": 518,
+        "y": 409,
+        "w": 82,
+        "h": 84
+      }
+    },
+    "enemyBlue5.png": {
+      "frame": {
+        "x": 421,
+        "y": 814,
+        "w": 97,
+        "h": 84
+      }
+    },
+    "enemyGreen1.png": {
+      "frame": {
+        "x": 425,
+        "y": 552,
+        "w": 93,
+        "h": 84
+      }
+    },
+    "enemyGreen2.png": {
+      "frame": {
+        "x": 133,
+        "y": 412,
+        "w": 104,
+        "h": 84
+      }
+    },
+    "enemyGreen3.png": {
+      "frame": {
+        "x": 224,
+        "y": 496,
+        "w": 103,
+        "h": 84
+      }
+    },
+    "enemyGreen4.png": {
+      "frame": {
+        "x": 518,
+        "y": 493,
+        "w": 82,
+        "h": 84
+      }
+    },
+    "enemyGreen5.png": {
+      "frame": {
+        "x": 408,
+        "y": 907,
+        "w": 97,
+        "h": 84
+      }
+    },
+    "enemyRed1.png": {
+      "frame": {
+        "x": 425,
+        "y": 384,
+        "w": 93,
+        "h": 84
+      }
+    },
+    "enemyRed2.png": {
+      "frame": {
+        "x": 120,
+        "y": 520,
+        "w": 104,
+        "h": 84
+      }
+    },
+    "enemyRed3.png": {
+      "frame": {
+        "x": 224,
+        "y": 580,
+        "w": 103,
+        "h": 84
+      }
+    },
+    "enemyRed4.png": {
+      "frame": {
+        "x": 520,
+        "y": 577,
+        "w": 82,
+        "h": 84
+      }
+    },
+    "enemyRed5.png": {
+      "frame": {
+        "x": 423,
+        "y": 644,
+        "w": 97,
+        "h": 84
+      }
+    },
+    "engine1.png": {
+      "frame": {
+        "x": 224,
+        "y": 907,
+        "w": 38,
+        "h": 23
+      }
+    },
+    "engine2.png": {
+      "frame": {
+        "x": 163,
+        "y": 688,
+        "w": 42,
+        "h": 28
+      }
+    },
+    "engine3.png": {
+      "frame": {
+        "x": 644,
+        "y": 1002,
+        "w": 27,
+        "h": 22
+      }
+    },
+    "engine4.png": {
+      "frame": {
+        "x": 144,
+        "y": 240,
+        "w": 49,
+        "h": 45
+      }
+    },
+    "engine5.png": {
+      "frame": {
+        "x": 133,
+        "y": 496,
+        "w": 44,
+        "h": 24
+      }
+    },
+    "fire00.png": {
+      "frame": {
+        "x": 827,
+        "y": 125,
+        "w": 16,
+        "h": 40
+      }
+    },
+    "fire01.png": {
+      "frame": {
+        "x": 828,
+        "y": 206,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire02.png": {
+      "frame": {
+        "x": 827,
+        "y": 663,
+        "w": 14,
+        "h": 32
+      }
+    },
+    "fire03.png": {
+      "frame": {
+        "x": 829,
+        "y": 437,
+        "w": 14,
+        "h": 34
+      }
+    },
+    "fire04.png": {
+      "frame": {
+        "x": 831,
+        "y": 0,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire05.png": {
+      "frame": {
+        "x": 834,
+        "y": 299,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire06.png": {
+      "frame": {
+        "x": 835,
+        "y": 502,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire07.png": {
+      "frame": {
+        "x": 835,
+        "y": 330,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire08.png": {
+      "frame": {
+        "x": 827,
+        "y": 867,
+        "w": 16,
+        "h": 40
+      }
+    },
+    "fire09.png": {
+      "frame": {
+        "x": 811,
+        "y": 663,
+        "w": 16,
+        "h": 40
+      }
+    },
+    "fire10.png": {
+      "frame": {
+        "x": 812,
+        "y": 206,
+        "w": 16,
+        "h": 40
+      }
+    },
+    "fire11.png": {
+      "frame": {
+        "x": 835,
+        "y": 395,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire12.png": {
+      "frame": {
+        "x": 835,
+        "y": 533,
+        "w": 14,
+        "h": 32
+      }
+    },
+    "fire13.png": {
+      "frame": {
+        "x": 835,
+        "y": 361,
+        "w": 14,
+        "h": 34
+      }
+    },
+    "fire14.png": {
+      "frame": {
+        "x": 831,
+        "y": 31,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire15.png": {
+      "frame": {
+        "x": 829,
+        "y": 471,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire16.png": {
+      "frame": {
+        "x": 828,
+        "y": 268,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire17.png": {
+      "frame": {
+        "x": 828,
+        "y": 237,
+        "w": 14,
+        "h": 31
+      }
+    },
+    "fire18.png": {
+      "frame": {
+        "x": 827,
+        "y": 165,
+        "w": 16,
+        "h": 41
+      }
+    },
+    "fire19.png": {
+      "frame": {
+        "x": 812,
+        "y": 246,
+        "w": 16,
+        "h": 41
+      }
+    },
+    "gun00.png": {
+      "frame": {
+        "x": 827,
+        "y": 907,
+        "w": 16,
+        "h": 36
+      }
+    },
+    "gun01.png": {
+      "frame": {
+        "x": 810,
+        "y": 867,
+        "w": 17,
+        "h": 33
+      }
+    },
+    "gun02.png": {
+      "frame": {
+        "x": 829,
+        "y": 611,
+        "w": 14,
+        "h": 36
+      }
+    },
+    "gun03.png": {
+      "frame": {
+        "x": 809,
+        "y": 796,
+        "w": 20,
+        "h": 41
+      }
+    },
+    "gun04.png": {
+      "frame": {
+        "x": 827,
+        "y": 84,
+        "w": 16,
+        "h": 41
+      }
+    },
+    "gun05.png": {
+      "frame": {
+        "x": 423,
+        "y": 0,
+        "w": 21,
+        "h": 41
+      }
+    },
+    "gun06.png": {
+      "frame": {
+        "x": 810,
+        "y": 900,
+        "w": 17,
+        "h": 38
+      }
+    },
+    "gun07.png": {
+      "frame": {
+        "x": 829,
+        "y": 796,
+        "w": 14,
+        "h": 41
+      }
+    },
+    "gun08.png": {
+      "frame": {
+        "x": 848,
+        "y": 263,
+        "w": 10,
+        "h": 47
+      }
+    },
+    "gun09.png": {
+      "frame": {
+        "x": 809,
+        "y": 611,
+        "w": 20,
+        "h": 52
+      }
+    },
+    "gun10.png": {
+      "frame": {
+        "x": 808,
+        "y": 961,
+        "w": 20,
+        "h": 52
+      }
+    },
+    "laserBlue01.png": {
+      "frame": {
+        "x": 856,
+        "y": 421,
+        "w": 9,
+        "h": 54
+      }
+    },
+    "laserBlue02.png": {
+      "frame": {
+        "x": 841,
+        "y": 647,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserBlue03.png": {
+      "frame": {
+        "x": 856,
+        "y": 57,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserBlue04.png": {
+      "frame": {
+        "x": 835,
+        "y": 565,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserBlue05.png": {
+      "frame": {
+        "x": 858,
+        "y": 475,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserBlue06.png": {
+      "frame": {
+        "x": 835,
+        "y": 752,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserBlue07.png": {
+      "frame": {
+        "x": 856,
+        "y": 775,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserBlue08.png": {
+      "frame": {
+        "x": 596,
+        "y": 961,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserBlue09.png": {
+      "frame": {
+        "x": 434,
+        "y": 325,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserBlue10.png": {
+      "frame": {
+        "x": 740,
+        "y": 724,
+        "w": 37,
+        "h": 37
+      }
+    },
+    "laserBlue11.png": {
+      "frame": {
+        "x": 698,
+        "y": 795,
+        "w": 38,
+        "h": 37
+      }
+    },
+    "laserBlue12.png": {
+      "frame": {
+        "x": 835,
+        "y": 695,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserBlue13.png": {
+      "frame": {
+        "x": 856,
+        "y": 869,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserBlue14.png": {
+      "frame": {
+        "x": 842,
+        "y": 206,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserBlue15.png": {
+      "frame": {
+        "x": 849,
+        "y": 480,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserBlue16.png": {
+      "frame": {
+        "x": 843,
+        "y": 62,
+        "w": 13,
+        "h": 54
+      }
+    },
+    "laserGreen01.png": {
+      "frame": {
+        "x": 740,
+        "y": 686,
+        "w": 37,
+        "h": 38
+      }
+    },
+    "laserGreen02.png": {
+      "frame": {
+        "x": 843,
+        "y": 116,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserGreen03.png": {
+      "frame": {
+        "x": 855,
+        "y": 173,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserGreen04.png": {
+      "frame": {
+        "x": 848,
+        "y": 565,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserGreen05.png": {
+      "frame": {
+        "x": 854,
+        "y": 639,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserGreen06.png": {
+      "frame": {
+        "x": 845,
+        "y": 0,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserGreen07.png": {
+      "frame": {
+        "x": 849,
+        "y": 364,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserGreen08.png": {
+      "frame": {
+        "x": 848,
+        "y": 738,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserGreen09.png": {
+      "frame": {
+        "x": 856,
+        "y": 94,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserGreen10.png": {
+      "frame": {
+        "x": 843,
+        "y": 426,
+        "w": 13,
+        "h": 54
+      }
+    },
+    "laserGreen11.png": {
+      "frame": {
+        "x": 849,
+        "y": 310,
+        "w": 9,
+        "h": 54
+      }
+    },
+    "laserGreen12.png": {
+      "frame": {
+        "x": 843,
+        "y": 602,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserGreen13.png": {
+      "frame": {
+        "x": 858,
+        "y": 0,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserGreen14.png": {
+      "frame": {
+        "x": 193,
+        "y": 240,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserGreen15.png": {
+      "frame": {
+        "x": 443,
+        "y": 182,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserGreen16.png": {
+      "frame": {
+        "x": 760,
+        "y": 192,
+        "w": 37,
+        "h": 37
+      }
+    },
+    "laserRed01.png": {
+      "frame": {
+        "x": 858,
+        "y": 230,
+        "w": 9,
+        "h": 54
+      }
+    },
+    "laserRed02.png": {
+      "frame": {
+        "x": 843,
+        "y": 977,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserRed03.png": {
+      "frame": {
+        "x": 856,
+        "y": 602,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserRed04.png": {
+      "frame": {
+        "x": 843,
+        "y": 940,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserRed05.png": {
+      "frame": {
+        "x": 856,
+        "y": 983,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserRed06.png": {
+      "frame": {
+        "x": 843,
+        "y": 903,
+        "w": 13,
+        "h": 37
+      }
+    },
+    "laserRed07.png": {
+      "frame": {
+        "x": 856,
+        "y": 131,
+        "w": 9,
+        "h": 37
+      }
+    },
+    "laserRed08.png": {
+      "frame": {
+        "x": 580,
+        "y": 661,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserRed09.png": {
+      "frame": {
+        "x": 602,
+        "y": 600,
+        "w": 48,
+        "h": 46
+      }
+    },
+    "laserRed10.png": {
+      "frame": {
+        "x": 738,
+        "y": 650,
+        "w": 37,
+        "h": 36
+      }
+    },
+    "laserRed11.png": {
+      "frame": {
+        "x": 737,
+        "y": 613,
+        "w": 37,
+        "h": 37
+      }
+    },
+    "laserRed12.png": {
+      "frame": {
+        "x": 843,
+        "y": 846,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserRed13.png": {
+      "frame": {
+        "x": 856,
+        "y": 812,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserRed14.png": {
+      "frame": {
+        "x": 843,
+        "y": 789,
+        "w": 13,
+        "h": 57
+      }
+    },
+    "laserRed15.png": {
+      "frame": {
+        "x": 856,
+        "y": 926,
+        "w": 9,
+        "h": 57
+      }
+    },
+    "laserRed16.png": {
+      "frame": {
+        "x": 848,
+        "y": 684,
+        "w": 13,
+        "h": 54
+      }
+    },
+    "meteorBrown_big1.png": {
+      "frame": {
+        "x": 224,
+        "y": 664,
+        "w": 101,
+        "h": 84
+      }
+    },
+    "meteorBrown_big2.png": {
+      "frame": {
+        "x": 0,
+        "y": 520,
+        "w": 120,
+        "h": 98
+      }
+    },
+    "meteorBrown_big3.png": {
+      "frame": {
+        "x": 518,
+        "y": 810,
+        "w": 89,
+        "h": 82
+      }
+    },
+    "meteorBrown_big4.png": {
+      "frame": {
+        "x": 327,
+        "y": 452,
+        "w": 98,
+        "h": 96
+      }
+    },
+    "meteorBrown_med1.png": {
+      "frame": {
+        "x": 651,
+        "y": 447,
+        "w": 43,
+        "h": 43
+      }
+    },
+    "meteorBrown_med3.png": {
+      "frame": {
+        "x": 237,
+        "y": 452,
+        "w": 45,
+        "h": 40
+      }
+    },
+    "meteorBrown_small1.png": {
+      "frame": {
+        "x": 406,
+        "y": 234,
+        "w": 28,
+        "h": 28
+      }
+    },
+    "meteorBrown_small2.png": {
+      "frame": {
+        "x": 778,
+        "y": 587,
+        "w": 29,
+        "h": 26
+      }
+    },
+    "meteorBrown_tiny1.png": {
+      "frame": {
+        "x": 346,
+        "y": 814,
+        "w": 18,
+        "h": 18
+      }
+    },
+    "meteorBrown_tiny2.png": {
+      "frame": {
+        "x": 399,
+        "y": 814,
+        "w": 16,
+        "h": 15
+      }
+    },
+    "meteorGrey_big1.png": {
+      "frame": {
+        "x": 224,
+        "y": 748,
+        "w": 101,
+        "h": 84
+      }
+    },
+    "meteorGrey_big2.png": {
+      "frame": {
+        "x": 0,
+        "y": 618,
+        "w": 120,
+        "h": 98
+      }
+    },
+    "meteorGrey_big3.png": {
+      "frame": {
+        "x": 516,
+        "y": 728,
+        "w": 89,
+        "h": 82
+      }
+    },
+    "meteorGrey_big4.png": {
+      "frame": {
+        "x": 327,
+        "y": 548,
+        "w": 98,
+        "h": 96
+      }
+    },
+    "meteorGrey_med1.png": {
+      "frame": {
+        "x": 674,
+        "y": 219,
+        "w": 43,
+        "h": 43
+      }
+    },
+    "meteorGrey_med2.png": {
+      "frame": {
+        "x": 282,
+        "y": 452,
+        "w": 45,
+        "h": 40
+      }
+    },
+    "meteorGrey_small1.png": {
+      "frame": {
+        "x": 406,
+        "y": 262,
+        "w": 28,
+        "h": 28
+      }
+    },
+    "meteorGrey_small2.png": {
+      "frame": {
+        "x": 396,
+        "y": 413,
+        "w": 29,
+        "h": 26
+      }
+    },
+    "meteorGrey_tiny1.png": {
+      "frame": {
+        "x": 364,
+        "y": 814,
+        "w": 18,
+        "h": 18
+      }
+    },
+    "meteorGrey_tiny2.png": {
+      "frame": {
+        "x": 602,
+        "y": 646,
+        "w": 16,
+        "h": 15
+      }
+    },
+    "numeral0.png": {
+      "frame": {
+        "x": 367,
+        "y": 644,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral1.png": {
+      "frame": {
+        "x": 205,
+        "y": 688,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral2.png": {
+      "frame": {
+        "x": 406,
+        "y": 290,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral3.png": {
+      "frame": {
+        "x": 580,
+        "y": 707,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral4.png": {
+      "frame": {
+        "x": 386,
+        "y": 644,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral5.png": {
+      "frame": {
+        "x": 628,
+        "y": 646,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral6.png": {
+      "frame": {
+        "x": 671,
+        "y": 1002,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral7.png": {
+      "frame": {
+        "x": 690,
+        "y": 1004,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral8.png": {
+      "frame": {
+        "x": 709,
+        "y": 1004,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeral9.png": {
+      "frame": {
+        "x": 491,
+        "y": 215,
+        "w": 19,
+        "h": 19
+      }
+    },
+    "numeralX.png": {
+      "frame": {
+        "x": 382,
+        "y": 814,
+        "w": 17,
+        "h": 17
+      }
+    },
+    "pill_blue.png": {
+      "frame": {
+        "x": 674,
+        "y": 262,
+        "w": 22,
+        "h": 21
+      }
+    },
+    "pill_green.png": {
+      "frame": {
+        "x": 573,
+        "y": 989,
+        "w": 22,
+        "h": 21
+      }
+    },
+    "pill_red.png": {
+      "frame": {
+        "x": 222,
+        "y": 108,
+        "w": 22,
+        "h": 21
+      }
+    },
+    "pill_yellow.png": {
+      "frame": {
+        "x": 222,
+        "y": 129,
+        "w": 22,
+        "h": 21
+      }
+    },
+    "playerLife1_blue.png": {
+      "frame": {
+        "x": 482,
+        "y": 358,
+        "w": 33,
+        "h": 26
+      }
+    },
+    "playerLife1_green.png": {
+      "frame": {
+        "x": 535,
+        "y": 150,
+        "w": 33,
+        "h": 26
+      }
+    },
+    "playerLife1_orange.png": {
+      "frame": {
+        "x": 777,
+        "y": 327,
+        "w": 33,
+        "h": 26
+      }
+    },
+    "playerLife1_red.png": {
+      "frame": {
+        "x": 775,
+        "y": 301,
+        "w": 33,
+        "h": 26
+      }
+    },
+    "playerLife2_blue.png": {
+      "frame": {
+        "x": 465,
+        "y": 991,
+        "w": 37,
+        "h": 26
+      }
+    },
+    "playerLife2_green.png": {
+      "frame": {
+        "x": 391,
+        "y": 991,
+        "w": 37,
+        "h": 26
+      }
+    },
+    "playerLife2_orange.png": {
+      "frame": {
+        "x": 428,
+        "y": 991,
+        "w": 37,
+        "h": 26
+      }
+    },
+    "playerLife2_red.png": {
+      "frame": {
+        "x": 502,
+        "y": 991,
+        "w": 37,
+        "h": 26
+      }
+    },
+    "playerLife3_blue.png": {
+      "frame": {
+        "x": 777,
+        "y": 385,
+        "w": 32,
+        "h": 26
+      }
+    },
+    "playerLife3_green.png": {
+      "frame": {
+        "x": 778,
+        "y": 469,
+        "w": 32,
+        "h": 26
+      }
+    },
+    "playerLife3_orange.png": {
+      "frame": {
+        "x": 777,
+        "y": 712,
+        "w": 32,
+        "h": 26
+      }
+    },
+    "playerLife3_red.png": {
+      "frame": {
+        "x": 777,
+        "y": 443,
+        "w": 32,
+        "h": 26
+      }
+    },
+    "playerShip1_blue.png": {
+      "frame": {
+        "x": 211,
+        "y": 941,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_damage1.png": {
+      "frame": {
+        "x": 112,
+        "y": 941,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_damage2.png": {
+      "frame": {
+        "x": 247,
+        "y": 234,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_damage3.png": {
+      "frame": {
+        "x": 247,
+        "y": 159,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_green.png": {
+      "frame": {
+        "x": 237,
+        "y": 377,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_orange.png": {
+      "frame": {
+        "x": 247,
+        "y": 84,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip1_red.png": {
+      "frame": {
+        "x": 224,
+        "y": 832,
+        "w": 99,
+        "h": 75
+      }
+    },
+    "playerShip2_blue.png": {
+      "frame": {
+        "x": 112,
+        "y": 791,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_damage1.png": {
+      "frame": {
+        "x": 0,
+        "y": 866,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_damage2.png": {
+      "frame": {
+        "x": 0,
+        "y": 791,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_damage3.png": {
+      "frame": {
+        "x": 0,
+        "y": 716,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_green.png": {
+      "frame": {
+        "x": 112,
+        "y": 866,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_orange.png": {
+      "frame": {
+        "x": 112,
+        "y": 716,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip2_red.png": {
+      "frame": {
+        "x": 0,
+        "y": 941,
+        "w": 112,
+        "h": 75
+      }
+    },
+    "playerShip3_blue.png": {
+      "frame": {
+        "x": 325,
+        "y": 739,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_damage1.png": {
+      "frame": {
+        "x": 323,
+        "y": 832,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_damage2.png": {
+      "frame": {
+        "x": 310,
+        "y": 907,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_damage3.png": {
+      "frame": {
+        "x": 325,
+        "y": 664,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_green.png": {
+      "frame": {
+        "x": 346,
+        "y": 75,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_orange.png": {
+      "frame": {
+        "x": 336,
+        "y": 309,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "playerShip3_red.png": {
+      "frame": {
+        "x": 325,
+        "y": 0,
+        "w": 98,
+        "h": 75
+      }
+    },
+    "powerupBlue.png": {
+      "frame": {
+        "x": 696,
+        "y": 329,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupBlue_bolt.png": {
+      "frame": {
+        "x": 539,
+        "y": 989,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupBlue_shield.png": {
+      "frame": {
+        "x": 777,
+        "y": 679,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupBlue_star.png": {
+      "frame": {
+        "x": 776,
+        "y": 895,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupGreen.png": {
+      "frame": {
+        "x": 774,
+        "y": 613,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupGreen_bolt.png": {
+      "frame": {
+        "x": 766,
+        "y": 80,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupGreen_shield.png": {
+      "frame": {
+        "x": 776,
+        "y": 862,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupGreen_star.png": {
+      "frame": {
+        "x": 651,
+        "y": 490,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupRed.png": {
+      "frame": {
+        "x": 491,
+        "y": 182,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupRed_bolt.png": {
+      "frame": {
+        "x": 775,
+        "y": 646,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupRed_shield.png": {
+      "frame": {
+        "x": 776,
+        "y": 928,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupRed_star.png": {
+      "frame": {
+        "x": 774,
+        "y": 977,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupYellow.png": {
+      "frame": {
+        "x": 774,
+        "y": 761,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupYellow_bolt.png": {
+      "frame": {
+        "x": 740,
+        "y": 761,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupYellow_shield.png": {
+      "frame": {
+        "x": 482,
+        "y": 325,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "powerupYellow_star.png": {
+      "frame": {
+        "x": 607,
+        "y": 857,
+        "w": 34,
+        "h": 33
+      }
+    },
+    "scratch1.png": {
+      "frame": {
+        "x": 325,
+        "y": 814,
+        "w": 21,
+        "h": 16
+      }
+    },
+    "scratch2.png": {
+      "frame": {
+        "x": 423,
+        "y": 41,
+        "w": 21,
+        "h": 16
+      }
+    },
+    "scratch3.png": {
+      "frame": {
+        "x": 346,
+        "y": 295,
+        "w": 16,
+        "h": 12
+      }
+    },
+    "shield1.png": {
+      "frame": {
+        "x": 0,
+        "y": 412,
+        "w": 133,
+        "h": 108
+      }
+    },
+    "shield2.png": {
+      "frame": {
+        "x": 0,
+        "y": 293,
+        "w": 143,
+        "h": 119
+      }
+    },
+    "shield3.png": {
+      "frame": {
+        "x": 0,
+        "y": 156,
+        "w": 144,
+        "h": 137
+      }
+    },
+    "shield_bronze.png": {
+      "frame": {
+        "x": 797,
+        "y": 143,
+        "w": 30,
+        "h": 30
+      }
+    },
+    "shield_gold.png": {
+      "frame": {
+        "x": 797,
+        "y": 113,
+        "w": 30,
+        "h": 30
+      }
+    },
+    "shield_silver.png": {
+      "frame": {
+        "x": 778,
+        "y": 824,
+        "w": 30,
+        "h": 30
+      }
+    },
+    "speed.png": {
+      "frame": {
+        "x": 858,
+        "y": 284,
+        "w": 7,
+        "h": 108
+      }
+    },
+    "star1.png": {
+      "frame": {
+        "x": 628,
+        "y": 681,
+        "w": 25,
+        "h": 24
+      }
+    },
+    "star2.png": {
+      "frame": {
+        "x": 222,
+        "y": 84,
+        "w": 25,
+        "h": 24
+      }
+    },
+    "star3.png": {
+      "frame": {
+        "x": 576,
+        "y": 300,
+        "w": 24,
+        "h": 24
+      }
+    },
+    "star_bronze.png": {
+      "frame": {
+        "x": 778,
+        "y": 794,
+        "w": 31,
+        "h": 30
+      }
+    },
+    "star_gold.png": {
+      "frame": {
+        "x": 778,
+        "y": 557,
+        "w": 31,
+        "h": 30
+      }
+    },
+    "star_silver.png": {
+      "frame": {
+        "x": 778,
+        "y": 527,
+        "w": 31,
+        "h": 30
+      }
+    },
+    "things_bronze.png": {
+      "frame": {
+        "x": 778,
+        "y": 495,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "things_gold.png": {
+      "frame": {
+        "x": 777,
+        "y": 411,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "things_silver.png": {
+      "frame": {
+        "x": 777,
+        "y": 353,
+        "w": 32,
+        "h": 32
+      }
+    },
+    "turretBase_big.png": {
+      "frame": {
+        "x": 310,
+        "y": 982,
+        "w": 41,
+        "h": 41
+      }
+    },
+    "turretBase_small.png": {
+      "frame": {
+        "x": 808,
+        "y": 301,
+        "w": 26,
+        "h": 26
+      }
+    },
+    "ufoBlue.png": {
+      "frame": {
+        "x": 444,
+        "y": 91,
+        "w": 91,
+        "h": 91
+      }
+    },
+    "ufoGreen.png": {
+      "frame": {
+        "x": 434,
+        "y": 234,
+        "w": 91,
+        "h": 91
+      }
+    },
+    "ufoRed.png": {
+      "frame": {
+        "x": 444,
+        "y": 0,
+        "w": 91,
+        "h": 91
+      }
+    },
+    "ufoYellow.png": {
+      "frame": {
+        "x": 505,
+        "y": 898,
+        "w": 91,
+        "h": 91
+      }
+    },
+    "wingBlue_0.png": {
+      "frame": {
+        "x": 647,
+        "y": 924,
+        "w": 45,
+        "h": 78
+      }
+    },
+    "wingBlue_1.png": {
+      "frame": {
+        "x": 738,
+        "y": 253,
+        "w": 37,
+        "h": 72
+      }
+    },
+    "wingBlue_2.png": {
+      "frame": {
+        "x": 805,
+        "y": 0,
+        "w": 26,
+        "h": 84
+      }
+    },
+    "wingBlue_3.png": {
+      "frame": {
+        "x": 600,
+        "y": 450,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "wingBlue_4.png": {
+      "frame": {
+        "x": 692,
+        "y": 924,
+        "w": 42,
+        "h": 80
+      }
+    },
+    "wingBlue_5.png": {
+      "frame": {
+        "x": 596,
+        "y": 892,
+        "w": 51,
+        "h": 69
+      }
+    },
+    "wingBlue_6.png": {
+      "frame": {
+        "x": 694,
+        "y": 847,
+        "w": 42,
+        "h": 74
+      }
+    },
+    "wingBlue_7.png": {
+      "frame": {
+        "x": 675,
+        "y": 134,
+        "w": 43,
+        "h": 83
+      }
+    },
+    "wingGreen_0.png": {
+      "frame": {
+        "x": 650,
+        "y": 525,
+        "w": 45,
+        "h": 78
+      }
+    },
+    "wingGreen_1.png": {
+      "frame": {
+        "x": 775,
+        "y": 229,
+        "w": 37,
+        "h": 72
+      }
+    },
+    "wingGreen_2.png": {
+      "frame": {
+        "x": 809,
+        "y": 527,
+        "w": 26,
+        "h": 84
+      }
+    },
+    "wingGreen_3.png": {
+      "frame": {
+        "x": 535,
+        "y": 0,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "wingGreen_4.png": {
+      "frame": {
+        "x": 694,
+        "y": 431,
+        "w": 42,
+        "h": 80
+      }
+    },
+    "wingGreen_5.png": {
+      "frame": {
+        "x": 525,
+        "y": 251,
+        "w": 51,
+        "h": 69
+      }
+    },
+    "wingGreen_6.png": {
+      "frame": {
+        "x": 695,
+        "y": 511,
+        "w": 42,
+        "h": 74
+      }
+    },
+    "wingGreen_7.png": {
+      "frame": {
+        "x": 655,
+        "y": 764,
+        "w": 43,
+        "h": 83
+      }
+    },
+    "wingRed_0.png": {
+      "frame": {
+        "x": 809,
+        "y": 712,
+        "w": 26,
+        "h": 84
+      }
+    },
+    "wingRed_1.png": {
+      "frame": {
+        "x": 768,
+        "y": 0,
+        "w": 37,
+        "h": 72
+      }
+    },
+    "wingRed_2.png": {
+      "frame": {
+        "x": 600,
+        "y": 300,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "wingRed_3.png": {
+      "frame": {
+        "x": 698,
+        "y": 715,
+        "w": 42,
+        "h": 80
+      }
+    },
+    "wingRed_4.png": {
+      "frame": {
+        "x": 586,
+        "y": 75,
+        "w": 51,
+        "h": 69
+      }
+    },
+    "wingRed_5.png": {
+      "frame": {
+        "x": 718,
+        "y": 123,
+        "w": 42,
+        "h": 74
+      }
+    },
+    "wingRed_6.png": {
+      "frame": {
+        "x": 653,
+        "y": 681,
+        "w": 43,
+        "h": 83
+      }
+    },
+    "wingRed_7.png": {
+      "frame": {
+        "x": 651,
+        "y": 286,
+        "w": 45,
+        "h": 78
+      }
+    },
+    "wingYellow_0.png": {
+      "frame": {
+        "x": 650,
+        "y": 603,
+        "w": 45,
+        "h": 78
+      }
+    },
+    "wingYellow_1.png": {
+      "frame": {
+        "x": 760,
+        "y": 120,
+        "w": 37,
+        "h": 72
+      }
+    },
+    "wingYellow_2.png": {
+      "frame": {
+        "x": 809,
+        "y": 353,
+        "w": 26,
+        "h": 84
+      }
+    },
+    "wingYellow_3.png": {
+      "frame": {
+        "x": 576,
+        "y": 150,
+        "w": 51,
+        "h": 75
+      }
+    },
+    "wingYellow_4.png": {
+      "frame": {
+        "x": 726,
+        "y": 0,
+        "w": 42,
+        "h": 80
+      }
+    },
+    "wingYellow_5.png": {
+      "frame": {
+        "x": 525,
+        "y": 182,
+        "w": 51,
+        "h": 69
+      }
+    },
+    "wingYellow_6.png": {
+      "frame": {
+        "x": 695,
+        "y": 585,
+        "w": 42,
+        "h": 74
+      }
+    },
+    "wingYellow_7.png": {
+      "frame": {
+        "x": 651,
+        "y": 364,
+        "w": 43,
+        "h": 83
+      }
+    }
+  },
+  "meta": {
+    "image": "sheet.png",
+    "scale": "1"
+  }
+}
+======== FILE END: public\sprites\sheet.json ========
+
+======== FILE START: public\sprites\sheet.xml ========
+<TextureAtlas imagePath="sheet.png">
+	<SubTexture name="beam0.png" x="143" y="377" width="43" height="31"/>
+	<SubTexture name="beam1.png" x="327" y="644" width="40" height="20"/>
+	<SubTexture name="beam2.png" x="262" y="907" width="38" height="31"/>
+	<SubTexture name="beam3.png" x="396" y="384" width="29" height="29"/>
+	<SubTexture name="beam4.png" x="177" y="496" width="41" height="17"/>
+	<SubTexture name="beam5.png" x="186" y="377" width="40" height="25"/>
+	<SubTexture name="beam6.png" x="120" y="688" width="43" height="23"/>
+	<SubTexture name="beamLong1.png" x="828" y="943" width="15" height="67"/>
+	<SubTexture name="beamLong2.png" x="307" y="309" width="25" height="64"/>
+	<SubTexture name="bold_silver.png" x="810" y="837" width="19" height="30"/>
+	<SubTexture name="bolt_bronze.png" x="810" y="467" width="19" height="30"/>
+	<SubTexture name="bolt_gold.png" x="809" y="437" width="19" height="30"/>
+	<SubTexture name="buttonBlue.png" x="0" y="78" width="222" height="39"/>
+	<SubTexture name="buttonGreen.png" x="0" y="117" width="222" height="39"/>
+	<SubTexture name="buttonRed.png" x="0" y="0" width="222" height="39"/>
+	<SubTexture name="buttonYellow.png" x="0" y="39" width="222" height="39"/>
+	<SubTexture name="cockpitBlue_0.png" x="586" y="0" width="51" height="75"/>
+	<SubTexture name="cockpitBlue_1.png" x="736" y="862" width="40" height="40"/>
+	<SubTexture name="cockpitBlue_2.png" x="684" y="67" width="42" height="56"/>
+	<SubTexture name="cockpitBlue_3.png" x="336" y="384" width="60" height="61"/>
+	<SubTexture name="cockpitBlue_4.png" x="637" y="0" width="47" height="67"/>
+	<SubTexture name="cockpitBlue_5.png" x="627" y="144" width="48" height="75"/>
+	<SubTexture name="cockpitBlue_6.png" x="684" y="0" width="42" height="67"/>
+	<SubTexture name="cockpitBlue_7.png" x="737" y="542" width="41" height="71"/>
+	<SubTexture name="cockpitGreen_0.png" x="576" y="225" width="51" height="75"/>
+	<SubTexture name="cockpitGreen_1.png" x="734" y="977" width="40" height="40"/>
+	<SubTexture name="cockpitGreen_2.png" x="696" y="659" width="42" height="56"/>
+	<SubTexture name="cockpitGreen_3.png" x="346" y="234" width="60" height="61"/>
+	<SubTexture name="cockpitGreen_4.png" x="627" y="219" width="47" height="67"/>
+	<SubTexture name="cockpitGreen_5.png" x="694" y="364" width="42" height="67"/>
+	<SubTexture name="cockpitGreen_6.png" x="737" y="471" width="41" height="71"/>
+	<SubTexture name="cockpitGreen_7.png" x="602" y="525" width="48" height="75"/>
+	<SubTexture name="cockpitRed_0.png" x="535" y="75" width="51" height="75"/>
+	<SubTexture name="cockpitRed_1.png" x="351" y="982" width="40" height="40"/>
+	<SubTexture name="cockpitRed_2.png" x="718" y="197" width="42" height="56"/>
+	<SubTexture name="cockpitRed_3.png" x="520" y="661" width="60" height="61"/>
+	<SubTexture name="cockpitRed_4.png" x="647" y="857" width="47" height="67"/>
+	<SubTexture name="cockpitRed_5.png" x="605" y="707" width="48" height="75"/>
+	<SubTexture name="cockpitRed_6.png" x="736" y="795" width="42" height="67"/>
+	<SubTexture name="cockpitRed_7.png" x="736" y="329" width="41" height="71"/>
+	<SubTexture name="cockpitYellow_0.png" x="726" y="80" width="40" height="40"/>
+	<SubTexture name="cockpitYellow_1.png" x="247" y="309" width="60" height="61"/>
+	<SubTexture name="cockpitYellow_2.png" x="637" y="67" width="47" height="67"/>
+	<SubTexture name="cockpitYellow_3.png" x="607" y="782" width="48" height="75"/>
+	<SubTexture name="cockpitYellow_4.png" x="696" y="262" width="42" height="67"/>
+	<SubTexture name="cockpitYellow_5.png" x="736" y="400" width="41" height="71"/>
+	<SubTexture name="cockpitYellow_6.png" x="734" y="921" width="42" height="56"/>
+	<SubTexture name="cockpitYellow_7.png" x="600" y="375" width="51" height="75"/>
+	<SubTexture name="cursor.png" x="797" y="173" width="30" height="33"/>
+	<SubTexture name="enemyBlack1.png" x="423" y="728" width="93" height="84"/>
+	<SubTexture name="enemyBlack2.png" x="120" y="604" width="104" height="84"/>
+	<SubTexture name="enemyBlack3.png" x="144" y="156" width="103" height="84"/>
+	<SubTexture name="enemyBlack4.png" x="518" y="325" width="82" height="84"/>
+	<SubTexture name="enemyBlack5.png" x="346" y="150" width="97" height="84"/>
+	<SubTexture name="enemyBlue1.png" x="425" y="468" width="93" height="84"/>
+	<SubTexture name="enemyBlue2.png" x="143" y="293" width="104" height="84"/>
+	<SubTexture name="enemyBlue3.png" x="222" y="0" width="103" height="84"/>
+	<SubTexture name="enemyBlue4.png" x="518" y="409" width="82" height="84"/>
+	<SubTexture name="enemyBlue5.png" x="421" y="814" width="97" height="84"/>
+	<SubTexture name="enemyGreen1.png" x="425" y="552" width="93" height="84"/>
+	<SubTexture name="enemyGreen2.png" x="133" y="412" width="104" height="84"/>
+	<SubTexture name="enemyGreen3.png" x="224" y="496" width="103" height="84"/>
+	<SubTexture name="enemyGreen4.png" x="518" y="493" width="82" height="84"/>
+	<SubTexture name="enemyGreen5.png" x="408" y="907" width="97" height="84"/>
+	<SubTexture name="enemyRed1.png" x="425" y="384" width="93" height="84"/>
+	<SubTexture name="enemyRed2.png" x="120" y="520" width="104" height="84"/>
+	<SubTexture name="enemyRed3.png" x="224" y="580" width="103" height="84"/>
+	<SubTexture name="enemyRed4.png" x="520" y="577" width="82" height="84"/>
+	<SubTexture name="enemyRed5.png" x="423" y="644" width="97" height="84"/>
+	<SubTexture name="engine1.png" x="224" y="907" width="38" height="23"/>
+	<SubTexture name="engine2.png" x="163" y="688" width="42" height="28"/>
+	<SubTexture name="engine3.png" x="644" y="1002" width="27" height="22"/>
+	<SubTexture name="engine4.png" x="144" y="240" width="49" height="45"/>
+	<SubTexture name="engine5.png" x="133" y="496" width="44" height="24"/>
+	<SubTexture name="fire00.png" x="827" y="125" width="16" height="40"/>
+	<SubTexture name="fire01.png" x="828" y="206" width="14" height="31"/>
+	<SubTexture name="fire02.png" x="827" y="663" width="14" height="32"/>
+	<SubTexture name="fire03.png" x="829" y="437" width="14" height="34"/>
+	<SubTexture name="fire04.png" x="831" y="0" width="14" height="31"/>
+	<SubTexture name="fire05.png" x="834" y="299" width="14" height="31"/>
+	<SubTexture name="fire06.png" x="835" y="502" width="14" height="31"/>
+	<SubTexture name="fire07.png" x="835" y="330" width="14" height="31"/>
+	<SubTexture name="fire08.png" x="827" y="867" width="16" height="40"/>
+	<SubTexture name="fire09.png" x="811" y="663" width="16" height="40"/>
+	<SubTexture name="fire10.png" x="812" y="206" width="16" height="40"/>
+	<SubTexture name="fire11.png" x="835" y="395" width="14" height="31"/>
+	<SubTexture name="fire12.png" x="835" y="533" width="14" height="32"/>
+	<SubTexture name="fire13.png" x="835" y="361" width="14" height="34"/>
+	<SubTexture name="fire14.png" x="831" y="31" width="14" height="31"/>
+	<SubTexture name="fire15.png" x="829" y="471" width="14" height="31"/>
+	<SubTexture name="fire16.png" x="828" y="268" width="14" height="31"/>
+	<SubTexture name="fire17.png" x="828" y="237" width="14" height="31"/>
+	<SubTexture name="fire18.png" x="827" y="165" width="16" height="41"/>
+	<SubTexture name="fire19.png" x="812" y="246" width="16" height="41"/>
+	<SubTexture name="gun00.png" x="827" y="907" width="16" height="36"/>
+	<SubTexture name="gun01.png" x="810" y="867" width="17" height="33"/>
+	<SubTexture name="gun02.png" x="829" y="611" width="14" height="36"/>
+	<SubTexture name="gun03.png" x="809" y="796" width="20" height="41"/>
+	<SubTexture name="gun04.png" x="827" y="84" width="16" height="41"/>
+	<SubTexture name="gun05.png" x="423" y="0" width="21" height="41"/>
+	<SubTexture name="gun06.png" x="810" y="900" width="17" height="38"/>
+	<SubTexture name="gun07.png" x="829" y="796" width="14" height="41"/>
+	<SubTexture name="gun08.png" x="848" y="263" width="10" height="47"/>
+	<SubTexture name="gun09.png" x="809" y="611" width="20" height="52"/>
+	<SubTexture name="gun10.png" x="808" y="961" width="20" height="52"/>
+	<SubTexture name="laserBlue01.png" x="856" y="421" width="9" height="54"/>
+	<SubTexture name="laserBlue02.png" x="841" y="647" width="13" height="37"/>
+	<SubTexture name="laserBlue03.png" x="856" y="57" width="9" height="37"/>
+	<SubTexture name="laserBlue04.png" x="835" y="565" width="13" height="37"/>
+	<SubTexture name="laserBlue05.png" x="858" y="475" width="9" height="37"/>
+	<SubTexture name="laserBlue06.png" x="835" y="752" width="13" height="37"/>
+	<SubTexture name="laserBlue07.png" x="856" y="775" width="9" height="37"/>
+	<SubTexture name="laserBlue08.png" x="596" y="961" width="48" height="46"/>
+	<SubTexture name="laserBlue09.png" x="434" y="325" width="48" height="46"/>
+	<SubTexture name="laserBlue10.png" x="740" y="724" width="37" height="37"/>
+	<SubTexture name="laserBlue11.png" x="698" y="795" width="38" height="37"/>
+	<SubTexture name="laserBlue12.png" x="835" y="695" width="13" height="57"/>
+	<SubTexture name="laserBlue13.png" x="856" y="869" width="9" height="57"/>
+	<SubTexture name="laserBlue14.png" x="842" y="206" width="13" height="57"/>
+	<SubTexture name="laserBlue15.png" x="849" y="480" width="9" height="57"/>
+	<SubTexture name="laserBlue16.png" x="843" y="62" width="13" height="54"/>
+	<SubTexture name="laserGreen01.png" x="740" y="686" width="37" height="38"/>
+	<SubTexture name="laserGreen02.png" x="843" y="116" width="13" height="57"/>
+	<SubTexture name="laserGreen03.png" x="855" y="173" width="9" height="57"/>
+	<SubTexture name="laserGreen04.png" x="848" y="565" width="13" height="37"/>
+	<SubTexture name="laserGreen05.png" x="854" y="639" width="9" height="37"/>
+	<SubTexture name="laserGreen06.png" x="845" y="0" width="13" height="57"/>
+	<SubTexture name="laserGreen07.png" x="849" y="364" width="9" height="57"/>
+	<SubTexture name="laserGreen08.png" x="848" y="738" width="13" height="37"/>
+	<SubTexture name="laserGreen09.png" x="856" y="94" width="9" height="37"/>
+	<SubTexture name="laserGreen10.png" x="843" y="426" width="13" height="54"/>
+	<SubTexture name="laserGreen11.png" x="849" y="310" width="9" height="54"/>
+	<SubTexture name="laserGreen12.png" x="843" y="602" width="13" height="37"/>
+	<SubTexture name="laserGreen13.png" x="858" y="0" width="9" height="37"/>
+	<SubTexture name="laserGreen14.png" x="193" y="240" width="48" height="46"/>
+	<SubTexture name="laserGreen15.png" x="443" y="182" width="48" height="46"/>
+	<SubTexture name="laserGreen16.png" x="760" y="192" width="37" height="37"/>
+	<SubTexture name="laserRed01.png" x="858" y="230" width="9" height="54"/>
+	<SubTexture name="laserRed02.png" x="843" y="977" width="13" height="37"/>
+	<SubTexture name="laserRed03.png" x="856" y="602" width="9" height="37"/>
+	<SubTexture name="laserRed04.png" x="843" y="940" width="13" height="37"/>
+	<SubTexture name="laserRed05.png" x="856" y="983" width="9" height="37"/>
+	<SubTexture name="laserRed06.png" x="843" y="903" width="13" height="37"/>
+	<SubTexture name="laserRed07.png" x="856" y="131" width="9" height="37"/>
+	<SubTexture name="laserRed08.png" x="580" y="661" width="48" height="46"/>
+	<SubTexture name="laserRed09.png" x="602" y="600" width="48" height="46"/>
+	<SubTexture name="laserRed10.png" x="738" y="650" width="37" height="36"/>
+	<SubTexture name="laserRed11.png" x="737" y="613" width="37" height="37"/>
+	<SubTexture name="laserRed12.png" x="843" y="846" width="13" height="57"/>
+	<SubTexture name="laserRed13.png" x="856" y="812" width="9" height="57"/>
+	<SubTexture name="laserRed14.png" x="843" y="789" width="13" height="57"/>
+	<SubTexture name="laserRed15.png" x="856" y="926" width="9" height="57"/>
+	<SubTexture name="laserRed16.png" x="848" y="684" width="13" height="54"/>
+	<SubTexture name="meteorBrown_big1.png" x="224" y="664" width="101" height="84"/>
+	<SubTexture name="meteorBrown_big2.png" x="0" y="520" width="120" height="98"/>
+	<SubTexture name="meteorBrown_big3.png" x="518" y="810" width="89" height="82"/>
+	<SubTexture name="meteorBrown_big4.png" x="327" y="452" width="98" height="96"/>
+	<SubTexture name="meteorBrown_med1.png" x="651" y="447" width="43" height="43"/>
+	<SubTexture name="meteorBrown_med3.png" x="237" y="452" width="45" height="40"/>
+	<SubTexture name="meteorBrown_small1.png" x="406" y="234" width="28" height="28"/>
+	<SubTexture name="meteorBrown_small2.png" x="778" y="587" width="29" height="26"/>
+	<SubTexture name="meteorBrown_tiny1.png" x="346" y="814" width="18" height="18"/>
+	<SubTexture name="meteorBrown_tiny2.png" x="399" y="814" width="16" height="15"/>
+	<SubTexture name="meteorGrey_big1.png" x="224" y="748" width="101" height="84"/>
+	<SubTexture name="meteorGrey_big2.png" x="0" y="618" width="120" height="98"/>
+	<SubTexture name="meteorGrey_big3.png" x="516" y="728" width="89" height="82"/>
+	<SubTexture name="meteorGrey_big4.png" x="327" y="548" width="98" height="96"/>
+	<SubTexture name="meteorGrey_med1.png" x="674" y="219" width="43" height="43"/>
+	<SubTexture name="meteorGrey_med2.png" x="282" y="452" width="45" height="40"/>
+	<SubTexture name="meteorGrey_small1.png" x="406" y="262" width="28" height="28"/>
+	<SubTexture name="meteorGrey_small2.png" x="396" y="413" width="29" height="26"/>
+	<SubTexture name="meteorGrey_tiny1.png" x="364" y="814" width="18" height="18"/>
+	<SubTexture name="meteorGrey_tiny2.png" x="602" y="646" width="16" height="15"/>
+	<SubTexture name="numeral0.png" x="367" y="644" width="19" height="19"/>
+	<SubTexture name="numeral1.png" x="205" y="688" width="19" height="19"/>
+	<SubTexture name="numeral2.png" x="406" y="290" width="19" height="19"/>
+	<SubTexture name="numeral3.png" x="580" y="707" width="19" height="19"/>
+	<SubTexture name="numeral4.png" x="386" y="644" width="19" height="19"/>
+	<SubTexture name="numeral5.png" x="628" y="646" width="19" height="19"/>
+	<SubTexture name="numeral6.png" x="671" y="1002" width="19" height="19"/>
+	<SubTexture name="numeral7.png" x="690" y="1004" width="19" height="19"/>
+	<SubTexture name="numeral8.png" x="709" y="1004" width="19" height="19"/>
+	<SubTexture name="numeral9.png" x="491" y="215" width="19" height="19"/>
+	<SubTexture name="numeralX.png" x="382" y="814" width="17" height="17"/>
+	<SubTexture name="pill_blue.png" x="674" y="262" width="22" height="21"/>
+	<SubTexture name="pill_green.png" x="573" y="989" width="22" height="21"/>
+	<SubTexture name="pill_red.png" x="222" y="108" width="22" height="21"/>
+	<SubTexture name="pill_yellow.png" x="222" y="129" width="22" height="21"/>
+	<SubTexture name="playerLife1_blue.png" x="482" y="358" width="33" height="26"/>
+	<SubTexture name="playerLife1_green.png" x="535" y="150" width="33" height="26"/>
+	<SubTexture name="playerLife1_orange.png" x="777" y="327" width="33" height="26"/>
+	<SubTexture name="playerLife1_red.png" x="775" y="301" width="33" height="26"/>
+	<SubTexture name="playerLife2_blue.png" x="465" y="991" width="37" height="26"/>
+	<SubTexture name="playerLife2_green.png" x="391" y="991" width="37" height="26"/>
+	<SubTexture name="playerLife2_orange.png" x="428" y="991" width="37" height="26"/>
+	<SubTexture name="playerLife2_red.png" x="502" y="991" width="37" height="26"/>
+	<SubTexture name="playerLife3_blue.png" x="777" y="385" width="32" height="26"/>
+	<SubTexture name="playerLife3_green.png" x="778" y="469" width="32" height="26"/>
+	<SubTexture name="playerLife3_orange.png" x="777" y="712" width="32" height="26"/>
+	<SubTexture name="playerLife3_red.png" x="777" y="443" width="32" height="26"/>
+	<SubTexture name="playerShip1_blue.png" x="211" y="941" width="99" height="75"/>
+	<SubTexture name="playerShip1_damage1.png" x="112" y="941" width="99" height="75"/>
+	<SubTexture name="playerShip1_damage2.png" x="247" y="234" width="99" height="75"/>
+	<SubTexture name="playerShip1_damage3.png" x="247" y="159" width="99" height="75"/>
+	<SubTexture name="playerShip1_green.png" x="237" y="377" width="99" height="75"/>
+	<SubTexture name="playerShip1_orange.png" x="247" y="84" width="99" height="75"/>
+	<SubTexture name="playerShip1_red.png" x="224" y="832" width="99" height="75"/>
+	<SubTexture name="playerShip2_blue.png" x="112" y="791" width="112" height="75"/>
+	<SubTexture name="playerShip2_damage1.png" x="0" y="866" width="112" height="75"/>
+	<SubTexture name="playerShip2_damage2.png" x="0" y="791" width="112" height="75"/>
+	<SubTexture name="playerShip2_damage3.png" x="0" y="716" width="112" height="75"/>
+	<SubTexture name="playerShip2_green.png" x="112" y="866" width="112" height="75"/>
+	<SubTexture name="playerShip2_orange.png" x="112" y="716" width="112" height="75"/>
+	<SubTexture name="playerShip2_red.png" x="0" y="941" width="112" height="75"/>
+	<SubTexture name="playerShip3_blue.png" x="325" y="739" width="98" height="75"/>
+	<SubTexture name="playerShip3_damage1.png" x="323" y="832" width="98" height="75"/>
+	<SubTexture name="playerShip3_damage2.png" x="310" y="907" width="98" height="75"/>
+	<SubTexture name="playerShip3_damage3.png" x="325" y="664" width="98" height="75"/>
+	<SubTexture name="playerShip3_green.png" x="346" y="75" width="98" height="75"/>
+	<SubTexture name="playerShip3_orange.png" x="336" y="309" width="98" height="75"/>
+	<SubTexture name="playerShip3_red.png" x="325" y="0" width="98" height="75"/>
+	<SubTexture name="powerupBlue.png" x="696" y="329" width="34" height="33"/>
+	<SubTexture name="powerupBlue_bolt.png" x="539" y="989" width="34" height="33"/>
+	<SubTexture name="powerupBlue_shield.png" x="777" y="679" width="34" height="33"/>
+	<SubTexture name="powerupBlue_star.png" x="776" y="895" width="34" height="33"/>
+	<SubTexture name="powerupGreen.png" x="774" y="613" width="34" height="33"/>
+	<SubTexture name="powerupGreen_bolt.png" x="766" y="80" width="34" height="33"/>
+	<SubTexture name="powerupGreen_shield.png" x="776" y="862" width="34" height="33"/>
+	<SubTexture name="powerupGreen_star.png" x="651" y="490" width="34" height="33"/>
+	<SubTexture name="powerupRed.png" x="491" y="182" width="34" height="33"/>
+	<SubTexture name="powerupRed_bolt.png" x="775" y="646" width="34" height="33"/>
+	<SubTexture name="powerupRed_shield.png" x="776" y="928" width="34" height="33"/>
+	<SubTexture name="powerupRed_star.png" x="774" y="977" width="34" height="33"/>
+	<SubTexture name="powerupYellow.png" x="774" y="761" width="34" height="33"/>
+	<SubTexture name="powerupYellow_bolt.png" x="740" y="761" width="34" height="33"/>
+	<SubTexture name="powerupYellow_shield.png" x="482" y="325" width="34" height="33"/>
+	<SubTexture name="powerupYellow_star.png" x="607" y="857" width="34" height="33"/>
+	<SubTexture name="scratch1.png" x="325" y="814" width="21" height="16"/>
+	<SubTexture name="scratch2.png" x="423" y="41" width="21" height="16"/>
+	<SubTexture name="scratch3.png" x="346" y="295" width="16" height="12"/>
+	<SubTexture name="shield1.png" x="0" y="412" width="133" height="108"/>
+	<SubTexture name="shield2.png" x="0" y="293" width="143" height="119"/>
+	<SubTexture name="shield3.png" x="0" y="156" width="144" height="137"/>
+	<SubTexture name="shield_bronze.png" x="797" y="143" width="30" height="30"/>
+	<SubTexture name="shield_gold.png" x="797" y="113" width="30" height="30"/>
+	<SubTexture name="shield_silver.png" x="778" y="824" width="30" height="30"/>
+	<SubTexture name="speed.png" x="858" y="284" width="7" height="108"/>
+	<SubTexture name="star1.png" x="628" y="681" width="25" height="24"/>
+	<SubTexture name="star2.png" x="222" y="84" width="25" height="24"/>
+	<SubTexture name="star3.png" x="576" y="300" width="24" height="24"/>
+	<SubTexture name="star_bronze.png" x="778" y="794" width="31" height="30"/>
+	<SubTexture name="star_gold.png" x="778" y="557" width="31" height="30"/>
+	<SubTexture name="star_silver.png" x="778" y="527" width="31" height="30"/>
+	<SubTexture name="things_bronze.png" x="778" y="495" width="32" height="32"/>
+	<SubTexture name="things_gold.png" x="777" y="411" width="32" height="32"/>
+	<SubTexture name="things_silver.png" x="777" y="353" width="32" height="32"/>
+	<SubTexture name="turretBase_big.png" x="310" y="982" width="41" height="41"/>
+	<SubTexture name="turretBase_small.png" x="808" y="301" width="26" height="26"/>
+	<SubTexture name="ufoBlue.png" x="444" y="91" width="91" height="91"/>
+	<SubTexture name="ufoGreen.png" x="434" y="234" width="91" height="91"/>
+	<SubTexture name="ufoRed.png" x="444" y="0" width="91" height="91"/>
+	<SubTexture name="ufoYellow.png" x="505" y="898" width="91" height="91"/>
+	<SubTexture name="wingBlue_0.png" x="647" y="924" width="45" height="78"/>
+	<SubTexture name="wingBlue_1.png" x="738" y="253" width="37" height="72"/>
+	<SubTexture name="wingBlue_2.png" x="805" y="0" width="26" height="84"/>
+	<SubTexture name="wingBlue_3.png" x="600" y="450" width="51" height="75"/>
+	<SubTexture name="wingBlue_4.png" x="692" y="924" width="42" height="80"/>
+	<SubTexture name="wingBlue_5.png" x="596" y="892" width="51" height="69"/>
+	<SubTexture name="wingBlue_6.png" x="694" y="847" width="42" height="74"/>
+	<SubTexture name="wingBlue_7.png" x="675" y="134" width="43" height="83"/>
+	<SubTexture name="wingGreen_0.png" x="650" y="525" width="45" height="78"/>
+	<SubTexture name="wingGreen_1.png" x="775" y="229" width="37" height="72"/>
+	<SubTexture name="wingGreen_2.png" x="809" y="527" width="26" height="84"/>
+	<SubTexture name="wingGreen_3.png" x="535" y="0" width="51" height="75"/>
+	<SubTexture name="wingGreen_4.png" x="694" y="431" width="42" height="80"/>
+	<SubTexture name="wingGreen_5.png" x="525" y="251" width="51" height="69"/>
+	<SubTexture name="wingGreen_6.png" x="695" y="511" width="42" height="74"/>
+	<SubTexture name="wingGreen_7.png" x="655" y="764" width="43" height="83"/>
+	<SubTexture name="wingRed_0.png" x="809" y="712" width="26" height="84"/>
+	<SubTexture name="wingRed_1.png" x="768" y="0" width="37" height="72"/>
+	<SubTexture name="wingRed_2.png" x="600" y="300" width="51" height="75"/>
+	<SubTexture name="wingRed_3.png" x="698" y="715" width="42" height="80"/>
+	<SubTexture name="wingRed_4.png" x="586" y="75" width="51" height="69"/>
+	<SubTexture name="wingRed_5.png" x="718" y="123" width="42" height="74"/>
+	<SubTexture name="wingRed_6.png" x="653" y="681" width="43" height="83"/>
+	<SubTexture name="wingRed_7.png" x="651" y="286" width="45" height="78"/>
+	<SubTexture name="wingYellow_0.png" x="650" y="603" width="45" height="78"/>
+	<SubTexture name="wingYellow_1.png" x="760" y="120" width="37" height="72"/>
+	<SubTexture name="wingYellow_2.png" x="809" y="353" width="26" height="84"/>
+	<SubTexture name="wingYellow_3.png" x="576" y="150" width="51" height="75"/>
+	<SubTexture name="wingYellow_4.png" x="726" y="0" width="42" height="80"/>
+	<SubTexture name="wingYellow_5.png" x="525" y="182" width="51" height="69"/>
+	<SubTexture name="wingYellow_6.png" x="695" y="585" width="42" height="74"/>
+	<SubTexture name="wingYellow_7.png" x="651" y="364" width="43" height="83"/>
+</TextureAtlas>
+======== FILE END: public\sprites\sheet.xml ========
+
+======== FILE START: scripts\combine.py ========
+import os
+import argparse
+
+def combine_source_code(root_dir, output_file, 
+                        # 除外ディレクトリに 'node_modules', 'dist', 'build' などを追加
+                        exclude_dirs=['.git', '__pycache__', 'node_modules', 'dist', 'build', 'vendor'], 
+                        exclude_extensions=['.pyc', '.o', '.exe', '.dll', '.bin', '.pdb', '.log', '.out', '.zip', '.tar', '.gz', '.jpg', '.jpeg', '.png', '.gif', '.svg', '.ico', '.webp']):
+    """
+    指定されたルートディレクトリ以下のソースコードファイルの内容と階層情報を結合します。
+
+    Args:
+        root_dir (str): 走査を開始するルートディレクトリのパス。
+        output_file (str): 結合された内容を書き込むファイルのパス。
+        exclude_dirs (list): 走査から除外するディレクトリ名（例: .git, node_modules）。
+        exclude_extensions (list): 走査から除外するファイルの拡張子（例: .pyc, .png）。
+    """
+    combined_content = []
+
+    print(f"✅ 走査を開始: {os.path.abspath(root_dir)}")
+    print(f"📁 除外ディレクトリ: {exclude_dirs}")
+    print(f"🚫 除外拡張子: {exclude_extensions}")
+    print("-" * 40)
+
+    for dirpath, dirnames, filenames in os.walk(root_dir, topdown=True):
+        # 除外ディレクトリのスキップ処理
+        dirnames[:] = [d for d in dirnames if d not in exclude_dirs]
+
+        for filename in filenames:
+            # 除外拡張子のスキップ
+            if any(filename.endswith(ext) for ext in exclude_extensions):
+                continue
+            
+            full_path = os.path.join(dirpath, filename)
+            relative_path = os.path.relpath(full_path, root_dir)
+
+            try:
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                # ファイルの階層情報と内容を特定のフォーマットで結合
+                combined_content.append(f"======== FILE START: {relative_path} ========\n")
+                combined_content.append(content)
+                combined_content.append(f"\n======== FILE END: {relative_path} ========\n\n")
+                print(f"   [追加] {relative_path}")
+
+            except UnicodeDecodeError:
+                # バイナリファイルや非UTF-8ファイルをスキップ
+                print(f"   [スキップ] バイナリまたはエンコードエラー: {relative_path}")
+            except Exception as e:
+                # その他のエラー処理
+                print(f"   [エラー] {relative_path}: {e}")
+
+    # すべての内容を単一の文字列に結合
+    final_output = "".join(combined_content)
+
+    # 結果を指定されたファイルに書き出す
+    try:
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(final_output)
+        
+        print("-" * 40)
+        print(f"✨ 結合が完了しました！")
+        print(f"💾 出力ファイル: {os.path.abspath(output_file)}")
+        print(f"📏 サイズ: {len(final_output):,} 文字")
+        print(f"これで、この '{output_file}' ファイルの内容をCopilotにアップロードできます。")
+    except Exception as e:
+        print(f"❌ 出力ファイルへの書き込みに失敗しました: {e}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="指定フォルダ内の全ソースコードを結合し、ファイルパスと内容を含む単一のテキストファイルを作成します。"
+    )
+    parser.add_argument(
+        "root_directory",
+        type=str,
+        help="走査対象のルートディレクトリ（例: ./my_project）"
+    )
+    parser.add_argument(
+        "-o", "--output",
+        type=str,
+        default="combined_code_for_copilot.txt",
+        help="出力ファイル名 (デフォルト: combined_code_for_copilot.txt)"
+    )
+    
+    args = parser.parse_args()
+    
+    if not os.path.isdir(args.root_directory):
+        print(f"❌ エラー: 指定されたディレクトリ '{args.root_directory}' が見つかりません。")
+    else:
+        # スクリプトを実行
+        combine_source_code(args.root_directory, args.output)
+======== FILE END: scripts\combine.py ========
+
+======== FILE START: src\config.ts ========
+// src/config.ts (修正後)
+export const CONFIG = {
+    SCREEN: {
+        WIDTH: 800,
+        HEIGHT: 600,
+        BG_COLOR: 0x000000,
+        MARGIN: 50, // 画面外判定のマージン（スポーン/デスポーン用）
+    },
+    ASSETS: {
+        SHEET: "sprites/sheet.json",
+        TEXTURES: {
+            PLAYER: "playerShip1_blue.png",
+            BULLET: "laserBlue07.png",
+            ENEMY: "enemyBlack5.png",
+            EXPLOSION: "meteorGrey_big1.png",
+            ENEMY_BULLET: "laserRed07.png",
+        },
+    },
+    PLAYER: {
+        SPEED: 300,
+        SHOT_INTERVAL_MS: 150,
+        INITIAL_X_RATIO: 0.5, // 画面幅に対する比率 (0.5 = 中央)
+        INITIAL_Y: 500, // 初期Y座標
+        BULLET_OFFSET_Y: 20, // 機体から弾が出る位置のオフセット
+    },
+    BULLET: {
+        SPEED: 600,
+        POOL_SIZE: 100, // 同時に出せる弾の上限数
+        // 🚀 修正箇所: LIFE_TIME_MS を再追加
+        LIFE_TIME_MS: 3000, // 弾丸の寿命（ミリ秒）
+    },
+    ENEMY: {
+        SPEED: 120,
+        SPAWN_INTERVAL_MS: 2000,
+        POOL_SIZE: 10, // 同時に出せる敵の上限数
+        SCORE_VALUE: 100,
+        INITIAL_Y: 50,
+        FIRE_RATE_MS: 1500, // 敵の発射間隔 (ms)
+    },
+    EXPLOSION: {
+        LIFETIME_MS: 300, // 爆発の表示時間（ミリ秒）
+        POOL_SIZE: 15,
+    },
+    ENEMY_BULLET: {
+        WIDTH: 10,
+        HEIGHT: 20,
+        SPEED: 400, // 敵弾の速度 (PlayerBulletより速くても良い)
+        POOL_SIZE: 50,
+    },
+    INPUT: {
+        MOVE_LEFT: "ArrowLeft",
+        MOVE_RIGHT: "ArrowRight",
+        SHOOT: "Space",
+    },
+} as const;
+======== FILE END: src\config.ts ========
+
+======== FILE START: src\main.ts ========
+// src/main.ts
+
+import { Application, Assets, Texture, Ticker } from "pixi.js";
+import { CONFIG } from "./config";
+
+// Core modules
+import { InputManager } from "./core/InputManager";
+import { ScoreManager } from "./core/ScoreManager";
+import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
+
+// Entities
+import { Player } from "./entities/Player";
+
+// Types
+import type { ScaleOption, SpeedOption, ShotSpec, TrajectoryOption } from "./types/ShotTypes";
+
+class Game {
+    private app: Application;
+    private input: InputManager;
+    private textures: Record<string, Texture> = {};
+
+    private player: Player | null = null;
+    private scoreManager: ScoreManager;
+    private entityManager: EntityManager | null = null;
+
+    constructor(app: Application) {
+        this.app = app;
+        this.input = new InputManager();
+        this.scoreManager = new ScoreManager();
+    }
+
+    /** 初期化処理 */
+    async init() {
+        const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
+        this.textures = atlas.textures as Record<string, Texture>;
+        this.createScene();
+    }
+
+    /** ゲームシーンの構築 */
+    private createScene() {
+        // プレイヤー生成
+        this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
+        this.app.stage.addChild(this.player.sprite);
+        this.player.reset();
+
+        // エンティティ管理
+        this.entityManager = new EntityManager(this.app.stage, this.textures, this.player);
+        this.entityManager.setup(this.textures);
+
+        // イベント購読
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
+        this.entityManager.on(EntityManager.ENEMY_DESTROYED_EVENT, this.handleEnemyDestroyed.bind(this));
+
+        // メインループ開始
+        this.app.ticker.add((ticker) => this.update(ticker));
+    }
+
+    /** プレイヤーの発射処理 */
+    private handlePlayerShoot(
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        textureKey: string,
+        scaleOpt: ScaleOption | null,
+        speedOpt: SpeedOption | null,
+        trajectoryOpt: TrajectoryOption | null,
+        initialAngleDeg: number,
+        onDeathShotSpec: ShotSpec | null
+    ) {
+        if (!this.entityManager) return;
+
+        this.entityManager.spawn(
+            ENTITY_KEYS.BULLET,
+            x,
+            y,
+            velX,
+            velY,
+            textureKey,
+            scaleOpt,
+            speedOpt,
+            trajectoryOpt,
+            initialAngleDeg,
+            onDeathShotSpec
+        );
+    }
+
+    /** 敵撃破時のスコア加算 */
+    private handleEnemyDestroyed() {
+        this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
+    }
+
+    /** 毎フレーム更新処理 */
+    private update(ticker: Ticker) {
+        if (!this.player || !this.entityManager) return;
+
+        const delta = ticker.deltaMS / 1000;
+
+        this.player.handleInput(this.input, delta);
+        this.player.update(delta);
+
+        this.entityManager.update(delta);
+    }
+
+    /** リソース解放 */
+    public destroy() {
+        this.input.destroy();
+        this.app.destroy();
+    }
+}
+
+/** エントリーポイント */
+async function main() {
+    const app = new Application();
+    await app.init({
+        width: CONFIG.SCREEN.WIDTH,
+        height: CONFIG.SCREEN.HEIGHT,
+        backgroundColor: CONFIG.SCREEN.BG_COLOR,
+    });
+
+    document.body.appendChild(app.canvas);
+
+    const game = new Game(app);
+    await game.init();
+}
+
+main();
+======== FILE END: src\main.ts ========
+
+======== FILE START: src\style.css ========
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.vanilla:hover {
+  filter: drop-shadow(0 0 2em #3178c6aa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+======== FILE END: src\style.css ========
+
+======== FILE START: src\core\EntityManager.ts ========
+// src/core/EntityManager.ts
+
+import { Container, Texture, EventEmitter } from "pixi.js";
+import { CONFIG } from "../config";
+import { ObjectPool, type Poolable, type ResetArgs } from "./ObjectPool";
+import { Bullet } from "../entities/Bullet";
+import { Enemy } from "../entities/Enemy";
+import { Explosion } from "../entities/Explosion";
+import { EnemyBullet } from "../entities/EnemyBullet";
+import { GameObject } from "../entities/GameObject";
+import { checkAABBCollision } from "../utils/CollisionUtils";
+import { Player } from "../entities/Player";
+// 🚀 修正 1: TrajectoryOption の型をインポートに追加
+import {
+    type ScaleOption,
+    type SpeedOption,
+    type ShotSpec,
+    type TrajectoryOption,
+} from "../types/ShotTypes";
+
+type ManagedObject = GameObject & Poolable;
+
+export const ENTITY_KEYS = {
+    BULLET: "bullet",
+    ENEMY: "enemy",
+    EXPLOSION: "explosion",
+    ENEMY_BULLET: "enemy_bullet",
+} as const;
+
+export type EntityType = (typeof ENTITY_KEYS)[keyof typeof ENTITY_KEYS];
+
+interface EntityMap {
+    [ENTITY_KEYS.BULLET]: Bullet;
+    [ENTITY_KEYS.ENEMY]: Enemy;
+    [ENTITY_KEYS.EXPLOSION]: Explosion;
+    [ENTITY_KEYS.ENEMY_BULLET]: EnemyBullet;
+}
+
+export class EntityManager extends EventEmitter {
+    private _pools: { [key in EntityType]: ObjectPool<EntityMap[key]> };
+    private _activeObjects: { [key in EntityType]: ManagedObject[] } = {
+        [ENTITY_KEYS.BULLET]: [],
+        [ENTITY_KEYS.ENEMY]: [],
+        [ENTITY_KEYS.EXPLOSION]: [],
+        [ENTITY_KEYS.ENEMY_BULLET]: [],
+    };
+    private _container: Container;
+    private _textures: Record<string, Texture>; // テクスチャ参照を保持
+    private player: Player;
+
+    private timeSinceLastEnemySpawn: number = 0;
+
+    public static readonly ENEMY_DESTROYED_EVENT = "enemyDestroyed";
+
+    // コンストラクタで textures を受け取ったらプロパティに保存するように変更
+    constructor(
+        container: Container,
+        textures: Record<string, Texture>,
+        player: Player
+    ) {
+        super();
+        this._container = container;
+        this._textures = textures; // 保持する
+        this.player = player;
+
+        this._pools = {} as { [key in EntityType]: ObjectPool<EntityMap[key]> };
+    }
+
+    public setup(textures: Record<string, Texture>): void {
+        this._textures = textures; // 再度設定（念のため）
+
+        const bulletFactory = () =>
+            new Bullet(textures[CONFIG.ASSETS.TEXTURES.BULLET], this);
+        const enemyFactory = () =>
+            new Enemy(textures[CONFIG.ASSETS.TEXTURES.ENEMY], this);
+        const explosionFactory = () =>
+            new Explosion(textures[CONFIG.ASSETS.TEXTURES.EXPLOSION]);
+        const enemyBulletFactory = () =>
+            new EnemyBullet(textures[CONFIG.ASSETS.TEXTURES.ENEMY_BULLET]);
+
+        this._pools[ENTITY_KEYS.BULLET] = new ObjectPool(
+            bulletFactory,
+            CONFIG.BULLET.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.ENEMY] = new ObjectPool(
+            enemyFactory,
+            CONFIG.ENEMY.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.EXPLOSION] = new ObjectPool(
+            explosionFactory,
+            CONFIG.EXPLOSION.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.ENEMY_BULLET] = new ObjectPool(
+            enemyBulletFactory,
+            CONFIG.ENEMY_BULLET.POOL_SIZE
+        );
+
+        for (const poolKey of Object.keys(this._pools) as EntityType[]) {
+            const pool = this._pools[poolKey];
+            pool.getAllObjects().forEach((obj: ManagedObject) => {
+                this._container.addChild(obj.sprite);
+            });
+        }
+
+        const enemyPool = this._pools[ENTITY_KEYS.ENEMY] as ObjectPool<Enemy>;
+        enemyPool.getAllObjects().forEach((enemy: Enemy) => {
+            // Enemyにon/emitが実装されている前提
+            if (typeof enemy.on === "function") {
+                enemy.on(Enemy.FIRE_EVENT, this.spawnEnemyBullet, this);
+            }
+        });
+    }
+
+    // 🚀 新規: Bulletがテクスチャを変更できるようにする
+    public getTexture(key: string): Texture | undefined {
+        return this._textures[key];
+    }
+
+    // main.ts から呼ばれる汎用スポーンメソッド
+    // ResetArgs<EntityMap[K]> は Bullet の reset(x, y, velX, velY, textureKey, scaleOpt, speedOpt, trajectoryOpt, initialAngleDeg, onDeathShotSpec) に対応
+    public spawn<K extends EntityType>(
+        key: K,
+        ...args: ResetArgs<EntityMap[K]>
+    ): EntityMap[K] {
+        const pool = this._pools[key] as ObjectPool<EntityMap[K]>;
+        const obj = pool.get(...args);
+        this._activeObjects[key].push(obj as ManagedObject);
+        return obj;
+    }
+
+    public spawnEnemyBullet(x: number, y: number): EnemyBullet {
+        // 💡 修正案: 速度を計算し、resetに渡す
+        const targetX = this.player.x;
+        const targetY = this.player.y;
+
+        // プレイヤーに向かうベクトルを計算
+        const dx = targetX - x;
+        const dy = targetY - y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // 敵弾の速度 (CONFIGから取得するか、仮の値を使用)
+        // CONFIG.ENEMY_BULLET.SPEED が存在しない場合を想定して、仮に200とします
+        const ENEMY_BULLET_SPEED = 200;
+
+        const velX = (dx / distance) * ENEMY_BULLET_SPEED;
+        const velY = (dy / distance) * ENEMY_BULLET_SPEED;
+
+        // 修正された reset の引数に合わせて velX, velY を追加
+        const enemyBullet = this.spawn(
+            ENTITY_KEYS.ENEMY_BULLET,
+            x,
+            y,
+            velX,
+            velY
+        );
+        return enemyBullet;
+    }
+
+    // 古いメソッド（念のため残すが、main.tsはspawnを使っているはず）
+    public spawnBullet(
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        // 🚀 修正 3: ここも引数を追加（使われない可能性が高いが安全のため）
+        textureKey: string = CONFIG.ASSETS.TEXTURES.BULLET,
+        scaleOpt: ScaleOption | null = null,
+        speedOpt: SpeedOption | null = null,
+        trajectoryOpt: TrajectoryOption | null = null,
+        initialAngleDeg: number = 0,
+        onDeathShotSpec: ShotSpec | null = null
+    ): Bullet | null {
+        return this.spawn(
+            ENTITY_KEYS.BULLET,
+            x,
+            y,
+            velX,
+            velY,
+            textureKey,
+            scaleOpt,
+            speedOpt,
+            trajectoryOpt, // 【新規】
+            initialAngleDeg, // 【新規】
+            onDeathShotSpec
+        );
+    }
+
+    // 🚀 修正 4: fireDeathShot は Player.SHOOT_EVENT の全引数を揃えて emit する
+    // Death Shotは、メイン弾丸が持っていた「trajectory, scale, speed, textureKey」の情報を使わないため、
+    // ここでデフォルト値を設定して Player の fire メソッドのロジックを再利用する。
+    public fireDeathShot(x: number, y: number, spec: ShotSpec): void {
+        // PlayerのfireメソッドはShotSpecを分解して emit に流すため、ここでは簡易的なemitを行う
+        // Playerのfire()のロジックを再利用するために、Player.SHOOT_EVENT に渡す引数を揃える必要がある。
+        // spec の中には、発射に必要な情報 (pattern, count, speed, angle, baseAngleDegなど) が含まれている。
+        // しかし、EntityManagerはPlayerのfireロジックを再実装するべきではない。
+        // Player.ts 側の実装を信じ、specを引数として渡すのが最もシンプルで安全な方法。
+        // ただし、Player.tsで修正した emit の引数リストは spec ではなく、分解されたプリミティブな値である。
+
+        // 🚨 Player.ts の fire メソッドで、Player.SHOOT_EVENT に渡す引数リストに spec を分解して渡していたため、
+        // ここでも同様に、spec に含まれる情報を使って、emit が期待する引数リストを揃える必要がある。
+
+        // 暫定的な対応として、このメソッド自体が不要になるように、Bullet側を修正します。
+        // Bullet.ts の deactivateAndFireDeathShot() は、このメソッドではなく、
+        // プレイヤー側と同じロジックを使って、Player.SHOOT_EVENT を発火させるべき。
+
+        // 既存の Player.SHOOT_EVENT は spec を受け取らないため、ここでは処理を変更しないままにします。
+        // 後の Bullet.ts の修正で、このメソッドの扱いの見直しを提案します。
+
+        // 💡 Bullet.ts の修正前にこのコードが実行されるとエラーになるため、Player.SHOOT_EVENT の引数を揃える。
+        // spec から速度を抽出し、角度は一旦 270 (上) とし、それ以外のオプションは null で渡します。
+        const velY = -(spec.speed ?? 0); // 速度が指定されていればそれを使う
+
+        this.emit(
+            Player.SHOOT_EVENT,
+            x,
+            y,
+            0, // velX
+            velY,
+            spec.textureKey ?? CONFIG.ASSETS.TEXTURES.BULLET, // textureKey
+            spec.scale ?? null, // scaleOpt
+            spec.speedMod ?? null, // speedOpt
+            null, // trajectoryOpt (DeathShotはFIXED想定)
+            270, // initialAngleDeg (DeathShotはPlayerが計算)
+            null // onDeathShotSpec
+        );
+    }
+
+    private addEnemySpawner(delta: number) {
+        this.timeSinceLastEnemySpawn += delta * 1000;
+
+        if (this.timeSinceLastEnemySpawn >= CONFIG.ENEMY.SPAWN_INTERVAL_MS) {
+            this.timeSinceLastEnemySpawn = 0;
+            const x = Math.random() * (CONFIG.SCREEN.WIDTH - 100) + 50;
+            const y = CONFIG.ENEMY.INITIAL_Y;
+            this.spawn(ENTITY_KEYS.ENEMY, x, y);
+        }
+    }
+
+    public update(delta: number): void {
+        this.addEnemySpawner(delta);
+
+        for (const key of Object.keys(this._activeObjects) as EntityType[]) {
+            const list = this._activeObjects[key];
+            for (const obj of list) {
+                if (obj.active) {
+                    obj.update(delta);
+                }
+            }
+        }
+
+        this.collisionCheck();
+        this.cleanup();
+    }
+
+    private collisionCheck(): void {
+        const activeBullets = this._activeObjects[
+            ENTITY_KEYS.BULLET
+        ] as Bullet[];
+        const activeEnemies = this._activeObjects[ENTITY_KEYS.ENEMY] as Enemy[];
+        const activeEnemyBullets = this._activeObjects[
+            ENTITY_KEYS.ENEMY_BULLET
+        ] as EnemyBullet[];
+
+        if (activeBullets && activeEnemies) {
+            for (const b of activeBullets) {
+                if (!b.active) continue;
+                for (const e of activeEnemies) {
+                    if (!e.active) continue;
+                    if (checkAABBCollision(b, e)) {
+                        b.deactivateAndFireDeathShot();
+                        e.active = false;
+                        this.spawn(ENTITY_KEYS.EXPLOSION, e.x, e.y);
+                        this.emit(
+                            EntityManager.ENEMY_DESTROYED_EVENT,
+                            CONFIG.ENEMY.SCORE_VALUE
+                        );
+                    }
+                }
+            }
+        }
+
+        if (this.player.active && activeEnemyBullets) {
+            for (const eb of activeEnemyBullets) {
+                if (!eb.active) continue;
+                if (checkAABBCollision(eb, this.player)) {
+                    eb.active = false;
+                    this.player.takeHit();
+                    this.spawn(
+                        ENTITY_KEYS.EXPLOSION,
+                        this.player.x,
+                        this.player.y
+                    );
+                    return;
+                }
+            }
+        }
+    }
+
+    private cleanup() {
+        for (const key of Object.keys(this._activeObjects) as EntityType[]) {
+            const list = this._activeObjects[key];
+            const pool = this._pools[key] as ObjectPool<ManagedObject>;
+            this.cleanupList(list, pool);
+        }
+    }
+
+    private cleanupList(
+        list: ManagedObject[],
+        pool: ObjectPool<ManagedObject>
+    ) {
+        for (let i = list.length - 1; i >= 0; i--) {
+            const obj = list[i];
+            if (!obj.active) {
+                pool.release(obj);
+                list.splice(i, 1);
+            }
+        }
+    }
+}
+
+======== FILE END: src\core\EntityManager.ts ========
+
+======== FILE START: src\core\InputManager.ts ========
+// src/core/InputManager.ts
+export class InputManager {
+    private keys: Record<string, boolean> = {};
+
+    // イベントリスナーを保持する関数
+    private handleKeyDown = (e: KeyboardEvent) => (this.keys[e.code] = true);
+    private handleKeyUp = (e: KeyboardEvent) => (this.keys[e.code] = false);
+
+    constructor() {
+        window.addEventListener("keydown", this.handleKeyDown);
+        window.addEventListener("keyup", this.handleKeyUp);
+    }
+
+    public isDown(code: string): boolean {
+        return !!this.keys[code];
+    }
+
+    // クリーンアップメソッド
+    public destroy() {
+        window.removeEventListener("keydown", this.handleKeyDown);
+        window.removeEventListener("keyup", this.handleKeyUp);
+    }
+}
+
+======== FILE END: src\core\InputManager.ts ========
+
+======== FILE START: src\core\ObjectPool.ts ========
+// src/core/ObjectPool.ts (修正後)
+
+import { Container } from "pixi.js"; 
+
+// 💡 修正: EntityManagerで利用するため export する
+export type ResetArgs<T extends Poolable> = T extends { reset(...args: infer A): void } ? A : never;
+
+export interface Poolable {
+  active: boolean;
+  sprite: Container;
+  reset(...args: any[]): void; 
+}
+
+export class ObjectPool<T extends Poolable> {
+  private freeObjects: T[] = [];
+  private allObjects: T[] = [];
+  private factory: () => T;
+
+  constructor(factory: () => T, initialSize: number = 10) {
+    this.factory = factory;
+    this.expand(initialSize);
+  }
+
+  private expand(count: number) {
+    for (let i = 0; i < count; i++) {
+      const obj = this.factory();
+      obj.active = false;
+      obj.sprite.visible = false;
+      this.freeObjects.push(obj);
+      this.allObjects.push(obj);
+    }
+  }
+
+  public get(...args: ResetArgs<T>): T {
+    let obj = this.freeObjects.pop();
+
+    if (!obj) {
+      this.expand(5);
+      obj = this.freeObjects.pop()!;
+    }
+    
+    obj.active = true;
+    obj.sprite.visible = true;
+    
+    obj.reset(...args);
+    
+    return obj;
+  }
+  
+  public release(obj: T) {
+    obj.active = false;
+    obj.sprite.visible = false;
+    this.freeObjects.push(obj);
+  }
+
+  // 🚀 修正箇所 1: EntityManagerで使用されている getAllObjects を追加
+  public getAllObjects(): T[] {
+    return this.allObjects;
+  }
+}
+======== FILE END: src\core\ObjectPool.ts ========
+
+======== FILE START: src\core\ScoreManager.ts ========
+// src/core/ScoreManager.ts
+
+import { EventEmitter } from "pixi.js";
+
+export class ScoreManager extends EventEmitter{
+    private score: number = 0;
+
+    public static readonly SCORE_CHANGED_EVENT = "scoreChanged";
+
+    public getScore(): number {
+        return this.score;
+    }
+
+    public addScore(points: number): void {
+        this.score += points;
+        this.notifyScoreUpdate();
+    }
+
+    private notifyScoreUpdate() {
+        this.emit(ScoreManager.SCORE_CHANGED_EVENT, this.score);
+    }
+}
+======== FILE END: src\core\ScoreManager.ts ========
+
+======== FILE START: src\entities\Bullet.ts ========
+// src/entities/Bullet.ts
+
+import { Texture } from "pixi.js";
+import { Projectile } from "./Projectile";
+import type {
+    ScaleOption,
+    SpeedOption,
+    ShotSpec,
+    TrajectoryOption,
+} from "../types/ShotTypes";
+import type { EntityManager } from "../core/EntityManager";
+
+export class Bullet extends Projectile {
+    private onDeathShotSpec: ShotSpec | null = null;
+    private entityManager: EntityManager;
+
+    constructor(texture: Texture, entityManager: EntityManager) {
+        super(texture);
+        this.entityManager = entityManager;
+    }
+
+    /**
+     * オブジェクトプールから取得する際のリセット処理。
+     * Projectileのプロパティに加え、デスショットの設定を受け取る。
+     */
+    public reset(
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        textureKey: string,
+        scaleOpt: ScaleOption | null,
+        speedOpt: SpeedOption | null,
+        // 🚀 修正点: 軌道と角度の引数を追加
+        trajectoryOpt: TrajectoryOption | null,
+        initialAngle: number,
+        onDeathShotSpec: ShotSpec | null
+    ) {
+        // Projectileのプロパティを初期化
+        this.sprite.x = x;
+        this.sprite.y = y;
+        this.velX = velX;
+        this.velY = velY;
+        this.lifeTime = 0;
+        this.scaleOpt = scaleOpt;
+        this.speedOpt = speedOpt;
+
+        // 🚀 修正点: 軌道プロパティを初期化
+        this.trajectoryOpt = trajectoryOpt;
+        this.initialAngle = initialAngle;
+        this.trajectoryTimer = 0; // タイマーをリセット
+
+        this.currentMinScale = scaleOpt?.minScale ?? 0.1;
+
+        // Bullet固有のプロパティを初期化
+        this.onDeathShotSpec = onDeathShotSpec;
+
+        // 初期スケール設定
+        const initialScale = scaleOpt?.initial ?? 1.0;
+        this.sprite.scale.set(initialScale);
+        this.updateHitbox(initialScale);
+
+        // エラー修正済みの非 Null アサーション (!) を使用
+        this.sprite.texture = this.entityManager.getTexture(textureKey)!;
+
+        this.active = true;
+        this.sprite.visible = true;
+
+        // Bullet.ts reset の最後に追加
+        const angleRad = Math.atan2(this.velY, this.velX);
+        this.sprite.rotation = angleRad + Math.PI / 2;
+
+        // 以降は更新しないようにフラグを固定
+        this.shouldUpdateRotation = false;
+    }
+
+    public deactivateAndFireDeathShot() {
+        // ... (ロジックは変更なし) ...
+        if (!this.active) return;
+
+        this.active = false;
+        this.sprite.visible = false;
+
+        if (this.onDeathShotSpec && this.entityManager) {
+            this.entityManager.fireDeathShot(
+                this.x,
+                this.y,
+                this.onDeathShotSpec
+            );
+        }
+    }
+
+    public update(delta: number) {
+        // Projectileのupdateを呼び出すことで、移動、スケール、軌道が処理される
+        super.update(delta);
+
+        // 特定のスケールまで縮小したらデスショットを発射する判定 (Bullet固有)
+        if (
+            this.active &&
+            this.scaleOpt?.mode === "LINEAR" &&
+            this.scaleOpt.rate < 0
+        ) {
+            if (this.sprite.scale.x <= this.currentMinScale * 0.2) {
+                this.deactivateAndFireDeathShot();
+            }
+        }
+    }
+
+    protected deactivate(): void {
+        this.deactivateAndFireDeathShot();
+    }
+}
+
+======== FILE END: src\entities\Bullet.ts ========
+
+======== FILE START: src\entities\Enemy.ts ========
+// src/entities/Enemy.ts (修正後)
+
+import { Texture, EventEmitter } from "pixi.js"; // 💡 修正 1: EventEmitterをインポート
+import { GameObject } from "./GameObject"; 
+import type { Collider } from "./GameObject"; 
+import type { Poolable } from "../core/ObjectPool"; 
+import { CONFIG } from "../config";
+import { EntityManager, ENTITY_KEYS } from "../core/EntityManager"; 
+
+export class Enemy extends GameObject implements Poolable, Collider { 
+    // 🚀 修正 3: 静的プロパティ FIRE_EVENT の追加
+    public static readonly FIRE_EVENT = "fire";
+
+    public readonly width: number;
+    public readonly height: number;
+    
+    // 💡 修正 2: EventEmitter機能の実装
+    private emitter: EventEmitter = new EventEmitter();
+
+    private entityManager: EntityManager; 
+    private timeSinceLastShot: number = 0; 
+
+    constructor(texture: Texture, entityManager: EntityManager) {
+        const w = texture.width * 0.9;
+        const h = texture.height * 0.9;
+        super(texture, w, h); 
+        
+        this.width = w; 
+        this.height = h; 
+
+        this.entityManager = entityManager;
+        this.timeSinceLastShot = 0; 
+    }
+
+    // 💡 修正 2: on メソッドの実装 (EntityManagerのエラー解消)
+    public on(event: string | symbol, fn: (...args: any[]) => void, context?: any): this {
+        this.emitter.on(event, fn, context);
+        return this;
+    }
+
+    // 💡 修正 2: emit メソッドの実装 (updateでの発火に対応)
+    public emit(event: string | symbol, ...args: any[]): boolean {
+        return this.emitter.emit(event, ...args);
+    }
+
+    public reset(x: number, y: number): void { 
+        this.sprite.x = x; 
+        this.sprite.y = y; 
+        
+        this.active = true; 
+        this.sprite.visible = true; 
+        this.timeSinceLastShot = 0; 
+    }
+
+    public update(delta: number): void {
+        if (!this.active) return;
+
+        this.sprite.y += CONFIG.ENEMY.SPEED * delta;
+
+        if (this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN) {
+            this.active = false;
+            this.sprite.visible = false;
+        }
+        
+        this.timeSinceLastShot += delta * 1000; 
+        if (this.timeSinceLastShot >= CONFIG.ENEMY.FIRE_RATE_MS) {
+            // 🚀 修正 4: 敵弾発射イベントを発火
+            this.emit(Enemy.FIRE_EVENT, this.x, this.y); 
+            this.timeSinceLastShot = 0;
+        }
+    }
+}
+======== FILE END: src\entities\Enemy.ts ========
+
+======== FILE START: src\entities\EnemyBullet.ts ========
+// src/entities/EnemyBullet.ts
+
+import { Texture } from "pixi.js";
+import { Projectile } from "./Projectile"; 
+
+export class EnemyBullet extends Projectile {
+
+    constructor(texture: Texture) {
+        super(texture); 
+    }
+
+    /**
+     * オブジェクトプールから取得する際のリセット処理。
+     */
+    public reset(
+        x: number, 
+        y: number, 
+        velX: number, 
+        velY: number, 
+    ) {
+        // Projectileのプロパティを初期化
+        this.sprite.x = x;
+        this.sprite.y = y;
+        this.velX = velX; 
+        this.velY = velY; 
+        this.lifeTime = 0; 
+        
+        // 敵弾は直線弾なので、オプションは全てnullで初期化
+        this.scaleOpt = null;
+        this.speedOpt = null;
+        this.trajectoryOpt = null;
+        
+        // 直線弾は initialAngle を使わないが、リセットしておく
+        const angleRad = Math.atan2(velY, velX);
+        this.initialAngle = angleRad * (180 / Math.PI);
+
+        this.trajectoryTimer = 0; 
+
+        // 初期スケール設定（デフォルト）
+        const initialScale = 1.0;
+        this.sprite.scale.set(initialScale);
+        this.updateHitbox(initialScale); 
+        
+        this.active = true;
+        this.sprite.visible = true;
+
+        // 🚀 修正: 直線弾なので、回転を発射時に一度だけ固定する
+        // Projectile.ts の update() で shouldUpdateRotation が false になるため、
+        // この回転が維持されます。
+        this.sprite.rotation = angleRad + Math.PI / 2;
+    }
+
+    public update(delta: number) {
+        // Projectileのupdateを呼び出すことで、移動、回転（WAVE弾のみ）、寿命が処理される
+        super.update(delta);
+    }
+}
+======== FILE END: src\entities\EnemyBullet.ts ========
+
+======== FILE START: src\entities\Explosion.ts ========
+// src/entities/Explosion.ts
+import { Texture } from "pixi.js";
+import { GameObject } from "./GameObject";
+import { CONFIG } from "../config";
+
+export class Explosion extends GameObject {
+  private _lifeTimeMs = 0; 
+
+  constructor(texture: Texture) {
+    super(texture,0,0);
+    this.sprite.scale.set(0.5); 
+
+    this._hitWidth = texture.width * 0.5;
+    this._hitHeight = texture.height * 0.5;
+  }
+
+  reset(x: number, y: number) {
+    this.sprite.x = x;
+    this.sprite.y = y;
+    this._lifeTimeMs = CONFIG.EXPLOSION.LIFETIME_MS;
+  }
+
+  update(delta: number) {
+    if (!this.active) return;
+    
+    const deltaMS = delta * 1000;
+    this._lifeTimeMs -= deltaMS;
+    
+    if (this._lifeTimeMs <= 0) {
+      this.active = false;
+    }
+  }
+}
+======== FILE END: src\entities\Explosion.ts ========
+
+======== FILE START: src\entities\GameObject.ts ========
+// src/entities/GameObject.ts
+import { Sprite, Texture } from "pixi.js";
+import type { Poolable } from "../core/ObjectPool";
+
+export interface Collider {
+    x: number;
+    y: number;
+    hitWidth: number;
+    hitHeight: number;
+
+    get top(): number;
+    get bottom(): number;
+    get left(): number;
+    get right(): number;
+}
+
+export abstract class GameObject implements Poolable, Collider {
+    public sprite: Sprite;
+    public active: boolean = false;
+
+    protected _hitWidth: number;
+    protected _hitHeight: number;
+
+    public get x() {
+        return this.sprite.x;
+    }
+    public get y() {
+        return this.sprite.y;
+    }
+
+    public get hitWidth() {
+        return this._hitWidth;
+    }
+    public get hitHeight() {
+        return this._hitHeight;
+    }
+
+    public get top(): number {
+        return this.y - this.hitHeight / 2;
+    }
+    public get bottom(): number {
+        return this.y + this.hitHeight / 2;
+    }
+    public get left(): number {
+        return this.x - this.hitWidth / 2;
+    }
+    public get right(): number {
+        return this.x + this.hitWidth / 2;
+    }
+
+    constructor(texture: Texture, hitWidth: number, hitHeight: number) {
+        this.sprite = new Sprite(texture);
+        this.sprite.anchor.set(0.5);
+        this.sprite.visible = false;
+
+        this._hitWidth = hitWidth;
+        this._hitHeight = hitHeight;
+    }
+
+    abstract update(delta: number): void;
+    abstract reset(...args: any[]): void;
+}
+======== FILE END: src\entities\GameObject.ts ========
+
+======== FILE START: src\entities\Player.ts ========
+// src/entities/Player.ts
+
+import { Texture, EventEmitter } from "pixi.js";
+import { GameObject } from "./GameObject";
+import type { Collider } from "./GameObject";
+import { InputManager } from "../core/InputManager";
+import { CONFIG } from "../config";
+// 🚀 修正 1: ShotSpec に TrajectoryOption を含めるため、import に TrajectoryOption を追加
+import type { ShotSpec, TrajectoryOption } from "../types/ShotTypes"; 
+import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
+
+export class Player extends GameObject implements Collider {
+
+    public static readonly SHOOT_EVENT = "shoot";
+
+    private lastShotTime = 0;
+    public active: boolean = true;
+    private emitter: EventEmitter = new EventEmitter();
+
+    // 弾丸軌道に必要なタイマー
+    private _shotWavyTimer: number = 0; 
+    private _rotaryShotAngle: number = 0; 
+
+    // HPに関するプロパティ (移動、衝突処理がシンプルなため、これらは未使用の可能性があります)
+    private hitPoints: number = 3;
+    private isInvincible: boolean = false;
+    private blinkTimer: number = 0;
+    private INVINCIBILITY_DURATION = 2000;
+    private BLINK_RATE = 100;
+
+    constructor(texture: Texture) { 
+        const w = texture.width;
+        const h = texture.height;
+        super(texture, w, h); 
+        
+        this.active = true;
+        // 🚀 初期位置設定のためにresetPositionの呼び出しを推奨
+        this.resetPosition();
+    }
+
+    public resetPosition(): void {
+        this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
+        this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
+    }
+    
+    public on(event: string | symbol, fn: (...args: any[]) => void, context?: any): this {
+        this.emitter.on(event, fn, context);
+        return this;
+    }
+
+    public emit(event: string | symbol, ...args: any[]): boolean {
+        return this.emitter.emit(event, ...args);
+    }
+
+    public reset() {
+        this.active = true;
+        this.sprite.visible = true;
+        this.lastShotTime = 0;
+        this._shotWavyTimer = 0;
+        this._rotaryShotAngle = 0;
+        
+        // 🚀 HP/無敵関連のプロパティをリセット
+        this.hitPoints = 3;
+        this.isInvincible = false;
+        this.blinkTimer = 0;
+        
+        this.resetPosition();
+    }
+
+    public update(delta: number) {
+        // 🚀 無敵時間中の点滅処理
+        if (this.isInvincible) {
+            const deltaMS = delta * 1000;
+            this.blinkTimer += deltaMS;
+            
+            if (this.blinkTimer >= this.INVINCIBILITY_DURATION) {
+                this.isInvincible = false;
+                this.sprite.visible = true;
+            } else {
+                const isVisible = (this.blinkTimer % this.BLINK_RATE) < (this.BLINK_RATE / 2);
+                this.sprite.visible = isVisible;
+            }
+        }
+        
+        this._shotWavyTimer += delta; 
+    }
+
+    public takeHit() {
+        if (!this.active || this.isInvincible) return;
+        
+        // 🚀 ダメージ処理を復元
+        this.hitPoints--;
+        
+        if (this.hitPoints <= 0) {
+            this.active = false;
+            this.sprite.visible = false;
+        } else {
+            this.isInvincible = true;
+            this.blinkTimer = 0;
+        }
+    }
+    
+    public fire(spec: ShotSpec) {
+        const { 
+            pattern, 
+            count, 
+            speed, 
+            trajectory, 
+            angle, 
+            spacing, 
+            speedMod, 
+            scale, 
+            textureKey: specTextureKey,
+            onDeathShot, 
+            // 🚀 baseAngleDeg を取得
+            baseAngleDeg: specBaseAngleDeg
+        } = spec; 
+        
+        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
+        const scaleOpt = scale ?? null;
+        const speedOpt = speedMod ?? null; 
+        const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
+
+        // baseAngleDegが指定されていなければデフォルトの270度（真上）を使用
+        let baseAngle = specBaseAngleDeg ?? 270; 
+
+        // --- 2. 方向の動かし方 (Trajectory) の計算 ---
+        let trajectoryOffsetDeg = 0;
+        
+        if (trajectory) {
+            switch (trajectory.mode) {
+                case TrajectoryModes.ROTARY:
+                    // 発射角度を更新し、今回の発射角度として使用
+                    this._rotaryShotAngle = (this._rotaryShotAngle + trajectory.rate) % 360;
+                    // baseAngleを上書き
+                    baseAngle = this._rotaryShotAngle;
+                    break;
+                    
+                case TrajectoryModes.WAVE:
+                    // サイン波で角度を揺らす
+                    const range = trajectory.range ?? 30; 
+                    const rate = trajectory.rate; 
+                    trajectoryOffsetDeg = Math.sin(this._shotWavyTimer * rate) * range;
+                    break;
+                
+                case TrajectoryModes.FIXED:
+                default:
+                    break;
+            }
+        }
+
+
+        // --- 1. 発射時の配置 (Pattern) の計算 ---
+        let startAngle = baseAngle + trajectoryOffsetDeg;
+        let angleStep = 0;
+        
+        switch (pattern) {
+            case ShotPatterns.FAN:
+                const arc = angle || 60;
+                startAngle -= (arc / 2); 
+                angleStep = count > 1 ? arc / (count - 1) : 0;
+                break;
+                
+            case ShotPatterns.RING:
+                angleStep = 360 / count;
+                break;
+                
+            case ShotPatterns.LINE:
+            default:
+                angleStep = 0;
+                break;
+        }
+
+
+        // --- 弾丸生成ループ ---
+        for (let i = 0; i < count; i++) {
+            let currentAngleDeg = startAngle + (i * angleStep);
+            
+            const angleRad = currentAngleDeg * (Math.PI / 180);
+
+            // 💡 修正 2: 角度計算を三角関数に合わせる (0度 = 右、90度 = 上、180度 = 左、270度 = 下)
+            // プレイヤーの弾は通常上向き(270度)なので、Y軸を反転させる (上向きを正のY軸の反対にする)
+            const velX = speed * Math.cos(angleRad);
+            const velY = speed * Math.sin(angleRad);
+            
+            const finalX = (pattern === ShotPatterns.LINE && spacing)
+                ? this.sprite.x + (i - (count - 1) / 2) * spacing
+                : this.sprite.x;
+
+            // 🚀 修正 3: 新しい引数 trajectory と currentAngleDeg を追加
+            this.emit(
+                Player.SHOOT_EVENT,
+                finalX,
+                this.sprite.y - offsetY,
+                velX,
+                velY,
+                textureKey, 
+                scaleOpt,   
+                speedOpt,
+                trajectory ?? null,          // 🚀 【新規】TrajectoryOption
+                currentAngleDeg,             // 🚀 【新規】初速角度 (度)
+                onDeathShot ?? null 
+            );
+        }
+    }
+
+    /**
+     * @param input InputManagerインスタンス
+     * @param delta デルタタイム（秒）
+     */
+    public handleInput(input: InputManager, delta: number): void {
+        if (!this.active) return;
+        
+        const moveSpeed = CONFIG.PLAYER.SPEED * delta;
+
+        // --- 移動ロジック (水平移動のみ) ---
+        if (input.isDown(CONFIG.INPUT.MOVE_LEFT)) {
+            this.sprite.x = Math.max(
+                this.sprite.x - moveSpeed,
+                this.hitWidth / 2
+            );
+        }
+        if (input.isDown(CONFIG.INPUT.MOVE_RIGHT)) {
+            this.sprite.x = Math.min(
+                this.sprite.x + moveSpeed,
+                CONFIG.SCREEN.WIDTH - this.hitWidth / 2
+            );
+        }
+
+        const now = performance.now();
+        
+        // 無敵時間中は射撃不可
+        if (this.isInvincible) return;
+
+        // --- ショット定義 ---
+
+        // KeyA: 基本の直線ショット (LINE + FIXED)
+        if (input.isDown("KeyA")) {
+            if (now - this.lastShotTime > 150) {
+                this.fire({ pattern: "LINE", count: 1, speed: 600 });
+                this.lastShotTime = now;
+            }
+        }
+
+        // KeyS: 扇形ショット (FAN + FIXED)
+        if (input.isDown("KeyS")) {
+            if (now - this.lastShotTime > 250) {
+                this.fire({ pattern: "FAN", count: 7, speed: 550, angle: 90 });
+                this.lastShotTime = now;
+            }
+        }
+
+        // KeyD: ロータリーショット (LINE + ROTARY)
+        if (input.isDown("KeyD")) {
+            if (now - this.lastShotTime > 20) {
+                // 🚀 この定義により、以前の CONFIG 参照エラーは発生しなくなりました
+                this.fire({
+                    pattern: "LINE",
+                    count: 1,
+                    speed: 400,
+                    trajectory: { mode: TrajectoryModes.ROTARY, rate: 15 }
+                });
+                this.lastShotTime = now;
+            }
+        }
+
+        // KeyF: 角度が左右に揺れる直線ショット (LINE + WAVE)
+        if (input.isDown("KeyF")) {
+            if (now - this.lastShotTime > 100) {
+                this.fire({
+                    pattern: "LINE",
+                    count: 4,
+                    spacing: 30,
+                    speed: 600,
+                    trajectory: { mode: TrajectoryModes.WAVE, rate: 5, range: 30 },
+                    scale: { rate: -0.5, initial: 1.2 },
+                });
+                this.lastShotTime = now;
+            }
+        }
+
+        // KeyG: 加速・縮小するショット
+        if (input.isDown("KeyG")) {
+            if (now - this.lastShotTime > 150) {
+                this.fire({
+                    pattern: "LINE",
+                    count: 1,
+                    speed: 150, 
+                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, 
+                    speedMod: {
+                        rate: 400, 
+                    },
+                    scale: {
+                        rate: -0.8, 
+                        initial: 2.0, 
+                        minScale: 0.1,
+                    },
+                });
+                this.lastShotTime = now;
+            }
+        }
+
+        // KeyW: 鼓動する全方位ショット (RING + WAVE + SINE Scale)
+        if (input.isDown("KeyW")) {
+            if (now - this.lastShotTime > 1000) {
+                this.fire({
+                    pattern: "RING",
+                    count: 16,
+                    speed: 150,
+                    trajectory: { mode: TrajectoryModes.WAVE, rate: 3, range: 10 },
+                    scale: {
+                        mode: "SINE",
+                        rate: 4.0,
+                        minScale: 0.8,
+                        maxScale: 1.8,
+                    },
+                });
+                this.lastShotTime = now;
+            }
+        }
+        
+        // KeyQ: 複合ショット & 死亡時子弾のテスト (LINE + ON DEATH)
+        if (input.isDown("KeyQ")) {
+            if (now - this.lastShotTime > 500) {
+                this.fire({
+                    pattern: "LINE",
+                    count: 1,
+                    speed: 400,
+                    scale: { rate: 0.5, initial: 1.0, maxScale: 3.0 },
+                    // 💡 新規: 弾が消えるときに全方位に子弾を8発発射
+                    onDeathShot: {
+                        pattern: "RING",
+                        count: 8,
+                        speed: 200,
+                        textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
+                        scale: { rate: -1.0, initial: 1.0 },
+                    }
+                });
+                this.lastShotTime = now;
+            }
+        }
+    }
+}
+======== FILE END: src\entities\Player.ts ========
+
+======== FILE START: src\entities\Projectile.ts ========
+// src/entities/Projectile.ts
+
+import { Texture } from "pixi.js";
+import { GameObject } from "./GameObject";
+import { CONFIG } from "../config";
+import {
+    ScaleModes,
+    TrajectoryModes,
+    type ScaleOption,
+    type SpeedOption,
+    type TrajectoryOption,
+} from "../types/ShotTypes";
+
+/**
+ * 自機弾 (Bullet) と敵弾 (EnemyBullet) に共通する
+ * 弾道、速度変化、スケール変化、寿命管理を担う基底クラス。
+ */
+export abstract class Projectile extends GameObject {
+    // 弾の移動速度 (ベクトル)
+    protected velX: number = 0;
+    protected velY: number = 0;
+
+    // 弾がアクティブになってからの時間 (秒)
+    protected lifeTime: number = 0;
+
+    // スケール変更に関するオプションと状態
+    protected scaleOpt: ScaleOption | null = null;
+    protected currentMinScale: number = 0.1;
+
+    // 速度変更 (加速度/減速度) に関するオプション
+    protected speedOpt: SpeedOption | null = null;
+
+    // 🚀 軌道変更オプション
+    protected trajectoryOpt: TrajectoryOption | null = null;
+
+    // 🚀 WAVE 軌道のためのタイマー（秒）
+    protected trajectoryTimer: number = 0;
+
+    // 🚀 弾丸の初期角度 (WAVE計算の基点として使用)
+    protected initialAngle: number = 0;
+
+    // 🚀 新規: 回転を毎フレーム更新するかどうかを制御
+    protected shouldUpdateRotation: boolean = true;
+
+    constructor(texture: Texture) {
+        const initialScale = 1.0;
+        super(
+            texture,
+            texture.width * initialScale * 0.5,
+            texture.height * initialScale * 0.5
+        );
+        this.sprite.scale.set(initialScale);
+
+        this.sprite.anchor.set(0.5);
+    }
+
+    protected updateHitbox(scale: number): void {
+        this._hitWidth = this.sprite.texture.width * scale * 0.5;
+        this._hitHeight = this.sprite.texture.height * scale * 0.5;
+    }
+
+    public setTexture(texture: Texture): void {
+        this.sprite.texture = texture;
+        this.updateHitbox(this.sprite.scale.x);
+    }
+
+    protected deactivate(): void {
+        this.active = false;
+        this.sprite.visible = false;
+    }
+
+    // 🚀 修正 1: shouldUpdateRotation が true の場合に呼ばれる
+    protected updateRotation(): void {
+        const MIN_SPEED_SQ = 0.0001;
+        if (this.velX * this.velX + this.velY * this.velY < MIN_SPEED_SQ) {
+            return;
+        }
+        const angleRad = Math.atan2(this.velY, this.velX);
+        this.sprite.rotation = angleRad + Math.PI / 2;
+    }
+
+    // 🚀 修正 2: shouldUpdateRotation の設定を追加
+    protected handleTrajectory(delta: number) {
+        // WAVEモードでない場合は、直線弾として扱い、以降の回転更新をスキップ
+        if (
+            !this.trajectoryOpt ||
+            this.trajectoryOpt.mode !== TrajectoryModes.WAVE
+        ) {
+            this.shouldUpdateRotation = false;
+            return;
+        }
+
+        // WAVE弾の場合は、毎フレーム回転を更新する
+        this.shouldUpdateRotation = true;
+
+        this.trajectoryTimer += delta;
+
+        const opt = this.trajectoryOpt;
+        const currentSpeed = Math.sqrt(
+            this.velX * this.velX + this.velY * this.velY
+        );
+
+        if (currentSpeed === 0) return;
+
+        const angleChange =
+            Math.sin(this.trajectoryTimer * opt.rate) * (opt.range ?? 1);
+
+        const currentAngleDeg = this.initialAngle + angleChange;
+        const currentAngleRad = currentAngleDeg * (Math.PI / 180);
+
+        this.velX = Math.cos(currentAngleRad) * currentSpeed;
+        this.velY = Math.sin(currentAngleRad) * currentSpeed;
+    }
+
+    protected handleScale(delta: number) {
+        if (!this.scaleOpt) return;
+
+        const opt = this.scaleOpt;
+        let newScale = this.sprite.scale.x;
+        const maxScale = opt.maxScale ?? Infinity;
+
+        if (opt.mode === ScaleModes.SINE) {
+            const t = this.lifeTime * (opt.rate ?? 1);
+            const sineValue = (1 + Math.sin(t)) / 2;
+            const range = (opt.maxScale ?? 1.5) - (opt.minScale ?? 0.5);
+            newScale = (opt.minScale ?? 0.5) + sineValue * range;
+        } else if (opt.rate !== 0) {
+            newScale = this.sprite.scale.x + opt.rate * delta;
+            if (opt.rate > 0) {
+                newScale = Math.min(maxScale, newScale);
+            } else {
+                newScale = Math.max(this.currentMinScale, newScale);
+            }
+        }
+
+        if (newScale !== this.sprite.scale.x) {
+            this.sprite.scale.set(newScale);
+            this.updateHitbox(newScale);
+        }
+    }
+
+    public update(delta: number): void {
+        if (!this.active) return;
+        this.lifeTime += delta;
+
+        this.handleScale(delta);
+        // 🚀 軌道処理を完全にスキップ
+        // this.handleTrajectory(delta);
+
+        // 速度変化のみ適用
+        if (this.speedOpt) {
+            const currentSpeed = Math.sqrt(
+                this.velX * this.velX + this.velY * this.velY
+            );
+            const newSpeed = currentSpeed + this.speedOpt.rate * delta;
+            const finalSpeed = Math.max(0, newSpeed);
+
+            if (currentSpeed > 0) {
+                const ratio = finalSpeed / currentSpeed;
+                this.velX *= ratio;
+                this.velY *= ratio;
+            }
+        }
+
+        // 🚀 回転更新を削除
+        // if (this.shouldUpdateRotation) {
+        //     this.updateRotation();
+        // }
+
+        // 位置更新
+        this.sprite.x += this.velX * delta;
+        this.sprite.y += this.velY * delta;
+
+        // 寿命・画面外チェック
+        if (this.lifeTime * 1000 > CONFIG.BULLET.LIFE_TIME_MS) {
+            this.deactivate();
+        }
+        if (
+            this.sprite.x < -CONFIG.SCREEN.MARGIN ||
+            this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN ||
+            this.sprite.y < -CONFIG.SCREEN.MARGIN ||
+            this.sprite.y > CONFIG.SCREEN.HEIGHT + CONFIG.SCREEN.MARGIN
+        ) {
+            this.deactivate();
+        }
+    }
+}
+
+======== FILE END: src\entities\Projectile.ts ========
+
+======== FILE START: src\types\ShotTypes.ts ========
+// src/types/ShotTypes.ts
+
+// --- 1. 発射時の配置 (Pattern) ---
+/** 弾丸の発射パターンを定義する定数オブジェクト (発射時の配置) */
+export const ShotPatterns = {
+    LINE: 'LINE',   // 機体前方などに並列に配置
+    FAN: 'FAN',     // 扇形に広がる
+    RING: 'RING',   // 360度均等に広がる
+} as const;
+export type ShotPattern = typeof ShotPatterns[keyof typeof ShotPatterns];
+
+// --- 2. 方向の動かし方 (Trajectory) ---
+export const TrajectoryModes = {
+    FIXED: 'FIXED',   // 角度固定 (デフォルト)
+    ROTARY: 'ROTARY', // 発射するたびに角度が回転
+    WAVE: 'WAVE',     // 角度がサイン波のように揺れる
+} as const;
+export type TrajectoryMode = typeof TrajectoryModes[keyof typeof TrajectoryModes];
+
+/** ショットの軌道変化オプション */
+export interface TrajectoryOption {
+    mode: TrajectoryMode;
+    rate: number;   // ROTARY: 1発あたりの回転角度 (度) / WAVE: 揺れる速さ (周波数)
+    range?: number; // WAVE: 揺れる幅 (角度・度数)
+}
+
+// --- 3. 弾丸自体の変化 (Bullet Effects) ---
+// サイズ変化モード
+export const ScaleModes = {
+    LINEAR: 'LINEAR',
+    SINE: 'SINE',
+} as const;
+export type ScaleMode = typeof ScaleModes[keyof typeof ScaleModes];
+
+/** 弾丸のサイズ変化オプション */
+export interface ScaleOption {
+    mode?: ScaleMode;
+    rate: number; // 1秒あたりの変化量 or SINEの周波数
+    minScale?: number;
+    maxScale?: number;
+    initial?: number;
+}
+
+/** 弾丸の速度変化オプション (Acceleration/Deceleration) */
+export interface SpeedOption {
+    rate: number; // 1秒あたりの速度変化量 (ピクセル/秒^2)
+}
+
+// --- 最終仕様書 ---
+/** Playerのfireメソッドに渡すショットの仕様書 */
+export interface ShotSpec {
+    // 1. 発射時の配置 (Pattern)
+    pattern: ShotPattern;
+    count: number;
+    speed: number; // 発射速度 (ピクセル/秒)
+    
+    // Patternごとの設定
+    angle?: number; // FAN: 扇形の角度 (度数)
+    spacing?: number; // LINE: X軸方向の間隔
+
+    // 2. 方向の動かし方 (Trajectory)
+    trajectory?: TrajectoryOption;
+
+    // 3. 弾丸自体の変化 (Bullet Effects)
+    scale?: ScaleOption;
+    speedMod?: SpeedOption;
+    textureKey?: string; 
+    offsetY?: number; 
+    
+    // 💡 修正: 弾が消える際に発射する子弾の仕様 (再帰的にShotSpecを保持)
+    onDeathShot?: ShotSpec;
+    
+    // 🚀 【新規追加】基本の発射角度（度数）
+    baseAngleDeg?: number;
+}
+======== FILE END: src\types\ShotTypes.ts ========
+
+======== FILE START: src\utils\CollisionUtils.ts ========
+// src/utils/CollisionUtils.ts
+
+import type { Collider } from "../entities/GameObject"; 
+
+/**
+ * 2つのGameObjectのAABB（軸並行境界ボックス）衝突をチェックする。
+ * @param objA 衝突判定を行うGameObject A
+ * @param objB 衝突判定を行うGameObject B
+ * @returns 衝突している場合は true
+ */
+export function checkAABBCollision(objA: Collider, objB: Collider): boolean {
+    return (
+        objA.left < objB.right &&
+        objA.right > objB.left &&
+        objA.top < objB.bottom &&
+        objA.bottom > objB.top
+    );
+}
+======== FILE END: src\utils\CollisionUtils.ts ========
+

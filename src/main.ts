@@ -2,11 +2,16 @@
 
 import { Application, Assets, Texture, Ticker } from "pixi.js";
 import { CONFIG } from "./config";
+
+// Core modules
 import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
 import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
+
+// Entities
 import { Player } from "./entities/Player";
-// 🚀 修正 1: TrajectoryOption の型をインポート
+
+// Types
 import type { ScaleOption, SpeedOption, ShotSpec, TrajectoryOption } from "./types/ShotTypes";
 
 class Game {
@@ -24,44 +29,33 @@ class Game {
         this.scoreManager = new ScoreManager();
     }
 
+    /** 初期化処理 */
     async init() {
-        // アセットのロード
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
         this.textures = atlas.textures as Record<string, Texture>;
         this.createScene();
     }
 
+    /** ゲームシーンの構築 */
     private createScene() {
-        // 1. プレイヤー生成
+        // プレイヤー生成
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
-
-        // プレイヤーの初期位置と可視性を設定するために reset() を呼び出す
         this.player.reset();
 
-        // 2. スコアマネージャー、エンティティマネージャーの生成
-        this.entityManager = new EntityManager(
-            this.app.stage,
-            this.textures,
-            this.player
-        );
-        
-        // EntityManagerのオブジェクトプールを初期化
-        this.entityManager.setup(this.textures); 
+        // エンティティ管理
+        this.entityManager = new EntityManager(this.app.stage, this.textures, this.player);
+        this.entityManager.setup(this.textures);
 
-        // Playerの発射イベントを購読する
+        // イベント購読
         this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
-        // スコア更新イベントを購読する
-        this.entityManager.on(
-            EntityManager.ENEMY_DESTROYED_EVENT,
-            this.handleEnemyDestroyed.bind(this)
-        );
+        this.entityManager.on(EntityManager.ENEMY_DESTROYED_EVENT, this.handleEnemyDestroyed.bind(this));
 
-        // 3. メインループの開始
+        // メインループ開始
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    // 🚀 修正 2: trajectoryOpt と initialAngleDeg を引数に追加
+    /** プレイヤーの発射処理 */
     private handlePlayerShoot(
         x: number,
         y: number,
@@ -70,15 +64,13 @@ class Game {
         textureKey: string,
         scaleOpt: ScaleOption | null,
         speedOpt: SpeedOption | null,
-        trajectoryOpt: TrajectoryOption | null,   // 【新規】軌道オプション
-        initialAngleDeg: number,                  // 【新規】初速角度
+        trajectoryOpt: TrajectoryOption | null,
+        initialAngleDeg: number,
         onDeathShotSpec: ShotSpec | null
     ) {
-        const entityManager = this.entityManager;
-        if (!entityManager) return;
+        if (!this.entityManager) return;
 
-        // 🚀 修正 3: 新しい引数を spawn メソッドに渡す
-        entityManager.spawn(
+        this.entityManager.spawn(
             ENTITY_KEYS.BULLET,
             x,
             y,
@@ -87,38 +79,37 @@ class Game {
             textureKey,
             scaleOpt,
             speedOpt,
-            trajectoryOpt,   // 【新規】
-            initialAngleDeg, // 【新規】
+            trajectoryOpt,
+            initialAngleDeg,
             onDeathShotSpec
         );
     }
 
+    /** 敵撃破時のスコア加算 */
     private handleEnemyDestroyed() {
-        // スコア加算
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
 
+    /** 毎フレーム更新処理 */
     private update(ticker: Ticker) {
         if (!this.player || !this.entityManager) return;
-        // deltaは秒に変換
+
         const delta = ticker.deltaMS / 1000;
 
-        // 1. プレイヤー更新（入力処理と内部タイマーの更新）
-        // 🚀 修正: Playerの入力処理をメインループで明示的に呼び出し、弾が発射されない問題を解消
-        this.player.handleInput(this.input, delta); 
+        this.player.handleInput(this.input, delta);
         this.player.update(delta);
 
-        // 2. エンティティ全体の更新
         this.entityManager.update(delta);
     }
 
-    // リソースクリーンアップメソッド
+    /** リソース解放 */
     public destroy() {
         this.input.destroy();
         this.app.destroy();
     }
 }
 
+/** エントリーポイント */
 async function main() {
     const app = new Application();
     await app.init({
@@ -126,10 +117,11 @@ async function main() {
         height: CONFIG.SCREEN.HEIGHT,
         backgroundColor: CONFIG.SCREEN.BG_COLOR,
     });
+
     document.body.appendChild(app.canvas);
 
     const game = new Game(app);
-    await game.init(); // initを呼び出し
+    await game.init();
 }
 
 main();
