@@ -3,13 +3,13 @@
 import { Texture } from "pixi.js";
 import { GameObject } from "./GameObject";
 import { CONFIG } from "../config";
-import { 
-    ScaleModes, 
+import {
+    ScaleModes,
     TrajectoryModes,
-    type ScaleOption, 
-    type SpeedOption, 
-    type TrajectoryOption
-} from "../types/ShotTypes"; 
+    type ScaleOption,
+    type SpeedOption,
+    type TrajectoryOption,
+} from "../types/ShotTypes";
 
 /**
  * 自機弾 (Bullet) と敵弾 (EnemyBullet) に共通する
@@ -17,34 +17,40 @@ import {
  */
 export abstract class Projectile extends GameObject {
     // 弾の移動速度 (ベクトル)
-    protected velX: number = 0; 
-    protected velY: number = 0; 
-    
+    protected velX: number = 0;
+    protected velY: number = 0;
+
     // 弾がアクティブになってからの時間 (秒)
-    protected lifeTime: number = 0; 
+    protected lifeTime: number = 0;
 
     // スケール変更に関するオプションと状態
     protected scaleOpt: ScaleOption | null = null;
-    protected currentMinScale: number = 0.1; 
+    protected currentMinScale: number = 0.1;
 
     // 速度変更 (加速度/減速度) に関するオプション
-    protected speedOpt: SpeedOption | null = null; 
-    
+    protected speedOpt: SpeedOption | null = null;
+
     // 🚀 軌道変更オプション
-    protected trajectoryOpt: TrajectoryOption | null = null; 
-    
+    protected trajectoryOpt: TrajectoryOption | null = null;
+
     // 🚀 WAVE 軌道のためのタイマー（秒）
-    protected trajectoryTimer: number = 0; 
-    
+    protected trajectoryTimer: number = 0;
+
     // 🚀 弾丸の初期角度 (WAVE計算の基点として使用)
-    protected initialAngle: number = 0; 
+    protected initialAngle: number = 0;
+
+    // 🚀 新規: 回転を毎フレーム更新するかどうかを制御
+    protected shouldUpdateRotation: boolean = true;
 
     constructor(texture: Texture) {
-        const initialScale = 1.0; 
-        super(texture, texture.width * initialScale * 0.5, texture.height * initialScale * 0.5);
-        this.sprite.scale.set(initialScale); 
-        
-        // 🛠️ 修正 1: 回転の中心をスプライトの中心に設定 (必須)
+        const initialScale = 1.0;
+        super(
+            texture,
+            texture.width * initialScale * 0.5,
+            texture.height * initialScale * 0.5
+        );
+        this.sprite.scale.set(initialScale);
+
         this.sprite.anchor.set(0.5);
     }
 
@@ -57,66 +63,72 @@ export abstract class Projectile extends GameObject {
         this.sprite.texture = texture;
         this.updateHitbox(this.sprite.scale.x);
     }
-    
+
     protected deactivate(): void {
         this.active = false;
         this.sprite.visible = false;
     }
 
-    // 🛠️ 修正 2: 速度ベクトルに基づいてスプライトの回転を更新する (180度ズレを修正)
+    // 🚀 修正 1: shouldUpdateRotation が true の場合に呼ばれる
     protected updateRotation(): void {
-        // 速度ベクトル (velX, velY) を使って角度 (ラジアン) を計算
-        const angleRad = Math.atan2(this.velY, this.velX);
-        
-        // 180度反転（横向き）を修正するため、+Math.PI / 2（+90度）のオフセットを適用
-        this.sprite.rotation = angleRad + Math.PI / 2; 
-    }
-    
-    // 🛠️ 修正 3: 弾道計算ロジック（三角関数を Player.ts と統一）
-    protected handleTrajectory(delta: number) {
-        // WAVEモードでない場合は何もしない
-        if (!this.trajectoryOpt || this.trajectoryOpt.mode !== TrajectoryModes.WAVE) {
+        const MIN_SPEED_SQ = 0.0001;
+        if (this.velX * this.velX + this.velY * this.velY < MIN_SPEED_SQ) {
             return;
         }
-        
+        const angleRad = Math.atan2(this.velY, this.velX);
+        this.sprite.rotation = angleRad + Math.PI / 2;
+    }
+
+    // 🚀 修正 2: shouldUpdateRotation の設定を追加
+    protected handleTrajectory(delta: number) {
+        // WAVEモードでない場合は、直線弾として扱い、以降の回転更新をスキップ
+        if (
+            !this.trajectoryOpt ||
+            this.trajectoryOpt.mode !== TrajectoryModes.WAVE
+        ) {
+            this.shouldUpdateRotation = false;
+            return;
+        }
+
+        // WAVE弾の場合は、毎フレーム回転を更新する
+        this.shouldUpdateRotation = true;
+
         this.trajectoryTimer += delta;
-        
+
         const opt = this.trajectoryOpt;
-        // 現在の速度（ベクトル長）を維持するために計算
-        const currentSpeed = Math.sqrt(this.velX * this.velX + this.velY * this.velY);
-        
+        const currentSpeed = Math.sqrt(
+            this.velX * this.velX + this.velY * this.velY
+        );
+
         if (currentSpeed === 0) return;
 
-        // サイン波 (WAVE) の計算
-        const angleChange = Math.sin(this.trajectoryTimer * opt.rate) * (opt.range ?? 1);
-        
-        // 新しい角度を適用（初期角度 + 揺れ幅）
+        const angleChange =
+            Math.sin(this.trajectoryTimer * opt.rate) * (opt.range ?? 1);
+
         const currentAngleDeg = this.initialAngle + angleChange;
         const currentAngleRad = currentAngleDeg * (Math.PI / 180);
 
-        // 速度ベクトルを再計算: Cos for X, Sin for Y (Player.tsと統一)
         this.velX = Math.cos(currentAngleRad) * currentSpeed;
         this.velY = Math.sin(currentAngleRad) * currentSpeed;
     }
 
-    protected handleScale(delta: number) { 
+    protected handleScale(delta: number) {
         if (!this.scaleOpt) return;
-        
+
         const opt = this.scaleOpt;
         let newScale = this.sprite.scale.x;
         const maxScale = opt.maxScale ?? Infinity;
-        
+
         if (opt.mode === ScaleModes.SINE) {
-            const t = this.lifeTime * (opt.rate ?? 1); 
+            const t = this.lifeTime * (opt.rate ?? 1);
             const sineValue = (1 + Math.sin(t)) / 2;
             const range = (opt.maxScale ?? 1.5) - (opt.minScale ?? 0.5);
             newScale = (opt.minScale ?? 0.5) + sineValue * range;
-        } 
-        else if (opt.rate !== 0) { 
+        } else if (opt.rate !== 0) {
             newScale = this.sprite.scale.x + opt.rate * delta;
-            if (opt.rate > 0) { 
+            if (opt.rate > 0) {
                 newScale = Math.min(maxScale, newScale);
-            } else { 
+            } else {
                 newScale = Math.max(this.currentMinScale, newScale);
             }
         }
@@ -129,19 +141,19 @@ export abstract class Projectile extends GameObject {
 
     public update(delta: number): void {
         if (!this.active) return;
-        this.lifeTime += delta; 
+        this.lifeTime += delta;
 
-        // 1. スケール変化の適用
-        this.handleScale(delta); 
-        
-        // 2. 軌道変化の適用 (WAVE)
-        this.handleTrajectory(delta);
+        this.handleScale(delta);
+        // 🚀 軌道処理を完全にスキップ
+        // this.handleTrajectory(delta);
 
-        // 3. 速度変化 (加速度/減速度) の適用
+        // 速度変化のみ適用
         if (this.speedOpt) {
-            const currentSpeed = Math.sqrt(this.velX * this.velX + this.velY * this.velY);
+            const currentSpeed = Math.sqrt(
+                this.velX * this.velX + this.velY * this.velY
+            );
             const newSpeed = currentSpeed + this.speedOpt.rate * delta;
-            const finalSpeed = Math.max(0, newSpeed); 
+            const finalSpeed = Math.max(0, newSpeed);
 
             if (currentSpeed > 0) {
                 const ratio = finalSpeed / currentSpeed;
@@ -150,19 +162,19 @@ export abstract class Projectile extends GameObject {
             }
         }
 
-        // 🚀 4. 回転の更新
-        this.updateRotation();
+        // 🚀 回転更新を削除
+        // if (this.shouldUpdateRotation) {
+        //     this.updateRotation();
+        // }
 
-        // 5. 位置の更新 (移動)
+        // 位置更新
         this.sprite.x += this.velX * delta;
         this.sprite.y += this.velY * delta;
 
-        // 6. 寿命による非アクティブ化
+        // 寿命・画面外チェック
         if (this.lifeTime * 1000 > CONFIG.BULLET.LIFE_TIME_MS) {
             this.deactivate();
         }
-        
-        // 7. 画面外による非アクティブ化
         if (
             this.sprite.x < -CONFIG.SCREEN.MARGIN ||
             this.sprite.x > CONFIG.SCREEN.WIDTH + CONFIG.SCREEN.MARGIN ||

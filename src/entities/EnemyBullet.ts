@@ -1,23 +1,16 @@
 // src/entities/EnemyBullet.ts
 
 import { Texture } from "pixi.js";
-import { Projectile } from "./Projectile"; // Projectileを継承
-// 敵弾にはオプションは不要だが、型定義は念のため残しておく
-import type { ScaleOption, SpeedOption, TrajectoryOption } from "../types/ShotTypes"; 
+import { Projectile } from "./Projectile"; 
 
 export class EnemyBullet extends Projectile {
 
-    // 敵弾は基本的にオプションやEntityManagerへの参照は不要
-
     constructor(texture: Texture) {
         super(texture); 
-        // EnemyBulletのテクスチャの中心をアンカーに設定するのは、Projectileのコンストラクタで行われている
     }
 
     /**
      * オブジェクトプールから取得する際のリセット処理。
-     * 敵弾はシンプルに位置と速度を受け取ることを想定。
-     * Projectile.resetの引数と互換性を持たせるため、今回は velX/velY 以降の引数は受け取らない、あるいは無視するシンプルな形とする。
      */
     public reset(
         x: number, 
@@ -30,14 +23,18 @@ export class EnemyBullet extends Projectile {
         this.sprite.y = y;
         this.velX = velX; 
         this.velY = velY; 
-        this.lifeTime = 0; // タイマーをリセット
+        this.lifeTime = 0; 
         
-        // 敵弾はオプション設定をしないため、nullで初期化
+        // 敵弾は直線弾なので、オプションは全てnullで初期化
         this.scaleOpt = null;
         this.speedOpt = null;
         this.trajectoryOpt = null;
-        this.initialAngle = 0;
-        this.trajectoryTimer = 0;
+        
+        // 直線弾は initialAngle を使わないが、リセットしておく
+        const angleRad = Math.atan2(velY, velX);
+        this.initialAngle = angleRad * (180 / Math.PI);
+
+        this.trajectoryTimer = 0; 
 
         // 初期スケール設定（デフォルト）
         const initialScale = 1.0;
@@ -46,12 +43,15 @@ export class EnemyBullet extends Projectile {
         
         this.active = true;
         this.sprite.visible = true;
+
+        // 🚀 修正: 直線弾なので、回転を発射時に一度だけ固定する
+        // Projectile.ts の update() で shouldUpdateRotation が false になるため、
+        // この回転が維持されます。
+        this.sprite.rotation = angleRad + Math.PI / 2;
     }
 
     public update(delta: number) {
-        // Projectileのupdateを呼び出すことで、移動、回転、寿命が処理される
+        // Projectileのupdateを呼び出すことで、移動、回転（WAVE弾のみ）、寿命が処理される
         super.update(delta);
-        
-        // 必要であれば、敵弾固有のロジック（例えば、画面下端での非アクティブ化など）をここに追加
     }
 }
