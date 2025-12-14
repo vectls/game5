@@ -11,6 +11,9 @@ import { EntityManager } from "./core/EntityManager";
 // Entities
 import { Player } from "./entities/Player";
 
+// UI
+import { ScoreDisplay } from "./ui/ScoreDisplay"; // 🚀 インポート追加
+
 class Game {
     private app: Application;
     private input: InputManager;
@@ -19,14 +22,16 @@ class Game {
     private player: Player | null = null;
     private scoreManager: ScoreManager;
     private entityManager: EntityManager | null = null;
+    private scoreDisplay: ScoreDisplay; // 🚀 プロパティ追加
 
     constructor(app: Application) {
         this.app = app;
         this.input = new InputManager();
         this.scoreManager = new ScoreManager();
+        this.scoreDisplay = new ScoreDisplay(); // 🚀 初期化追加
     }
 
-    /** 初期化処理 (アセットロード後にシーン構築を呼び出す) */
+    /** 初期化処理 */
     async init() {
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
         this.textures = atlas.textures as Record<string, Texture>;
@@ -35,9 +40,9 @@ class Game {
 
     /** ゲームシーンの構築 (全体の流れを定義) */
     private createScene() {
-        // 責務ごとに処理を分割し、高レベルの処理の流れを明確にする
         this._createPlayer();
         this._createEntityManager();
+        this._createUI(); // 🚀 UI作成メソッドを追加
         this._subscribeEvents();
 
         // メインループ開始
@@ -51,30 +56,43 @@ class Game {
         this.player.reset();
     }
     
-    /** エンティティマネージャーの生成と初期化を担当 */
+    /** エンティティマネージャーの生成と依存性注入を担当 */
     private _createEntityManager() {
-        // Playerが初期化済みであることを前提とする
         if (!this.player) throw new Error("Player must be initialized before EntityManager.");
         
+        // EntityManagerにPlayerとScoreManagerを依存性注入
         this.entityManager = new EntityManager(
             this.app.stage,
             this.textures,
             this.player,
-            this.scoreManager // ScoreManagerを渡すことで、EntityManagerがスコア処理を委譲される
+            this.scoreManager
         );
         this.entityManager.setup(this.textures);
     }
     
-    /** エンティティ間のイベント購読設定を担当 */
+    /** 🚀 UIの生成と初期化を担当 */
+    private _createUI() {
+        // スコア表示をステージに追加
+        this.app.stage.addChild(this.scoreDisplay.container);
+        this.scoreDisplay.updateScore(this.scoreManager.score);
+    }
+
+    /** モジュール間のイベント購読設定を担当 (コーディネート) */
     private _subscribeEvents() {
-        // 必要なエンティティが初期化済みであることを前提とする
         if (!this.player || !this.entityManager) throw new Error("Entities must be initialized before event subscription.");
 
-        // Playerの発射イベントをEntityManagerに委譲
+        // Playerの発射イベントをEntityManagerに委譲 (既存)
         this.player.on(
             Player.SHOOT_EVENT,
             this.entityManager.handlePlayerShoot,
             this.entityManager
+        );
+        
+        // 🚀 ScoreManagerのスコア変更イベントをScoreDisplayに委譲
+        this.scoreManager.on(
+            ScoreManager.SCORE_CHANGED_EVENT, 
+            this.scoreDisplay.updateScore, 
+            this.scoreDisplay 
         );
         // EntityManager内部でENEMY_DESTROYED_EVENTが処理されるため、Gameクラスでの購読は不要
     }
@@ -95,6 +113,7 @@ class Game {
     public destroy() {
         this.input.destroy();
         this.app.destroy();
+        this.scoreDisplay.destroy(); // 🚀 ScoreDisplayの解放を追加
     }
 }
 
