@@ -10,6 +10,8 @@ import { EnemyBullet } from "../entities/EnemyBullet";
 import { GameObject } from "../entities/GameObject";
 import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player";
+import { ScoreManager } from "./ScoreManager"; // ScoreManagerのインポート
+
 // 🚀 修正 1: TrajectoryOption の型をインポートに追加
 import {
     type ScaleOption,
@@ -47,6 +49,7 @@ export class EntityManager extends EventEmitter {
     private _container: Container;
     private _textures: Record<string, Texture>; // テクスチャ参照を保持
     private player: Player;
+    private scoreManager: ScoreManager;
 
     private timeSinceLastEnemySpawn: number = 0;
 
@@ -56,14 +59,19 @@ export class EntityManager extends EventEmitter {
     constructor(
         container: Container,
         textures: Record<string, Texture>,
-        player: Player
+        player: Player,
+        scoreManager: ScoreManager // 🚀 追加
     ) {
         super();
         this._container = container;
-        this._textures = textures; // 保持する
+        this._textures = textures;
         this.player = player;
+        this.scoreManager = scoreManager; // 🚀 追加
 
         this._pools = {} as { [key in EntityType]: ObjectPool<EntityMap[key]> };
+
+        // プレイヤーの発射イベントを購読
+        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
     }
 
     public setup(textures: Record<string, Texture>): void {
@@ -109,6 +117,8 @@ export class EntityManager extends EventEmitter {
                 enemy.on(Enemy.FIRE_EVENT, this.spawnEnemyBullet, this);
             }
         });
+
+        this.on(EntityManager.ENEMY_DESTROYED_EVENT, this.handleEnemyDestroyed, this);
     }
 
     // 🚀 新規: Bulletがテクスチャを変更できるようにする
@@ -315,5 +325,38 @@ export class EntityManager extends EventEmitter {
                 list.splice(i, 1);
             }
         }
+    }
+
+    public handlePlayerShoot(
+        x: number,
+        y: number,
+        velX: number,
+        velY: number,
+        textureKey: string,
+        scaleOpt: ScaleOption | null,
+        speedOpt: SpeedOption | null,
+        trajectoryOpt: TrajectoryOption | null,
+        initialAngleDeg: number,
+        onDeathShotSpec: ShotSpec | null
+    ) {
+        // Player.SHOOT_EVENT の引数をそのまま Bullet の reset/spawn に渡す
+        this.spawn(
+            ENTITY_KEYS.BULLET,
+            x,
+            y,
+            velX,
+            velY,
+            textureKey,
+            scaleOpt,
+            speedOpt,
+            trajectoryOpt,
+            initialAngleDeg,
+            onDeathShotSpec
+        );
+    }
+
+    // 🚀 新規追加: 敵撃破時のスコア加算を処理するメソッド
+    public handleEnemyDestroyed() {
+        this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
     }
 }

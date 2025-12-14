@@ -6,13 +6,10 @@ import { CONFIG } from "./config";
 // Core modules
 import { InputManager } from "./core/InputManager";
 import { ScoreManager } from "./core/ScoreManager";
-import { EntityManager, ENTITY_KEYS } from "./core/EntityManager";
+import { EntityManager } from "./core/EntityManager";
 
 // Entities
 import { Player } from "./entities/Player";
-
-// Types
-import type { ScaleOption, SpeedOption, ShotSpec, TrajectoryOption } from "./types/ShotTypes";
 
 class Game {
     private app: Application;
@@ -29,65 +26,57 @@ class Game {
         this.scoreManager = new ScoreManager();
     }
 
-    /** 初期化処理 */
+    /** 初期化処理 (アセットロード後にシーン構築を呼び出す) */
     async init() {
         const atlas = await Assets.load(CONFIG.ASSETS.SHEET);
         this.textures = atlas.textures as Record<string, Texture>;
         this.createScene();
     }
 
-    /** ゲームシーンの構築 */
+    /** ゲームシーンの構築 (全体の流れを定義) */
     private createScene() {
-        // プレイヤー生成
-        this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
-        this.app.stage.addChild(this.player.sprite);
-        this.player.reset();
-
-        // エンティティ管理
-        this.entityManager = new EntityManager(this.app.stage, this.textures, this.player);
-        this.entityManager.setup(this.textures);
-
-        // イベント購読
-        this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
-        this.entityManager.on(EntityManager.ENEMY_DESTROYED_EVENT, this.handleEnemyDestroyed.bind(this));
+        // 責務ごとに処理を分割し、高レベルの処理の流れを明確にする
+        this._createPlayer();
+        this._createEntityManager();
+        this._subscribeEvents();
 
         // メインループ開始
         this.app.ticker.add((ticker) => this.update(ticker));
     }
 
-    /** プレイヤーの発射処理 */
-    private handlePlayerShoot(
-        x: number,
-        y: number,
-        velX: number,
-        velY: number,
-        textureKey: string,
-        scaleOpt: ScaleOption | null,
-        speedOpt: SpeedOption | null,
-        trajectoryOpt: TrajectoryOption | null,
-        initialAngleDeg: number,
-        onDeathShotSpec: ShotSpec | null
-    ) {
-        if (!this.entityManager) return;
-
-        this.entityManager.spawn(
-            ENTITY_KEYS.BULLET,
-            x,
-            y,
-            velX,
-            velY,
-            textureKey,
-            scaleOpt,
-            speedOpt,
-            trajectoryOpt,
-            initialAngleDeg,
-            onDeathShotSpec
-        );
+    /** プレイヤーの生成と初期化を担当 */
+    private _createPlayer() {
+        this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
+        this.app.stage.addChild(this.player.sprite);
+        this.player.reset();
     }
+    
+    /** エンティティマネージャーの生成と初期化を担当 */
+    private _createEntityManager() {
+        // Playerが初期化済みであることを前提とする
+        if (!this.player) throw new Error("Player must be initialized before EntityManager.");
+        
+        this.entityManager = new EntityManager(
+            this.app.stage,
+            this.textures,
+            this.player,
+            this.scoreManager // ScoreManagerを渡すことで、EntityManagerがスコア処理を委譲される
+        );
+        this.entityManager.setup(this.textures);
+    }
+    
+    /** エンティティ間のイベント購読設定を担当 */
+    private _subscribeEvents() {
+        // 必要なエンティティが初期化済みであることを前提とする
+        if (!this.player || !this.entityManager) throw new Error("Entities must be initialized before event subscription.");
 
-    /** 敵撃破時のスコア加算 */
-    private handleEnemyDestroyed() {
-        this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
+        // Playerの発射イベントをEntityManagerに委譲
+        this.player.on(
+            Player.SHOOT_EVENT,
+            this.entityManager.handlePlayerShoot,
+            this.entityManager
+        );
+        // EntityManager内部でENEMY_DESTROYED_EVENTが処理されるため、Gameクラスでの購読は不要
     }
 
     /** 毎フレーム更新処理 */
