@@ -12,29 +12,31 @@ import { checkAABBCollision } from "../utils/CollisionUtils";
 import { Player } from "../entities/Player";
 import { ScoreManager } from "./ScoreManager";
 
-import {
-    type ScaleOption,
-    type SpeedOption,
-    type ShotSpec,
-    type TrajectoryOption,
-} from "../types/ShotTypes";
+// ENTITY_KEYSは値として使用するため、通常のimportにする
+import { ENTITY_KEYS } from "../types/EntityKeys";
+import type { ShotSpec, ScaleOption, SpeedOption, TrajectoryOption } from "../types/ShotTypes";
+import { ShotPatterns } from "../types/ShotTypes"; 
+
+// 🚀 修正: ENTITY_KEYSをこのモジュールから再エクスポート (Uncaught SyntaxError 対策)
+export { ENTITY_KEYS }; 
 
 type ManagedObject = GameObject & Poolable;
 
-export const ENTITY_KEYS = {
-    BULLET: "bullet",
-    ENEMY: "enemy",
-    EXPLOSION: "explosion",
-    ENEMY_BULLET: "enemy_bullet",
-} as const;
+// 🚀 修正: プール/アクティブオブジェクト管理対象のキーを明示的に定義
+export type PooledKey = 
+    | typeof ENTITY_KEYS.BULLET 
+    | typeof ENTITY_KEYS.ENEMY 
+    | typeof ENTITY_KEYS.EXPLOSION 
+    | typeof ENTITY_KEYS.ENEMY_BULLET;
 
-export type EntityType = (typeof ENTITY_KEYS)[keyof typeof ENTITY_KEYS];
+export type EntityType = PooledKey; 
 
+// 全てのエンティティがPoolableであることを保証する型マップを定義
 interface EntityMap {
-    [ENTITY_KEYS.BULLET]: Bullet;
-    [ENTITY_KEYS.ENEMY]: Enemy;
-    [ENTITY_KEYS.EXPLOSION]: Explosion;
-    [ENTITY_KEYS.ENEMY_BULLET]: EnemyBullet;
+    [ENTITY_KEYS.BULLET]: Bullet & Poolable;
+    [ENTITY_KEYS.ENEMY]: Enemy & Poolable;
+    [ENTITY_KEYS.EXPLOSION]: Explosion & Poolable;
+    [ENTITY_KEYS.ENEMY_BULLET]: EnemyBullet & Poolable;
 }
 
 export class EntityManager extends EventEmitter {
@@ -67,27 +69,39 @@ export class EntityManager extends EventEmitter {
         this.scoreManager = scoreManager;
 
         this._pools = {} as { [key in EntityType]: ObjectPool<EntityMap[key]> };
-
-        // 🚀 修正 1: main.ts が連携役を担うため、ここでの購読は削除
-        // this.player.on(Player.SHOOT_EVENT, this.handlePlayerShoot.bind(this));
     }
 
     public setup(textures: Record<string, Texture>): void {
-        this._textures = textures; 
+        this._textures = textures;
 
-        // 🚀 改善: ファクトリメソッドをまとめて定義し、コードの重複を防ぐ
-        const bulletFactory = () => new Bullet(textures[CONFIG.ASSETS.TEXTURES.BULLET], this);
-        const enemyFactory = () => new Enemy(textures[CONFIG.ASSETS.TEXTURES.ENEMY], this);
-        const explosionFactory = () => new Explosion(textures[CONFIG.ASSETS.TEXTURES.EXPLOSION]);
-        const enemyBulletFactory = () => new EnemyBullet(textures[CONFIG.ASSETS.TEXTURES.ENEMY_BULLET]);
+        const bulletFactory = () =>
+            new Bullet(textures[CONFIG.ASSETS.TEXTURES.BULLET], this);
+        const enemyFactory = () =>
+            new Enemy(textures[CONFIG.ASSETS.TEXTURES.ENEMY], this);
+        const explosionFactory = () =>
+            new Explosion(textures[CONFIG.ASSETS.TEXTURES.EXPLOSION]);
+        const enemyBulletFactory = () =>
+            new EnemyBullet(textures[CONFIG.ASSETS.TEXTURES.ENEMY_BULLET]);
 
-        this._pools[ENTITY_KEYS.BULLET] = new ObjectPool(bulletFactory, CONFIG.BULLET.POOL_SIZE);
-        this._pools[ENTITY_KEYS.ENEMY] = new ObjectPool(enemyFactory, CONFIG.ENEMY.POOL_SIZE);
-        this._pools[ENTITY_KEYS.EXPLOSION] = new ObjectPool(explosionFactory, CONFIG.EXPLOSION.POOL_SIZE);
-        this._pools[ENTITY_KEYS.ENEMY_BULLET] = new ObjectPool(enemyBulletFactory, CONFIG.ENEMY_BULLET.POOL_SIZE);
+        this._pools[ENTITY_KEYS.BULLET] = new ObjectPool(
+            bulletFactory,
+            CONFIG.BULLET.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.ENEMY] = new ObjectPool(
+            enemyFactory,
+            CONFIG.ENEMY.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.EXPLOSION] = new ObjectPool(
+            explosionFactory,
+            CONFIG.EXPLOSION.POOL_SIZE
+        );
+        this._pools[ENTITY_KEYS.ENEMY_BULLET] = new ObjectPool(
+            enemyBulletFactory,
+            CONFIG.ENEMY_BULLET.POOL_SIZE
+        );
 
         for (const poolKey of Object.keys(this._pools) as EntityType[]) {
-            const pool = this._pools[poolKey];
+            const pool = this._pools[poolKey] as ObjectPool<ManagedObject>;
             pool.getAllObjects().forEach((obj: ManagedObject) => {
                 this._container.addChild(obj.sprite);
             });
@@ -100,11 +114,13 @@ export class EntityManager extends EventEmitter {
             }
         });
 
-        // 敵撃破イベントの自己購読 (スコア処理のため)
-        this.on(EntityManager.ENEMY_DESTROYED_EVENT, this.handleEnemyDestroyed, this);
+        this.on(
+            EntityManager.ENEMY_DESTROYED_EVENT,
+            this.handleEnemyDestroyed,
+            this
+        );
     }
 
-    /** テクスチャ参照を提供 (Bulletなどが動的にテクスチャを変更するために使用) */
     public getTexture(key: string): Texture | undefined {
         return this._textures[key];
     }
@@ -116,7 +132,7 @@ export class EntityManager extends EventEmitter {
     ): EntityMap[K] {
         const pool = this._pools[key] as ObjectPool<EntityMap[K]>;
         const obj = pool.get(...args);
-        this._activeObjects[key].push(obj as ManagedObject);
+        this._activeObjects[key].push(obj as ManagedObject); 
         return obj;
     }
 
@@ -129,10 +145,8 @@ export class EntityManager extends EventEmitter {
         const dy = targetY - y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
-        // CONFIGから取得するか、仮の値を使用
-        const ENEMY_BULLET_SPEED = CONFIG.ENEMY_BULLET.SPEED ?? 200; 
+        const ENEMY_BULLET_SPEED = CONFIG.ENEMY_BULLET.SPEED ?? 200;
 
-        // 正規化して速度を計算
         const velX = (dx / distance) * ENEMY_BULLET_SPEED;
         const velY = (dy / distance) * ENEMY_BULLET_SPEED;
 
@@ -160,7 +174,7 @@ export class EntityManager extends EventEmitter {
 
     public update(delta: number): void {
         this.addEnemySpawner(delta);
-        // ... (既存の update ループと cleanup)
+        
         for (const key of Object.keys(this._activeObjects) as EntityType[]) {
             const list = this._activeObjects[key];
             for (const obj of list) {
@@ -192,12 +206,9 @@ export class EntityManager extends EventEmitter {
                     if (checkAABBCollision(b, e)) {
                         b.deactivateAndFireDeathShot();
                         e.active = false;
-                        this.spawn(ENTITY_KEYS.EXPLOSION, e.x, e.y);
-                        
-                        // 🚀 修正 4: 内部購読でスコア処理するため、引数なしでイベントを発火
-                        this.emit(
-                            EntityManager.ENEMY_DESTROYED_EVENT
-                        ); 
+                        this.spawn(ENTITY_KEYS.EXPLOSION, e.x, e.y); 
+
+                        this.emit(EntityManager.ENEMY_DESTROYED_EVENT);
                     }
                 }
             }
@@ -255,7 +266,6 @@ export class EntityManager extends EventEmitter {
         initialAngleDeg: number,
         onDeathShotSpec: ShotSpec | null
     ) {
-        // 汎用 spawn を使って Bullet をアクティブにする
         this.spawn(
             ENTITY_KEYS.BULLET,
             x,
@@ -274,5 +284,78 @@ export class EntityManager extends EventEmitter {
     /** 敵撃破時のスコア加算ロジック (EntityManager内部で完結) */
     public handleEnemyDestroyed() {
         this.scoreManager.addScore(CONFIG.ENEMY.SCORE_VALUE);
+    }
+
+    /**
+     * 弾が消える際に発射される「デスショット」を生成します。
+     */
+    public fireDeathShot(x: number, y: number, spec: ShotSpec): void {
+        const {
+            pattern,
+            count,
+            speed,
+            trajectory,
+            angle,
+            spacing,
+            speedMod,
+            scale,
+            textureKey: specTextureKey,
+            onDeathShot, 
+            baseAngleDeg: specBaseAngleDeg,
+        } = spec;
+
+        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
+        const scaleOpt = scale ?? null;
+        const speedOpt = speedMod ?? null;
+        const trajectoryOpt = trajectory ?? null;
+
+        let baseAngle = specBaseAngleDeg ?? 0;
+
+        // --- 1. 発射時の配置 (Pattern) の計算 ---
+        let startAngle = baseAngle;
+        let angleStep = 0;
+
+        switch (pattern) {
+            case ShotPatterns.FAN:
+                const fanAngle = angle ?? 360;
+                angleStep = fanAngle / (count > 1 ? count - 1 : 1);
+                startAngle = baseAngle - fanAngle / 2;
+                break;
+            case ShotPatterns.LINE:
+            default:
+                break;
+        }
+
+        // --- 2. 発射実行 (Bullet生成) ---
+        for (let i = 0; i < count; i++) {
+            let currentAngleDeg = startAngle + angleStep * i;
+
+            let offsetX = 0;
+            if (pattern === ShotPatterns.LINE && spacing && count > 1) {
+                offsetX = spacing * (i - (count - 1) / 2);
+                currentAngleDeg = baseAngle;
+            }
+
+            const angleRad = currentAngleDeg * (Math.PI / 180);
+            const finalVelX = speed * Math.cos(angleRad);
+            const finalVelY = speed * Math.sin(angleRad);
+
+            const finalX = x + offsetX;
+            const finalY = y;
+
+            this.spawn(
+                ENTITY_KEYS.BULLET,
+                finalX,
+                finalY,
+                finalVelX,
+                finalVelY,
+                textureKey,
+                scaleOpt,
+                speedOpt,
+                trajectoryOpt,
+                currentAngleDeg,
+                onDeathShot ?? null 
+            );
+        }
     }
 }
