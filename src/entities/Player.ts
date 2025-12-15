@@ -352,41 +352,39 @@ export class Player extends GameObject implements Collider {
             }
         }
 
-        // 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (エラー修正済み)
-        if (input.isDown("KeyR")) {
-            if (now - this.lastShotTime > 1500) {
-                // 発射レートを遅くする
+        // 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (エラー修正済み)// 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (左右散布に修正)
+        if (input.isDown("KeyR")) { 
+            if (now - this.lastShotTime > 1500) { // 発射レートを遅くする
                 this.fire({
                     pattern: ShotPatterns.LINE, // まっすぐ飛ぶ親弾
                     count: 1,
                     speed: 300,
-                    // 💡 修正 1: 存在しないPLAYER_BULLET_LARGEをBULLETに置き換え
-                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
-                    // 💡 修正 2: rateが必須なので0を追加 (サイズ変化なし)
-                    scale: { initial: 1.5, rate: 0 },
+                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET, 
+                    scale: { initial: 1.5, rate: 0 }, 
 
-                    // 💡【1】飛行中に定期的に発射する子弾の設定
+                    // 💡【1】飛行中に定期的に発射する子弾の設定 (左右散布)
                     fireRateSpec: {
                         interval: 200, // 200ms (0.2秒) ごとに発射
                         shotSpec: {
-                            pattern: ShotPatterns.FAN,
-                            count: 3,
-                            angle: 30,
+                            pattern: ShotPatterns.FAN, 
+                            count: 2, // 2発
+                            angle: 180, // 180度の広がり
+                            baseAngleDeg: 90, // 中心角度を90度に設定することで、0度と180度に発射
                             speed: 150,
                             textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
-                            // 💡 修正 3: rateが必須なので0を追加
-                            scale: { initial: 0.5, rate: 0 },
+                            scale: { initial: 0.5, rate: 0 }, 
                         },
                     },
 
-                    // 💡【2】衝突時に発射する子弾の設定
+                    // 💡【2】衝突時に発射する子弾の設定 (丸い爆発)
                     onDeathShot: {
-                        pattern: ShotPatterns.RING,
-                        count: 10,
+                        pattern: ShotPatterns.RING, // RINGパターンで丸く発射
+                        count: 10, 
                         speed: 200,
                         textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
-                        // 💡 修正 4: rateが必須なので0を追加
                         scale: { initial: 0.6, rate: 0 },
+                        // 💡【修正】全方位発射を確実にするため、中心角度を明示的に0度(右)に設定
+                        baseAngleDeg: 0, 
                     },
                 });
                 this.lastShotTime = now;

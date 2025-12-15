@@ -289,40 +289,54 @@ export class EntityManager extends EventEmitter {
     /**
      * 弾が消える際に発射される「デスショット」を生成します。
      */
+    /**
+     * 死亡時や定期発射時などに、特定のShotSpecに基づき弾丸を発射する
+     * * @param x 弾丸のX座標
+     * @param y 弾丸のY座標
+     * @param spec ショットの仕様 (onDeathShotまたはfireRateSpec.shotSpec)
+     */
     public fireDeathShot(x: number, y: number, spec: ShotSpec): void {
-        const {
-            pattern,
-            count,
-            speed,
+        const { 
+            pattern, 
+            count, 
+            speed, 
+            baseAngleDeg,
+            angle, // FAN用
+            spacing, // LINE用
+            textureKey: specTextureKey, 
+            scale, 
+            speedMod, 
             trajectory,
-            angle,
-            spacing,
-            speedMod,
-            scale,
-            textureKey: specTextureKey,
-            onDeathShot, 
-            baseAngleDeg: specBaseAngleDeg,
         } = spec;
 
-        const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
-        const scaleOpt = scale ?? null;
-        const speedOpt = speedMod ?? null;
-        const trajectoryOpt = trajectory ?? null;
-
-        let baseAngle = specBaseAngleDeg ?? 0;
-
+        // 弾丸のTextureKeyを決定
+        const textureKey = specTextureKey ?? ENTITY_KEYS.BULLET;
+        
+        // baseAngleDegが指定されていなければ0度（右）をデフォルトとする
+        let baseAngle = baseAngleDeg ?? 0;
+        
         // --- 1. 発射時の配置 (Pattern) の計算 ---
         let startAngle = baseAngle;
         let angleStep = 0;
 
         switch (pattern) {
+            case ShotPatterns.RING:
+                // 💡【追加】RINGパターン: 360度を均等に分割
+                angleStep = 360 / count;
+                // startAngleはbaseAngleのまま（例: 0度から開始）
+                break;
+                
             case ShotPatterns.FAN:
                 const fanAngle = angle ?? 360;
-                angleStep = fanAngle / (count > 1 ? count - 1 : 1);
+                // 1発発射時はステップは0
+                angleStep = count > 1 ? fanAngle / (count - 1) : 0;
+                // 開始角度を扇の中心からずらす
                 startAngle = baseAngle - fanAngle / 2;
                 break;
+                
             case ShotPatterns.LINE:
             default:
+                // LINEの場合は angleStep は 0
                 break;
         }
 
@@ -332,29 +346,34 @@ export class EntityManager extends EventEmitter {
 
             let offsetX = 0;
             if (pattern === ShotPatterns.LINE && spacing && count > 1) {
+                // LINEパターンでspacingがある場合、X座標をずらし、角度はベース角度のまま
                 offsetX = spacing * (i - (count - 1) / 2);
                 currentAngleDeg = baseAngle;
             }
 
             const angleRad = currentAngleDeg * (Math.PI / 180);
+            
+            // 速度ベクトル計算 (0度=右, 90度=下, 270度=上)
             const finalVelX = speed * Math.cos(angleRad);
             const finalVelY = speed * Math.sin(angleRad);
 
             const finalX = x + offsetX;
             const finalY = y;
 
+            // 💡【修正】getBulletの代わりに、既存のspawnメソッドを使用
+            // spawnメソッドが Bullet.resetに必要な引数をすべて受け取ると仮定します。
             this.spawn(
                 ENTITY_KEYS.BULLET,
-                finalX,
+                finalX, 
                 finalY,
-                finalVelX,
+                finalVelX, 
                 finalVelY,
-                textureKey,
-                scaleOpt,
-                speedOpt,
-                trajectoryOpt,
-                currentAngleDeg,
-                onDeathShot ?? null 
+                textureKey, 
+                scale ?? null, 
+                speedMod ?? null,
+                trajectory ?? null,
+                currentAngleDeg, // 初速角度
+                null // 死亡時発射の弾は、onDeathShot/fireRateSpecを持たない (shotSpec=null)
             );
         }
     }
