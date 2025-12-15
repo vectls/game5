@@ -72,4 +72,10 @@ export interface ShotSpec {
     
     // 🚀 【新規追加】基本の発射角度（度数）
     baseAngleDeg?: number;
+
+    /** 💡【新規追加】飛行中に定期的に発射する子弾の設定 */
+    fireRateSpec?: {
+        shotSpec: ShotSpec; // 発射する子弾のShotSpec（再帰的にShotSpecを保持）
+        interval: number; // 発射間隔 (ミリ秒, 例: 200)
+    };
 }
