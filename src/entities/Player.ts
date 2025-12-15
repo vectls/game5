@@ -6,11 +6,10 @@ import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
 // 🚀 修正 1: ShotSpec に TrajectoryOption を含めるため、import に TrajectoryOption を追加
-import type { ShotSpec, TrajectoryOption } from "../types/ShotTypes"; 
+import type { ShotSpec, TrajectoryOption } from "../types/ShotTypes";
 import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
 
 export class Player extends GameObject implements Collider {
-
     public static readonly SHOOT_EVENT = "shoot";
 
     private lastShotTime = 0;
@@ -18,8 +17,8 @@ export class Player extends GameObject implements Collider {
     private emitter: EventEmitter = new EventEmitter();
 
     // 弾丸軌道に必要なタイマー
-    private _shotWavyTimer: number = 0; 
-    private _rotaryShotAngle: number = 0; 
+    private _shotWavyTimer: number = 0;
+    private _rotaryShotAngle: number = 0;
 
     // HPに関するプロパティ (移動、衝突処理がシンプルなため、これらは未使用の可能性があります)
     private hitPoints: number = 3;
@@ -28,11 +27,11 @@ export class Player extends GameObject implements Collider {
     private INVINCIBILITY_DURATION = 2000;
     private BLINK_RATE = 100;
 
-    constructor(texture: Texture) { 
+    constructor(texture: Texture) {
         const w = texture.width;
         const h = texture.height;
-        super(texture, w, h); 
-        
+        super(texture, w, h);
+
         this.active = true;
         // 🚀 初期位置設定のためにresetPositionの呼び出しを推奨
         this.resetPosition();
@@ -42,8 +41,12 @@ export class Player extends GameObject implements Collider {
         this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
         this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
     }
-    
-    public on(event: string | symbol, fn: (...args: any[]) => void, context?: any): this {
+
+    public on(
+        event: string | symbol,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): this {
         this.emitter.on(event, fn, context);
         return this;
     }
@@ -58,12 +61,12 @@ export class Player extends GameObject implements Collider {
         this.lastShotTime = 0;
         this._shotWavyTimer = 0;
         this._rotaryShotAngle = 0;
-        
+
         // 🚀 HP/無敵関連のプロパティをリセット
         this.hitPoints = 3;
         this.isInvincible = false;
         this.blinkTimer = 0;
-        
+
         this.resetPosition();
     }
 
@@ -72,25 +75,26 @@ export class Player extends GameObject implements Collider {
         if (this.isInvincible) {
             const deltaMS = delta * 1000;
             this.blinkTimer += deltaMS;
-            
+
             if (this.blinkTimer >= this.INVINCIBILITY_DURATION) {
                 this.isInvincible = false;
                 this.sprite.visible = true;
             } else {
-                const isVisible = (this.blinkTimer % this.BLINK_RATE) < (this.BLINK_RATE / 2);
+                const isVisible =
+                    this.blinkTimer % this.BLINK_RATE < this.BLINK_RATE / 2;
                 this.sprite.visible = isVisible;
             }
         }
-        
-        this._shotWavyTimer += delta; 
+
+        this._shotWavyTimer += delta;
     }
 
     public takeHit() {
         if (!this.active || this.isInvincible) return;
-        
+
         // 🚀 ダメージ処理を復元
         this.hitPoints--;
-        
+
         if (this.hitPoints <= 0) {
             this.active = false;
             this.sprite.visible = false;
@@ -99,107 +103,107 @@ export class Player extends GameObject implements Collider {
             this.blinkTimer = 0;
         }
     }
-    
+
     public fire(spec: ShotSpec) {
-        const { 
-            pattern, 
-            count, 
-            speed, 
-            trajectory, 
-            angle, 
-            spacing, 
-            speedMod, 
-            scale, 
+        const {
+            pattern,
+            count,
+            speed,
+            trajectory,
+            angle,
+            spacing,
+            speedMod,
+            scale,
             textureKey: specTextureKey,
-            onDeathShot, 
+            onDeathShot,
             // 🚀 baseAngleDeg を取得
-            baseAngleDeg: specBaseAngleDeg
-        } = spec; 
-        
+            baseAngleDeg: specBaseAngleDeg,
+        } = spec;
+
         const textureKey = specTextureKey ?? CONFIG.ASSETS.TEXTURES.BULLET;
         const scaleOpt = scale ?? null;
-        const speedOpt = speedMod ?? null; 
+        const speedOpt = speedMod ?? null;
         const offsetY = spec.offsetY ?? CONFIG.PLAYER.BULLET_OFFSET_Y;
 
         // baseAngleDegが指定されていなければデフォルトの270度（真上）を使用
-        let baseAngle = specBaseAngleDeg ?? 270; 
+        let baseAngle = specBaseAngleDeg ?? 270;
 
         // --- 2. 方向の動かし方 (Trajectory) の計算 ---
         let trajectoryOffsetDeg = 0;
-        
+
         if (trajectory) {
             switch (trajectory.mode) {
                 case TrajectoryModes.ROTARY:
                     // 発射角度を更新し、今回の発射角度として使用
-                    this._rotaryShotAngle = (this._rotaryShotAngle + trajectory.rate) % 360;
+                    this._rotaryShotAngle =
+                        (this._rotaryShotAngle + trajectory.rate) % 360;
                     // baseAngleを上書き
                     baseAngle = this._rotaryShotAngle;
                     break;
-                    
+
                 case TrajectoryModes.WAVE:
                     // サイン波で角度を揺らす
-                    const range = trajectory.range ?? 30; 
-                    const rate = trajectory.rate; 
-                    trajectoryOffsetDeg = Math.sin(this._shotWavyTimer * rate) * range;
+                    const range = trajectory.range ?? 30;
+                    const rate = trajectory.rate;
+                    trajectoryOffsetDeg =
+                        Math.sin(this._shotWavyTimer * rate) * range;
                     break;
-                
+
                 case TrajectoryModes.FIXED:
                 default:
                     break;
             }
         }
 
-
         // --- 1. 発射時の配置 (Pattern) の計算 ---
         let startAngle = baseAngle + trajectoryOffsetDeg;
         let angleStep = 0;
-        
+
         switch (pattern) {
             case ShotPatterns.FAN:
                 const arc = angle || 60;
-                startAngle -= (arc / 2); 
+                startAngle -= arc / 2;
                 angleStep = count > 1 ? arc / (count - 1) : 0;
                 break;
-                
+
             case ShotPatterns.RING:
                 angleStep = 360 / count;
                 break;
-                
+
             case ShotPatterns.LINE:
             default:
                 angleStep = 0;
                 break;
         }
 
-
         // --- 弾丸生成ループ ---
         for (let i = 0; i < count; i++) {
-            let currentAngleDeg = startAngle + (i * angleStep);
-            
+            let currentAngleDeg = startAngle + i * angleStep;
+
             const angleRad = currentAngleDeg * (Math.PI / 180);
 
             // 💡 修正 2: 角度計算を三角関数に合わせる (0度 = 右、90度 = 上、180度 = 左、270度 = 下)
-            // プレイヤーの弾は通常上向き(270度)なので、Y軸を反転させる (上向きを正のY軸の反対にする)
             const velX = speed * Math.cos(angleRad);
             const velY = speed * Math.sin(angleRad);
-            
-            const finalX = (pattern === ShotPatterns.LINE && spacing)
-                ? this.sprite.x + (i - (count - 1) / 2) * spacing
-                : this.sprite.x;
 
-            // 🚀 修正 3: 新しい引数 trajectory と currentAngleDeg を追加
+            const finalX =
+                pattern === ShotPatterns.LINE && spacing
+                    ? this.sprite.x + (i - (count - 1) / 2) * spacing
+                    : this.sprite.x;
+
             this.emit(
                 Player.SHOOT_EVENT,
                 finalX,
                 this.sprite.y - offsetY,
                 velX,
                 velY,
-                textureKey, 
-                scaleOpt,   
+                textureKey,
+                scaleOpt,
                 speedOpt,
-                trajectory ?? null,          // 🚀 【新規】TrajectoryOption
-                currentAngleDeg,             // 🚀 【新規】初速角度 (度)
-                onDeathShot ?? null 
+                trajectory ?? null,
+                currentAngleDeg,
+                // 💡【最重要修正】onDeathShot ではなく、spec 全体を渡します！
+                spec // <- これで fireRateSpec と onDeathShot の両方が Bullet に伝わります。
             );
         }
     }
@@ -210,7 +214,7 @@ export class Player extends GameObject implements Collider {
      */
     public handleInput(input: InputManager, delta: number): void {
         if (!this.active) return;
-        
+
         const moveSpeed = CONFIG.PLAYER.SPEED * delta;
 
         // --- 移動ロジック (水平移動のみ) ---
@@ -228,7 +232,7 @@ export class Player extends GameObject implements Collider {
         }
 
         const now = performance.now();
-        
+
         // 無敵時間中は射撃不可
         if (this.isInvincible) return;
 
@@ -258,7 +262,7 @@ export class Player extends GameObject implements Collider {
                     pattern: "LINE",
                     count: 1,
                     speed: 400,
-                    trajectory: { mode: TrajectoryModes.ROTARY, rate: 15 }
+                    trajectory: { mode: TrajectoryModes.ROTARY, rate: 15 },
                 });
                 this.lastShotTime = now;
             }
@@ -272,7 +276,11 @@ export class Player extends GameObject implements Collider {
                     count: 4,
                     spacing: 30,
                     speed: 600,
-                    trajectory: { mode: TrajectoryModes.WAVE, rate: 5, range: 30 },
+                    trajectory: {
+                        mode: TrajectoryModes.WAVE,
+                        rate: 5,
+                        range: 30,
+                    },
                     scale: { rate: -0.5, initial: 1.2 },
                 });
                 this.lastShotTime = now;
@@ -285,14 +293,14 @@ export class Player extends GameObject implements Collider {
                 this.fire({
                     pattern: "LINE",
                     count: 1,
-                    speed: 150, 
-                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET, 
+                    speed: 150,
+                    textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
                     speedMod: {
-                        rate: 400, 
+                        rate: 400,
                     },
                     scale: {
-                        rate: -0.8, 
-                        initial: 2.0, 
+                        rate: -0.8,
+                        initial: 2.0,
                         minScale: 0.1,
                     },
                 });
@@ -307,7 +315,11 @@ export class Player extends GameObject implements Collider {
                     pattern: "RING",
                     count: 16,
                     speed: 150,
-                    trajectory: { mode: TrajectoryModes.WAVE, rate: 3, range: 10 },
+                    trajectory: {
+                        mode: TrajectoryModes.WAVE,
+                        rate: 3,
+                        range: 10,
+                    },
                     scale: {
                         mode: "SINE",
                         rate: 4.0,
@@ -318,7 +330,7 @@ export class Player extends GameObject implements Collider {
                 this.lastShotTime = now;
             }
         }
-        
+
         // KeyQ: 複合ショット & 死亡時子弾のテスト (LINE + ON DEATH)
         if (input.isDown("KeyQ")) {
             if (now - this.lastShotTime > 500) {
@@ -334,42 +346,43 @@ export class Player extends GameObject implements Collider {
                         speed: 200,
                         textureKey: CONFIG.ASSETS.TEXTURES.ENEMY_BULLET,
                         scale: { rate: -1.0, initial: 1.0 },
-                    }
+                    },
                 });
                 this.lastShotTime = now;
             }
         }
 
         // 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (エラー修正済み)
-        if (input.isDown("KeyR")) { 
-            if (now - this.lastShotTime > 1500) { // 発射レートを遅くする
+        if (input.isDown("KeyR")) {
+            if (now - this.lastShotTime > 1500) {
+                // 発射レートを遅くする
                 this.fire({
                     pattern: ShotPatterns.LINE, // まっすぐ飛ぶ親弾
                     count: 1,
                     speed: 300,
                     // 💡 修正 1: 存在しないPLAYER_BULLET_LARGEをBULLETに置き換え
-                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET, 
+                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
                     // 💡 修正 2: rateが必須なので0を追加 (サイズ変化なし)
-                    scale: { initial: 1.5, rate: 0 }, 
+                    scale: { initial: 1.5, rate: 0 },
 
                     // 💡【1】飛行中に定期的に発射する子弾の設定
                     fireRateSpec: {
                         interval: 200, // 200ms (0.2秒) ごとに発射
                         shotSpec: {
-                            pattern: ShotPatterns.FAN, 
-                            count: 3, 
-                            angle: 30, 
+                            pattern: ShotPatterns.FAN,
+                            count: 3,
+                            angle: 30,
                             speed: 150,
                             textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
                             // 💡 修正 3: rateが必須なので0を追加
-                            scale: { initial: 0.5, rate: 0 }, 
+                            scale: { initial: 0.5, rate: 0 },
                         },
                     },
 
                     // 💡【2】衝突時に発射する子弾の設定
                     onDeathShot: {
                         pattern: ShotPatterns.RING,
-                        count: 10, 
+                        count: 10,
                         speed: 200,
                         textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
                         // 💡 修正 4: rateが必須なので0を追加
