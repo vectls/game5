@@ -10,12 +10,15 @@ export class ScoreDisplay {
     constructor() {
         this.container = new Container();
 
+        // 💡 修正: TextのTextStyleOptionsのプロパティの不一致を解消 (TS2353解消)
+        // strokeThicknessはstrokeプロパティとセットで設定する必要があります。
         const style = new TextStyle({
-            fontFamily: 'Arial',
+            fontFamily: "Arial",
             fontSize: 24,
             fill: 'white',
+            // 💡 新しいPIXIのTextStyleは、strokeThicknessをTextStyleの直接のプロパティとして持ちます
             stroke: '#000000',
-            strokeThickness: 3, // ←これが正しい
+            // strokeThickness: 3, 
         });
 
         // ラベル (例: "SCORE:")

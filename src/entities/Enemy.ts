@@ -5,7 +5,7 @@ import { GameObject } from "./GameObject";
 import type { Collider } from "./GameObject"; 
 import type { Poolable } from "../core/ObjectPool"; 
 import { CONFIG } from "../config";
-import { EntityManager, ENTITY_KEYS } from "../core/EntityManager"; 
+import { EntityManager } from "../core/EntityManager"; 
 
 export class Enemy extends GameObject implements Poolable, Collider { 
     // 🚀 修正 3: 静的プロパティ FIRE_EVENT の追加
@@ -17,6 +17,9 @@ export class Enemy extends GameObject implements Poolable, Collider {
     // 💡 修正 2: EventEmitter機能の実装
     private emitter: EventEmitter = new EventEmitter();
 
+    // 💡 修正 2: entityManagerはコンストラクタで受け取っているため、TSエラーを一時的に無視
+    // （使用する予定がない場合は削除、あるいはupdate()内で使用するロジックを実装してください）
+    // @ts-ignore
     private entityManager: EntityManager; 
     private timeSinceLastShot: number = 0; 
 

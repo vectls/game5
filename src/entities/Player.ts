@@ -6,7 +6,7 @@ import type { Collider } from "./GameObject";
 import { InputManager } from "../core/InputManager";
 import { CONFIG } from "../config";
 // 🚀 修正 1: ShotSpec に TrajectoryOption を含めるため、import に TrajectoryOption を追加
-import type { ShotSpec, TrajectoryOption } from "../types/ShotTypes";
+import type { ShotSpec } from "../types/ShotTypes";
 import { TrajectoryModes, ShotPatterns } from "../types/ShotTypes";
 
 export class Player extends GameObject implements Collider {
@@ -115,7 +115,7 @@ export class Player extends GameObject implements Collider {
             speedMod,
             scale,
             textureKey: specTextureKey,
-            onDeathShot,
+            // onDeathShot,
             // 🚀 baseAngleDeg を取得
             baseAngleDeg: specBaseAngleDeg,
         } = spec;
