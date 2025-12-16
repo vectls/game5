@@ -42,7 +42,7 @@ class Game {
     private createScene() {
         this._createPlayer();
         this._createEntityManager();
-        this._createUI(); // 🚀 UI作成メソッドを追加
+        this._createUI();
         this._subscribeEvents();
 
         // メインループ開始
@@ -53,19 +53,18 @@ class Game {
     private _createPlayer() {
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
-        
-        // 🚀 修正点: 初期位置の計算をmain.ts側で行い、Player.tsからCONFIGへの依存を排除
+
+        // 初期位置の計算をmain.ts側で行い、Player.tsからCONFIGへの依存を排除
         const initialX = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
         const initialY = CONFIG.PLAYER.INITIAL_Y;
-        
-        // 🚀 修正点: 計算した座標をPlayer.reset()に渡す
         this.player.reset(initialX, initialY);
     }
-    
+
     /** エンティティマネージャーの生成と依存性注入を担当 */
     private _createEntityManager() {
-        if (!this.player) throw new Error("Player must be initialized before EntityManager.");
-        
+        if (!this.player)
+            throw new Error("Player must be initialized before EntityManager.");
+
         // EntityManagerにPlayerとScoreManagerを依存性注入
         this.entityManager = new EntityManager(
             this.app.stage,
@@ -75,7 +74,7 @@ class Game {
         );
         this.entityManager.setup(this.textures);
     }
-    
+
     /** 🚀 UIの生成と初期化を担当 */
     private _createUI() {
         // スコア表示をステージに追加
@@ -85,7 +84,10 @@ class Game {
 
     /** モジュール間のイベント購読設定を担当 (コーディネート) */
     private _subscribeEvents() {
-        if (!this.player || !this.entityManager) throw new Error("Entities must be initialized before event subscription.");
+        if (!this.player || !this.entityManager)
+            throw new Error(
+                "Entities must be initialized before event subscription."
+            );
 
         // Playerの発射イベントをEntityManagerに委譲 (既存)
         this.player.on(
@@ -93,14 +95,13 @@ class Game {
             this.entityManager.handlePlayerShoot,
             this.entityManager
         );
-        
-        // 🚀 ScoreManagerのスコア変更イベントをScoreDisplayに委譲
+
+        // ScoreManagerのスコア変更イベントをScoreDisplayに委譲
         this.scoreManager.on(
-            ScoreManager.SCORE_CHANGED_EVENT, 
-            this.scoreDisplay.updateScore, 
-            this.scoreDisplay 
+            ScoreManager.SCORE_CHANGED_EVENT,
+            this.scoreDisplay.updateScore,
+            this.scoreDisplay
         );
-        // EntityManager内部でENEMY_DESTROYED_EVENTが処理されるため、Gameクラスでの購読は不要
     }
 
     /** 毎フレーム更新処理 */
@@ -117,9 +118,27 @@ class Game {
 
     /** リソース解放 */
     public destroy() {
+        // 1. イベントリスナーを明示的に解除
+        if (this.player && this.entityManager) {
+            this.player.off(
+                Player.SHOOT_EVENT,
+                this.entityManager.handlePlayerShoot,
+                this.entityManager
+            );
+        }
+
+        this.scoreManager.off(
+            ScoreManager.SCORE_CHANGED_EVENT,
+            this.scoreDisplay.updateScore,
+            this.scoreDisplay
+        );
+
+        // 2. 独自の管理モジュールを破棄
         this.input.destroy();
+        this.scoreDisplay.destroy(); // UI要素の破棄
+
+        // 3. PIXI Applicationの破棄（最も遅く行うべき）
         this.app.destroy();
-        this.scoreDisplay.destroy(); // 🚀 ScoreDisplayの解放を追加
     }
 }
 

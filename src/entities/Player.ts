@@ -34,7 +34,7 @@ export class Player extends GameObject implements Collider {
         this.active = true;
     }
 
-// 🚀 修正: reset()でx, y座標を引数で受け取る
+    // 🚀 修正: reset()でx, y座標を引数で受け取る
     public reset(x: number, y: number): void {
         this.active = true;
         this.sprite.visible = true;
@@ -47,10 +47,11 @@ export class Player extends GameObject implements Collider {
         this.blinkTimer = 0;
 
         // 🚀 外部から渡された座標を設定
-        this.sprite.x = x; 
-        this.sprite.y = y; 
+        this.sprite.x = x;
+        this.sprite.y = y;
     }
 
+    // 💡 修正: on メソッド (main.tsで既に使用されているはずですが、offとセットで定義します)
     public on(
         event: string | symbol,
         fn: (...args: any[]) => void,
@@ -60,10 +61,21 @@ export class Player extends GameObject implements Collider {
         return this;
     }
 
+    // 🚀 修正: off メソッドを追加 (今回のエラー TS2339 の解消)
+    public off(
+        event: string | symbol,
+        fn?: (...args: any[]) => void,
+        context?: any,
+        once?: boolean
+    ): this {
+        this.emitter.off(event, fn, context, once);
+        return this;
+    }
+
     public emit(event: string | symbol, ...args: any[]): boolean {
         return this.emitter.emit(event, ...args);
     }
-    
+
     public update(delta: number) {
         // 🚀 無敵時間中の点滅処理
         if (this.isInvincible) {
@@ -176,7 +188,8 @@ export class Player extends GameObject implements Collider {
 
             const angleRad = currentAngleDeg * (Math.PI / 180);
 
-            // 💡 修正 2: 角度計算を三角関数に合わせる (0度 = 右、90度 = 上、180度 = 左、270度 = 下)
+            // 💡 修正 2: 角度計算を三角関数に合わせる (0度 = 右、90度 = 下、180度 = 左、270度 = 上)
+            //           ※Pixi.jsの画面座標系はY軸下方向が正です。
             const velX = speed * Math.cos(angleRad);
             const velY = speed * Math.sin(angleRad);
 
@@ -347,38 +360,39 @@ export class Player extends GameObject implements Collider {
         }
 
         // 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (エラー修正済み)// 🚀 【新規追加】KeyR: 飛行中も子弾を発射し、衝突時にも発射するショット (左右散布に修正)
-        if (input.isDown("KeyR")) { 
-            if (now - this.lastShotTime > 1500) { // 発射レートを遅くする
+        if (input.isDown("KeyR")) {
+            if (now - this.lastShotTime > 1500) {
+                // 発射レートを遅くする
                 this.fire({
                     pattern: ShotPatterns.LINE, // まっすぐ飛ぶ親弾
                     count: 1,
                     speed: 300,
-                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET, 
-                    scale: { initial: 1.5, rate: 0 }, 
+                    textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
+                    scale: { initial: 1.5, rate: 0 },
 
                     // 💡【1】飛行中に定期的に発射する子弾の設定 (左右散布)
                     fireRateSpec: {
                         interval: 200, // 200ms (0.2秒) ごとに発射
                         shotSpec: {
-                            pattern: ShotPatterns.FAN, 
+                            pattern: ShotPatterns.FAN,
                             count: 2, // 2発
                             angle: 180, // 180度の広がり
                             baseAngleDeg: 90, // 中心角度を90度に設定することで、0度と180度に発射
                             speed: 150,
                             textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
-                            scale: { initial: 0.5, rate: 0 }, 
+                            scale: { initial: 0.5, rate: 0 },
                         },
                     },
 
                     // 💡【2】衝突時に発射する子弾の設定 (丸い爆発)
                     onDeathShot: {
                         pattern: ShotPatterns.RING, // RINGパターンで丸く発射
-                        count: 10, 
+                        count: 10,
                         speed: 200,
                         textureKey: CONFIG.ASSETS.TEXTURES.BULLET,
                         scale: { initial: 0.6, rate: 0 },
                         // 💡【修正】全方位発射を確実にするため、中心角度を明示的に0度(右)に設定
-                        baseAngleDeg: 0, 
+                        baseAngleDeg: 0,
                     },
                 });
                 this.lastShotTime = now;
