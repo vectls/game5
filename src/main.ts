@@ -53,7 +53,13 @@ class Game {
     private _createPlayer() {
         this.player = new Player(this.textures[CONFIG.ASSETS.TEXTURES.PLAYER]);
         this.app.stage.addChild(this.player.sprite);
-        this.player.reset();
+        
+        // 🚀 修正点: 初期位置の計算をmain.ts側で行い、Player.tsからCONFIGへの依存を排除
+        const initialX = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
+        const initialY = CONFIG.PLAYER.INITIAL_Y;
+        
+        // 🚀 修正点: 計算した座標をPlayer.reset()に渡す
+        this.player.reset(initialX, initialY);
     }
     
     /** エンティティマネージャーの生成と依存性注入を担当 */

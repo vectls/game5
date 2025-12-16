@@ -31,15 +31,24 @@ export class Player extends GameObject implements Collider {
         const w = texture.width;
         const h = texture.height;
         super(texture, w, h);
-
         this.active = true;
-        // 🚀 初期位置設定のためにresetPositionの呼び出しを推奨
-        this.resetPosition();
     }
 
-    public resetPosition(): void {
-        this.sprite.x = CONFIG.SCREEN.WIDTH * CONFIG.PLAYER.INITIAL_X_RATIO;
-        this.sprite.y = CONFIG.PLAYER.INITIAL_Y;
+// 🚀 修正: reset()でx, y座標を引数で受け取る
+    public reset(x: number, y: number): void {
+        this.active = true;
+        this.sprite.visible = true;
+        this.lastShotTime = 0;
+        this._shotWavyTimer = 0;
+        this._rotaryShotAngle = 0;
+
+        this.hitPoints = 3;
+        this.isInvincible = false;
+        this.blinkTimer = 0;
+
+        // 🚀 外部から渡された座標を設定
+        this.sprite.x = x; 
+        this.sprite.y = y; 
     }
 
     public on(
@@ -54,22 +63,7 @@ export class Player extends GameObject implements Collider {
     public emit(event: string | symbol, ...args: any[]): boolean {
         return this.emitter.emit(event, ...args);
     }
-
-    public reset() {
-        this.active = true;
-        this.sprite.visible = true;
-        this.lastShotTime = 0;
-        this._shotWavyTimer = 0;
-        this._rotaryShotAngle = 0;
-
-        // 🚀 HP/無敵関連のプロパティをリセット
-        this.hitPoints = 3;
-        this.isInvincible = false;
-        this.blinkTimer = 0;
-
-        this.resetPosition();
-    }
-
+    
     public update(delta: number) {
         // 🚀 無敵時間中の点滅処理
         if (this.isInvincible) {
